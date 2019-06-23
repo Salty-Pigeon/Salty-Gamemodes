@@ -13,9 +13,9 @@ namespace Salty_Gamemodes_Server {
 
 
         public enum Teams {
+            Spectators,
             Traitors,
-            Innocents,
-            Spectators
+            Innocents
         }
 
         public enum GameState {
@@ -28,9 +28,9 @@ namespace Salty_Gamemodes_Server {
         public GameState CurrentState = GameState.None;
 
 
-        public TTT( Map gameMap, PlayerList players ) {
+        public TTT( Map gameMap, PlayerList players, int ID ) : base ( ID ) {
             GameMap = gameMap;
-            Players = players;
+            this.players = players;
         }
 
         public override void Start() {
@@ -42,13 +42,17 @@ namespace Salty_Gamemodes_Server {
             int traitorID = rand.Next( 0, players.Count );
             Player traitor = players[ traitorID ];
             traitors.Add( traitor );
+            traitor.TriggerEvent( "salty::StartGame", ID, (int)Teams.Traitors, GameMap.Position, GameMap.Size );
             players.RemoveAt( traitorID );
 
             // Set innocents
             foreach( var ply in players ) {
                 innocents.Add( ply );
+                ply.TriggerEvent( "salty::StartGame", ID, (int)Teams.Innocents, GameMap.Position, GameMap.Size );
             }
 
+            // create map
+            TriggerClientEvent( "salty::CreateMap", GameMap.Position, GameMap.Size, GameMap.Name );
         }
 
         public override void End() {

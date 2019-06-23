@@ -9,11 +9,11 @@ namespace Salty_Gamemodes_Server {
     class BaseGamemode : BaseScript {
 
         public Map GameMap;
-        public PlayerList Players;
+        public PlayerList players;
+        public int ID;
 
-
-        public BaseGamemode( ) {
-
+        public BaseGamemode( int ID ) {
+            this.ID = ID;
         }
 
         public virtual void Start() {
@@ -26,6 +26,10 @@ namespace Salty_Gamemodes_Server {
 
         public virtual void Update() {
 
+        }
+
+        public virtual bool IsBase() {
+            return !(GetType().IsSubclassOf( typeof( BaseGamemode ) ));
         }
 
     }

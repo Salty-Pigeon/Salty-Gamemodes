@@ -10,12 +10,13 @@ namespace Salty_Gamemodes_Server
 {
     public class Init : BaseScript {
 
-        BaseGamemode ActiveGame = new BaseGamemode();
-
         enum Gamemodes {
             None,
             TTT
         }
+
+        public bool inGame = false;
+        BaseGamemode ActiveGame = new BaseGamemode( (int)Gamemodes.None );
 
         Database SQLConnection;
         MapManager MapManager;
@@ -49,7 +50,7 @@ namespace Salty_Gamemodes_Server
         public void EndGame() {
             ActiveGame.End();
             Gamemode = Gamemodes.None;
-            ActiveGame = new BaseGamemode();
+            ActiveGame = new BaseGamemode( (int)Gamemodes.None );
         }
 
         public void StartTTT() {
@@ -61,8 +62,9 @@ namespace Salty_Gamemodes_Server
 
             PlayerList players = new PlayerList();
             
-            ActiveGame = new TTT( map, players );
+            ActiveGame = new TTT( map, players, (int)Gamemodes.TTT );
             ActiveGame.Start();
+           
         }
 
     }

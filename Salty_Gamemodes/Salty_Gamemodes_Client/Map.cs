@@ -19,11 +19,9 @@ namespace Salty_Gamemodes_Client {
         public Map( Vector3 position, Vector2 size ) {
             Position = position;
             Size = size;
-            CreateBlimps();
         }
 
-        public void CreateBlimps() {
-            //var blip = AddBlipForRadius( Position.X, Position.Y, Position.Z, Radius * 10 );
+        public void CreateBlips() {
             Blip = AddBlipForArea( Position.X, Position.Y, Position.Z, Size.X, Size.Y );
             SetBlipAsShortRange( Blip, true );
             SetBlipColour( Blip, 2 );
@@ -32,16 +30,13 @@ namespace Salty_Gamemodes_Client {
             BeginTextCommandSetBlipName( "STRING" );
             AddTextComponentString( "Map bounds" );
             EndTextCommandSetBlipName( Blip );
-            
         }
 
         public void ClearBlip() {
             RemoveBlip( ref Blip );
         }
 
-        public bool IsInZone() {
-            Ped playerPed = Game.PlayerPed;
-            Vector3 pos = Game.Player.Character.Position;
+        public bool IsInZone( Vector3 pos ) {
             return ( pos.X > Position.X - ( Size.X / 2 ) && pos.X < Position.X + ( Size.X / 2 ) && pos.Y > Position.Y - ( Size.Y / 2 ) && pos.Y < Position.Y + ( Size.Y / 2 ) );
         }
     }
