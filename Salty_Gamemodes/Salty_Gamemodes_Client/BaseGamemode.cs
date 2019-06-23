@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Dynamic;
 
 namespace Salty_Gamemodes_Client {
     class BaseGamemode : BaseScript {
@@ -18,7 +19,8 @@ namespace Salty_Gamemodes_Client {
         public bool inGame = false;
         public Map GameMap;
 
-        private Vector3 noclipPos = Vector3.Zero;
+        public Vector3 noclipPos = Vector3.Zero;
+        Vector3 deathPos;
         private float deathTimer = 0;
         private float gracePeriod = 10 * 1000;
 
@@ -26,7 +28,7 @@ namespace Salty_Gamemodes_Client {
 
         public BaseGamemode() {
             TeamText = new Text( "Spectator", new System.Drawing.PointF( 20, 100 ), 1.0f );
-            BoundText = new Text( "", new System.Drawing.PointF( Screen.Width/3, Screen.Height/3), 1.0f );
+            BoundText = new Text( "", new System.Drawing.PointF( Screen.Width * 0.2f, Screen.Height * 0.1f), 1.0f );
         }
 
         public virtual void Start() {
@@ -35,6 +37,19 @@ namespace Salty_Gamemodes_Client {
 
         public virtual void End() {
             inGame = false;
+        }
+
+        public virtual void PlayerDied( int killerType, Vector3 deathcords ) {
+            deathPos = deathcords;
+        }
+
+        public virtual void PlayerSpawned( ExpandoObject spawnInfo ) {
+            if( inGame ) {
+                SetNoClip( true );
+                SetTeam( 0 );
+                Game.Player.Character.Position = deathPos;
+                noclipPos = deathPos;
+            }
         }
 
         public virtual bool IsBase() {

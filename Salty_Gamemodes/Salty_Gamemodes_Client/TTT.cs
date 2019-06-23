@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Dynamic;
 
 namespace Salty_Gamemodes_Client {
     class TTT : BaseGamemode {
@@ -42,6 +43,14 @@ namespace Salty_Gamemodes_Client {
             WriteChat( "Game ending" );
             base.End();
 
+        }
+
+        public override void PlayerDied( int killerType, Vector3 deathcords ) {
+            base.PlayerDied( killerType, deathcords );
+        }
+
+        public override void PlayerSpawned( ExpandoObject spawnInfo ) {
+            base.PlayerSpawned( spawnInfo );
         }
 
         public override void Update() {

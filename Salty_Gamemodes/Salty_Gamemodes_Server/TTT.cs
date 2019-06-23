@@ -33,22 +33,36 @@ namespace Salty_Gamemodes_Server {
             this.players = players;
         }
 
+
+
         public override void Start() {
             Debug.WriteLine( "TTT starting on " + GameMap.Name );
             Random rand = new Random();
             List<Player> players = Players.ToList();
 
+            List<Vector3> spawns = GameMap.SpawnPoints.ToList();
+            if( spawns.Count == 0 ) {
+                spawns.Add( GameMap.Position );
+            }
             // Set traitor
             int traitorID = rand.Next( 0, players.Count );
+            int spawn = rand.Next( 0, spawns.Count );
             Player traitor = players[ traitorID ];
             traitors.Add( traitor );
-            traitor.TriggerEvent( "salty::StartGame", ID, (int)Teams.Traitors, GameMap.Position, GameMap.Size );
+            traitor.TriggerEvent( "salty::StartGame", ID, (int)Teams.Traitors, GameMap.Position, GameMap.Size, spawns[spawn] );
             players.RemoveAt( traitorID );
-
+            spawns.RemoveAt( spawn );
             // Set innocents
             foreach( var ply in players ) {
                 innocents.Add( ply );
-                ply.TriggerEvent( "salty::StartGame", ID, (int)Teams.Innocents, GameMap.Position, GameMap.Size );
+                if( spawns.Count > 0 ) {
+                    spawn = rand.Next( 0, spawns.Count );
+                    ply.TriggerEvent( "salty::StartGame", ID, (int)Teams.Innocents, GameMap.Position, GameMap.Size, spawns[ spawn ] );
+                    spawns.RemoveAt( spawn );
+                } else {
+                    ply.TriggerEvent( "salty::StartGame", ID, (int)Teams.Innocents, GameMap.Position, GameMap.Size, GameMap.SpawnPoints[ rand.Next(0, GameMap.SpawnPoints.Count) ] );
+                }
+                
             }
 
             // create map

@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Salty_Gamemodes_Client {
-    class Map {
+    public class Map {
         public int Blip = -1;
 
         public Vector3 Position;
