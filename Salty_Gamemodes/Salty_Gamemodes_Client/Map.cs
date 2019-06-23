@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Salty_Gamemodes {
+namespace Salty_Gamemodes_Client {
     class Map {
         public int Blip = -1;
 
