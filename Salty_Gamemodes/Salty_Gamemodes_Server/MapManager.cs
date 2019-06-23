@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CitizenFX.Core;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,6 +21,14 @@ namespace Salty_Gamemodes_Server {
 
         public List<Map> MapList(string mapTag) {
             return Maps.Values.Where( i => i.Name.Contains( mapTag ) ).ToList();
+        }
+
+        public Dictionary<string,List<Vector3>> AllMapsSpawns() {
+            Dictionary<string, List<Vector3>> maps = new Dictionary<string, List<Vector3>>();
+            foreach( var map in Maps ) {
+                maps.Add( map.Value.Name, map.Value.SpawnPoints );
+            }
+            return maps;
         }
 
     }

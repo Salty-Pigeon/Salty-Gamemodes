@@ -22,6 +22,7 @@ namespace Salty_Gamemodes_Client
             EventHandlers[ "salty::StartGame" ] += new Action<int, int, Vector3, Vector2, Vector3>( StartGame );
             EventHandlers[ "salty::EndGame" ] += new Action( ActiveGame.End );
             EventHandlers[ "salty::CreateMap" ] += new Action( ActiveGame.CreateMap );
+            EventHandlers[ "salty::SpawnPointGUI" ] += new Action<ExpandoObject>( SpawnGUI );
             ActiveGame.SetNoClip( false );
             Tick += Update;
         }
@@ -40,6 +41,19 @@ namespace Salty_Gamemodes_Client
             }
             ActiveGame.Start();
             Game.Player.Character.Position = startPos;
+        }
+
+        private void SpawnGUI( ExpandoObject obj ) {
+            Dictionary<string, List<Vector3>> spawns = new Dictionary<string, List<Vector3>>();
+            foreach( var spawn in obj ) {
+                List<Vector3> spawnPoints = new List<Vector3>();
+                List<object> conversion = spawn.Value as List<object>;
+                foreach( Vector3 vec in conversion ) {
+                    spawnPoints.Add( vec );
+                }
+                spawns.Add( spawn.Key.ToString(), spawnPoints );
+            }
+            MapMenu menu = new MapMenu( "Maps", "Modify maps", spawns );
         }
 
         private void PlayerDied( int killerType, List<dynamic> deathcords ) {
@@ -64,7 +78,7 @@ namespace Salty_Gamemodes_Client
             } ), false );
 
             RegisterCommand( "spawnPoints", new Action<int, List<object>, string>( ( source, args, raw ) => {
-                new MapMenu("Spawn Points", "Modify spawn points below");
+                TriggerServerEvent( "salty::netSpawnPointGUI" );
             } ), false );
 
         }

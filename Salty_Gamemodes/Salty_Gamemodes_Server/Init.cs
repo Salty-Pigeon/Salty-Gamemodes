@@ -26,6 +26,7 @@ namespace Salty_Gamemodes_Server
         public Init() {
             EventHandlers[ "salty::netStartGame" ] += new Action( ActiveGame.Start );
             EventHandlers[ "salty::netEndGame" ] += new Action( ActiveGame.End );
+            EventHandlers[ "salty::netSpawnPointGUI" ] += new Action<Player>( SpawnPointGUI );
 
             SQLConnection = new Database();
             MapManager = new MapManager( SQLConnection.Load() );
@@ -65,6 +66,10 @@ namespace Salty_Gamemodes_Server
             ActiveGame = new TTT( map, players, (int)Gamemodes.TTT );
             ActiveGame.Start();
            
+        }
+
+        private void SpawnPointGUI([FromSource] Player ply) {
+            ply.TriggerEvent( "salty::SpawnPointGUI", MapManager.AllMapsSpawns() );
         }
 
     }
