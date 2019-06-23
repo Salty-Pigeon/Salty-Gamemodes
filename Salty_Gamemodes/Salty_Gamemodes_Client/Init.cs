@@ -63,6 +63,10 @@ namespace Salty_Gamemodes_Client
                 ActiveGame.SetNoClip(!ActiveGame.isNoclip);
             } ), false );
 
+            RegisterCommand( "spawnPoints", new Action<int, List<object>, string>( ( source, args, raw ) => {
+                new MapMenu("Spawn Points", "Modify spawn points below");
+            } ), false );
+
         }
     }
 }
