@@ -46,7 +46,6 @@ namespace Salty_Gamemodes_Server {
                         }
                     }
                     Maps.Add( name, map );
-                    Debug.WriteLine( name + " loaded" );
                 }
                 MyDataReader.Close();
             }

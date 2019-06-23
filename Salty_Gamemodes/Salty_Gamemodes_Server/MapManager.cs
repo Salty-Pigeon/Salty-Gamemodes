@@ -18,5 +18,9 @@ namespace Salty_Gamemodes_Server {
             Maps.Add( map.Name, map );
         }
 
+        public List<Map> MapList(string mapTag) {
+            return Maps.Values.Where( i => i.Name.Contains( mapTag ) ).ToList();
+        }
+
     }
 }
