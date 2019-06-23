@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29009.5
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Salty_Gamemodes_Client", "Salty_Gamemodes\Salty_Gamemodes_Client.csproj", "{1F0C3E1A-F2B5-4F3A-A7C8-963D1F22DD45}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Salty_Gamemodes_Server", "Salty_Gamemodes_Server\Salty_Gamemodes_Server.csproj", "{A880809B-CA37-4F6D-BFE3-E3529D72E7C2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Salty_Gamemodes_Client", "Salty_Gamemodes_Client\Salty_Gamemodes_Client.csproj", "{1F0C3E1A-F2B5-4F3A-A7C8-963D1F22DD45}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -13,14 +13,14 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{1F0C3E1A-F2B5-4F3A-A7C8-963D1F22DD45}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1F0C3E1A-F2B5-4F3A-A7C8-963D1F22DD45}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1F0C3E1A-F2B5-4F3A-A7C8-963D1F22DD45}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1F0C3E1A-F2B5-4F3A-A7C8-963D1F22DD45}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A880809B-CA37-4F6D-BFE3-E3529D72E7C2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A880809B-CA37-4F6D-BFE3-E3529D72E7C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A880809B-CA37-4F6D-BFE3-E3529D72E7C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A880809B-CA37-4F6D-BFE3-E3529D72E7C2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1F0C3E1A-F2B5-4F3A-A7C8-963D1F22DD45}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1F0C3E1A-F2B5-4F3A-A7C8-963D1F22DD45}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1F0C3E1A-F2B5-4F3A-A7C8-963D1F22DD45}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1F0C3E1A-F2B5-4F3A-A7C8-963D1F22DD45}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

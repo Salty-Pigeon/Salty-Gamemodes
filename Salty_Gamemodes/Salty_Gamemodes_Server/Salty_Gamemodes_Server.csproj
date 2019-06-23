@@ -51,6 +51,7 @@
     <Compile Include="Database.cs" />
     <Compile Include="Init.cs" />
     <Compile Include="Map.cs" />
+    <Compile Include="MapManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

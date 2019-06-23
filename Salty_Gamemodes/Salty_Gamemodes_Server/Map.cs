@@ -9,7 +9,7 @@ namespace Salty_Gamemodes_Server {
     class Map {
 
         public string Name = "None";
-
+        public bool isActive = false;
         public Vector3 Position;
         public Vector2 Size;
 

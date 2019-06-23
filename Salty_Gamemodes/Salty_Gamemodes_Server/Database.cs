@@ -53,8 +53,12 @@ namespace Salty_Gamemodes_Server {
             return Maps;
         }
 
-        public void Update() {
-
+        private void AddSpawnPoint( Vector3 pos, string name, string spawnPoints ) {
+            MySqlCommand comm = new MySqlCommand( "", Connection );
+            comm.CommandText = "UPDATE maps SET spawnPoints = ?spawnPoints WHERE name = ?name";
+            comm.Parameters.AddWithValue( "spawnPoints", spawnPoints );
+            comm.Parameters.AddWithValue( "name", name );
+            comm.ExecuteNonQuery();
         }
 
         public string SpawnPointsAsString( List<Vector3> points ) {
@@ -81,7 +85,6 @@ namespace Salty_Gamemodes_Server {
                     comm.Parameters.AddWithValue( "height", map.Value.Size.Y );
                     comm.Parameters.AddWithValue( "spawnPoints", SpawnPointsAsString( map.Value.SpawnPoints ) );
                     comm.ExecuteNonQuery();
-
                 }
             }
         }

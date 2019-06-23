@@ -1,6 +1,5 @@
 ﻿using CitizenFX.Core;
 using CitizenFX.Core.UI;
-using CitizenFX.Core.Native;
 using static CitizenFX.Core.Native.API;
 using System;
 using System.Collections.Generic;
@@ -8,20 +7,23 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Salty_Gamemodes_Client {
+namespace Salty_Gamemodes {
     class Map {
         public int Blip = -1;
 
         public Vector3 Position;
-        private Vector2 Size;
+        public Vector2 Size;
+
+        public bool isActive = false;
 
         public Map( Vector3 position, Vector2 size ) {
             Position = position;
             Size = size;
-            CreateBlips();
+            CreateBlimps();
         }
 
-        public void CreateBlips() {
+        public void CreateBlimps() {
+            //var blip = AddBlipForRadius( Position.X, Position.Y, Position.Z, Radius * 10 );
             Blip = AddBlipForArea( Position.X, Position.Y, Position.Z, Size.X, Size.Y );
             SetBlipAsShortRange( Blip, true );
             SetBlipColour( Blip, 2 );
@@ -30,9 +32,10 @@ namespace Salty_Gamemodes_Client {
             BeginTextCommandSetBlipName( "STRING" );
             AddTextComponentString( "Map bounds" );
             EndTextCommandSetBlipName( Blip );
+            
         }
 
-       public void RemoveBlips() {
+        public void ClearBlip() {
             RemoveBlip( ref Blip );
         }
 
