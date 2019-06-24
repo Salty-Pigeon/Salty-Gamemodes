@@ -11,12 +11,12 @@ namespace Salty_Gamemodes_Server {
         public string Name = "None";
         public bool isActive = false;
         public Vector3 Position;
-        public Vector2 Size;
+        public Vector3 Size;
 
         public List<Vector3> SpawnPoints = new List<Vector3>();
 
 
-        public Map( Vector3 position, Vector2 size, string name ) {
+        public Map( Vector3 position, Vector3 size, string name ) {
             Position = position;
             Size = size;
             Name = name;
@@ -28,6 +28,10 @@ namespace Salty_Gamemodes_Server {
 
         public void AddSpawnPoint( Vector3 spawnPoint ) {
             SpawnPoints.Add( spawnPoint );
+        }
+
+        public void DeleteSpawnPoint( Vector3 spawnPoint ) {
+            SpawnPoints.Remove( spawnPoint );
         }
     }
 }

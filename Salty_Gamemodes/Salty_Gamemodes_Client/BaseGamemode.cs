@@ -167,6 +167,15 @@ namespace Salty_Gamemodes_Client {
             noclipPos = GetOffsetFromEntityInWorldCoords( PlayerPedId(), offset.X, offset.Y, offset.Z );
         }
 
+        public static Vector3 StringToVector3( string vector ) {
+            vector = vector.Replace( "X:", "" );
+            vector = vector.Replace( "Y:", "" );
+            vector = vector.Replace( "Z:", "" );
+            string[] vector3 = vector.Split( ' ' );
+            return new Vector3( float.Parse( vector3[ 0 ] ), float.Parse( vector3[ 1 ] ), float.Parse( vector3[ 2 ] ) );
+           
+        }
+
         public void WriteChat( string str ) {
             TriggerEvent( "chat:addMessage", new {
                 color = new[] { 255, 0, 0 },

@@ -36,7 +36,7 @@ namespace Salty_Gamemodes_Server {
                     float z = MyDataReader.GetFloat( 4 );
                     float width = MyDataReader.GetFloat( 5 );
                     float height = MyDataReader.GetFloat( 6 );
-                    Map map = new Map( new Vector3( x, y, z ), new Vector2( width, height ), name );
+                    Map map = new Map( new Vector3( x, y, z ), new Vector3( width, height, 0 ), name );
                     string spawnPoints = MyDataReader.GetString( 7 );
                     if( spawnPoints.Length > 2 ) {
                         var points = spawnPoints.Split( ':' );
@@ -71,7 +71,7 @@ namespace Salty_Gamemodes_Server {
             return spawnPoints.Substring( 0, spawnPoints.Length - 1 );
         }
 
-        public void Save( Dictionary<string, Map> Maps ) {
+        public void SaveAll( Dictionary<string, Map> Maps ) {
             if( Connection.State == System.Data.ConnectionState.Open ) {
                 foreach( var map in Maps ) {
                     MySqlCommand comm = new MySqlCommand( "", Connection );
@@ -85,6 +85,21 @@ namespace Salty_Gamemodes_Server {
                     comm.Parameters.AddWithValue( "spawnPoints", SpawnPointsAsString( map.Value.SpawnPoints ) );
                     comm.ExecuteNonQuery();
                 }
+            }
+        }
+
+        public void SaveMap( Map map ) {
+            if( Connection.State == System.Data.ConnectionState.Open ) {
+                MySqlCommand comm = new MySqlCommand( "", Connection );
+                comm.CommandText = "REPLACE INTO maps(name,x,y,z,width,height,spawnPoints) VALUES(?name, ?x, ?y, ?z, ?width, ?height, ?spawnPoints)";
+                comm.Parameters.AddWithValue( "name", map.Name );
+                comm.Parameters.AddWithValue( "x", map.Position.X );
+                comm.Parameters.AddWithValue( "y", map.Position.Y );
+                comm.Parameters.AddWithValue( "z", map.Position.Z );
+                comm.Parameters.AddWithValue( "width", map.Size.X );
+                comm.Parameters.AddWithValue( "height", map.Size.Y );
+                comm.Parameters.AddWithValue( "spawnPoints", SpawnPointsAsString( map.SpawnPoints ) );
+                comm.ExecuteNonQuery();
             }
         }
 

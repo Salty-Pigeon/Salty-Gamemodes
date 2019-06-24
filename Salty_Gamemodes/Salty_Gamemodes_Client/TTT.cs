@@ -30,7 +30,7 @@ namespace Salty_Gamemodes_Client {
 
         public TTT( Map gameMap, int team ) {
             GameMap = gameMap;
-            GameMap.CreateBlips();
+            GameMap.CreateBlip();
             SetTeam( team );
         }
 

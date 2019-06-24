@@ -12,16 +12,22 @@ namespace Salty_Gamemodes_Client {
         public int Blip = -1;
 
         public Vector3 Position;
-        public Vector2 Size;
+        public Vector3 Size;
+        public string Name;
+
+        public List<Vector3> SpawnPoints = new List<Vector3>();
 
         public bool isActive = false;
 
-        public Map( Vector3 position, Vector2 size ) {
+        public bool isVisible = false;
+
+        public Map( Vector3 position, Vector3 size, string name ) {
             Position = position;
             Size = size;
+            Name = name;
         }
 
-        public void CreateBlips() {
+        public void CreateBlip() {
             Blip = AddBlipForArea( Position.X, Position.Y, Position.Z, Size.X, Size.Y );
             SetBlipAsShortRange( Blip, true );
             SetBlipColour( Blip, 2 );
@@ -30,10 +36,12 @@ namespace Salty_Gamemodes_Client {
             BeginTextCommandSetBlipName( "STRING" );
             AddTextComponentString( "Map bounds" );
             EndTextCommandSetBlipName( Blip );
+            isVisible = true;
         }
 
         public void ClearBlip() {
             RemoveBlip( ref Blip );
+            isVisible = false;
         }
 
         public bool IsInZone( Vector3 pos ) {

@@ -12,9 +12,8 @@ using System.Drawing;
 namespace Salty_Gamemodes_Client {
     class MapMenu : BaseScript {
 
-        public MapMenu( string name, string subtitle, Dictionary<string, List<Vector3>> maps ) {
 
-            Debug.WriteLine( maps.ElementAt( 0 ).Key.ToString() );
+        public MapMenu( Init instance, string name, string subtitle, Dictionary<string, Map> Maps ) {
 
             MenuController.MenuAlignment = MenuController.MenuAlignmentOption.Right;
             Menu mapMenu = new Menu( name, subtitle ) { Visible = true };
@@ -22,52 +21,105 @@ namespace Salty_Gamemodes_Client {
 
             // Create a third menu without a banner.
 
+            //Debug.WriteLine( Maps.Count.ToString() );
+            //Debug.WriteLine( Maps.ElementAt(0).Key );
             // you can use AddSubmenu or AddMenu, both will work but if you want to link this menu from another menu,
             // you should use AddSubmenu.
-            foreach( var spawn in maps ) {
-                Menu mapEditor = new Menu( null, "Edit " + spawn.Key );
-                MenuController.AddSubmenu( mapMenu, mapEditor );
-
-                MenuItem mapItem = new MenuItem( spawn.Key, "Modify map" ) { Label = ">>>" };
-                mapMenu.AddMenuItem( mapItem );
-                MenuController.BindMenuItem( mapMenu, mapEditor, mapItem );
-
-                Menu playerSpawnMenu = new Menu( null, "Edit " + spawn.Key + " player spawns" );
-                MenuController.AddSubmenu( mapEditor, playerSpawnMenu );
-
-                Menu modifyPosMenu = new Menu( null, "Edit position" );
-                MenuController.AddSubmenu( playerSpawnMenu, modifyPosMenu );
 
 
-                MenuItem playerSpawnItem = new MenuItem( "Player Spawns", "Modify player spawn points" ) { Label = ">>" };
-                mapEditor.AddMenuItem( playerSpawnItem );
-                MenuController.BindMenuItem( mapEditor, playerSpawnMenu, playerSpawnItem );
+
+
+            foreach( var map in Maps ) {
+                Debug.WriteLine( map.Value.isVisible.ToString() );
+                Vector3 selectedVector = map.Value.SpawnPoints[0];
+
+                Menu mapEditor = AddSubMenu( mapMenu, "Edit " + map.Key );
+
+
+                MenuItem mapItem = AddMenuItem( mapMenu, mapEditor, map.Key, "Modify Map", ">>>", true );
+
+                Menu playerSpawnMenu = AddSubMenu( mapEditor, "Edit " + map.Key + " player spawns" );
+                Menu deleteMapMenu = AddSubMenu( mapEditor, "Delete " + map.Key + "?" );
+                deleteMapMenu.AddMenuItem( new MenuItem( "Yes", "" ) );
+                deleteMapMenu.AddMenuItem( new MenuItem( "No", "" ) );
+                deleteMapMenu.OnItemSelect += ( _menu, _item, _index ) => {
+                    if( _item.Text == "Yes" ) {
+                        TriggerServerEvent( "salty::netModifyMap", "delete", map.Key );
+                        MenuController.CloseAllMenus();
+                        TriggerServerEvent( "salty::netSpawnPointGUI" );
+                    }
+                    if( _item.Text == "No" ) {
+                        deleteMapMenu.CloseMenu();
+                    }
+                };
+
+                mapEditor.AddMenuItem( new MenuItem( "Show/Hide" ) );
+
+                mapEditor.OnItemSelect += ( _menu, _item, _index ) => {
+                    if( _item.Text == "Show/Hide" ) {
+                        if( instance.Maps[map.Key].isVisible )
+                            instance.Maps[map.Key].ClearBlip();
+                        else
+                            instance.Maps[map.Key].CreateBlip();
+                    }
+                };
+
+                Menu modifyPosMenu = AddSubMenu( playerSpawnMenu, "Edit position" );
+
+                MenuItem playerSpawnItem = AddMenuItem( mapEditor, playerSpawnMenu, "Player Spawns", "Modify player spawn points", ">>", true );
+                MenuItem deleteMapItem = AddMenuItem( mapEditor, deleteMapMenu, "Delete Map", "Delete entire map", ">", true );
 
                 modifyPosMenu.AddMenuItem( new MenuItem( "Delete", "Deletes the selected position" ) );
 
-                foreach( var spawns in maps[spawn.Key] ) {
-                    //playerSpawnMenu.AddMenuItem( new MenuItem( spawns.ToString() ) );
 
-                    MenuItem playerPositionItem = new MenuItem( spawns.ToString(), "Modify player spawn point" ) { Label = ">" };
-                    playerSpawnMenu.AddMenuItem( playerPositionItem );
-                    MenuController.BindMenuItem( playerSpawnMenu, modifyPosMenu, playerPositionItem );
+                modifyPosMenu.OnItemSelect += ( _menu, _item, _index ) => {
+                    if( _item.Text == "Delete" ) {
+                        TriggerServerEvent( "salty::netModifyMapPos", "delete", map.Key, selectedVector );
+                        MenuController.CloseAllMenus();
+                        TriggerServerEvent( "salty::netSpawnPointGUI" );
+
+                    }
+                };
+
+                foreach( var spawns in map.Value.SpawnPoints ) {
+                    MenuItem playerPositionItem = AddMenuItem( playerSpawnMenu, modifyPosMenu, spawns.ToString(), "Modify player spawn point", ">", true );
 
                     playerSpawnMenu.OnIndexChange += ( _menu, _oldItem, _newItem, _oldIndex, _newIndex ) => {
-                       
+                        selectedVector = BaseGamemode.StringToVector3( _newItem.Text );
                     };
                 }
 
+
+                mapMenu.OnMenuClose += ( _menu ) => {
+
+                };
+
+                mapMenu.OnIndexChange += ( _menu, _oldItem, _newItem, _oldIndex, _newIndex ) => {
+                    // Code in here would get executed whenever the up or down key is pressed and the index of the menu is changed.
+                    //Debug.WriteLine( $"OnIndexChange: [{_menu}, {_oldItem}, {_newItem}, {_oldIndex}, {_newIndex}]" );
+
+                };
+
             }
-
-            mapMenu.OnIndexChange += ( _menu, _oldItem, _newItem, _oldIndex, _newIndex ) => {
-                // Code in here would get executed whenever the up or down key is pressed and the index of the menu is changed.
-                Debug.WriteLine( $"OnIndexChange: [{_menu}, {_oldItem}, {_newItem}, {_oldIndex}, {_newIndex}]" );
-            };
-
         }
 
-        public void CreatePosMenu() {
-            
+        public MenuItem AddMenuItem( Menu parent, Menu child, string name, string description, string label, bool bindMenu ) {
+            MenuItem menuItem = new MenuItem( name, description ) { Label = label };
+            parent.AddMenuItem( menuItem );
+            if( bindMenu ) {
+                MenuController.BindMenuItem( parent, child, menuItem );
+            }
+            return menuItem;
+        }
+
+        public Menu AddSubMenu( Menu parent, string name ) {
+            Menu subMenu = new Menu( null, name );
+            MenuController.AddSubmenu( parent, subMenu );
+            return subMenu;
+        }
+
+        public void CreatePosMenu(  ) {
+
         }
 
 
