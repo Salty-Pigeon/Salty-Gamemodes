@@ -11,6 +11,7 @@ namespace Salty_Gamemodes_Client {
     public class Map {
         public int Blip = -1;
 
+
         public Vector3 Position;
         public Vector3 Size;
         public string Name;
@@ -37,6 +38,12 @@ namespace Salty_Gamemodes_Client {
             AddTextComponentString( "Map bounds" );
             EndTextCommandSetBlipName( Blip );
             isVisible = true;
+        }
+
+        public void DrawSpawnPoints() {
+            foreach(Vector3 spawnCoords in SpawnPoints ) {
+                DrawMarker( 2, spawnCoords.X, spawnCoords.Y, spawnCoords.Z, 0.0f, 0.0f, 0.0f, 0.0f, 180.0f, 0.0f, 2.0f, 2.0f, 2.0f, 255, 128, 0, 200, false, true, 2, false, null, null, false );
+            }
         }
 
         public void ClearBlip() {

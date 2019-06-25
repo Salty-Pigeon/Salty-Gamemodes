@@ -26,6 +26,7 @@ namespace Salty_Gamemodes_Client
             EventHandlers[ "salty::SpawnPointGUI" ] += new Action<ExpandoObject, ExpandoObject>( SpawnGUI );
             ActiveGame.SetNoClip( false );
             Tick += Update;
+            SetMaxWantedLevel( 0 );
         }
 
         public void StartGame( int id, int team, Vector3 mapPos, Vector3 mapSize, Vector3 startPos ) {
@@ -57,6 +58,8 @@ namespace Salty_Gamemodes_Client
                 spawns.Add( spawn.Key.ToString(), spawnPoints );
             }
 
+            Dictionary<string, Map> Maps = new Dictionary<string, Map>();
+
             foreach( var obj in mapObj ) {
                 List<Vector3> bounds = new List<Vector3>();
                 List<object> conversion = obj.Value as List<object>;
@@ -78,7 +81,17 @@ namespace Salty_Gamemodes_Client
 
             }
 
-            MapMenu menu = new MapMenu( this, "Maps", "Modify maps", Maps );
+            this.Maps = new Dictionary<string, Map>();
+
+            foreach( var map in Maps ) {
+                if( this.Maps.ContainsKey(map.Key) ) {
+                    this.Maps.Add( map.Key, map.Value );
+                }
+            }
+
+            this.Maps = Maps;
+
+            MapMenu menu = new MapMenu( this, "Maps", "Modify maps", this.Maps );
         }
 
         private void PlayerDied( int killerType, List<dynamic> deathcords ) {
@@ -93,6 +106,11 @@ namespace Salty_Gamemodes_Client
         public async Task Update() {
             if( ActiveGame != null )
                 ActiveGame.Update();
+            foreach( var map in Maps ) {
+                if( map.Value.isVisible ) {
+                    map.Value.DrawSpawnPoints();
+                }
+            }
         }
 
         private void OnClientResourceStart( string resourceName ) {
