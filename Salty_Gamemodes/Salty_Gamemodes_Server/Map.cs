@@ -14,6 +14,7 @@ namespace Salty_Gamemodes_Server {
         public Vector3 Size;
 
         public List<Vector3> SpawnPoints = new List<Vector3>();
+        public Dictionary<string, List<Vector3>> GunSpawns = new Dictionary<string, List<Vector3>>();
 
 
         public Map( Vector3 position, Vector3 size, string name ) {
@@ -33,5 +34,48 @@ namespace Salty_Gamemodes_Server {
         public void DeleteSpawnPoint( Vector3 spawnPoint ) {
             SpawnPoints.Remove( spawnPoint );
         }
+
+
+        public void AddWeaponSpawn( string weaponType, Vector3 spawnPoint ) {
+            if( GunSpawns.ContainsKey(weaponType) ) {
+                GunSpawns[weaponType].Add( spawnPoint );
+            } else {
+                GunSpawns.Add( weaponType, new List<Vector3> { spawnPoint } );
+            }
+        }
+
+        public void DeleteWeaponSpawn( Vector3 pos ) {
+            foreach( var weapSpawns in GunSpawns ) {
+                if( weapSpawns.Value.Contains(pos) ) {
+                    GunSpawns[weapSpawns.Key].Remove( pos );
+                    break;
+                }
+            }
+        }
+
+        public string SpawnPointsAsString( ) {
+            string spawnPoints = "";
+            foreach( var vector in SpawnPoints ) {
+                spawnPoints += string.Format( "{0},{1},{2}:", vector.X, vector.Y, vector.Z );
+            }
+            if( spawnPoints == "" ) {
+                spawnPoints = "0,0,0:";
+            }
+            return spawnPoints.Substring( 0, spawnPoints.Length - 1 );
+        }
+
+        public string GunSpawnsAsString( ) {
+            string gunSpawns = "";
+            foreach( var vector in GunSpawns ) {
+                foreach( var spawn in vector.Value ) {
+                    gunSpawns += string.Format( "{0},{1},{2},{3}:", vector.Key, spawn.X, spawn.Y, spawn.Z );
+                }
+            }
+            if( gunSpawns == "" ) {
+                gunSpawns = "random,0,0,0:";
+            }
+            return gunSpawns.Substring( 0, gunSpawns.Length - 1 );
+        }
+
     }
 }

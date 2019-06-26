@@ -46,6 +46,7 @@ namespace Salty_Gamemodes_Client {
         }
 
         public override void PlayerDied( int killerType, Vector3 deathcords ) {
+            SetTeam( (int)Teams.Spectators );
             base.PlayerDied( killerType, deathcords );
         }
 
@@ -58,12 +59,15 @@ namespace Salty_Gamemodes_Client {
             if( Team == (int)Teams.Traitors ) {
                 TeamText.Color = System.Drawing.Color.FromArgb( 200, 0, 0 );
                 TeamText.Caption = "Traitor";
-                SetFollowPedCamViewMode( 4 );
             }
             if( Team == (int)Teams.Innocents ) {
                 TeamText.Color = System.Drawing.Color.FromArgb( 0, 200, 0 );
                 TeamText.Caption = "Innocent";
-                SetFollowPedCamViewMode( 4 );
+            }
+
+            if( Team != (int)Teams.Spectators ) {
+                if( GetFollowPedCamViewMode() != 4 )
+                    SetFollowPedCamViewMode( 4 );
             }
 
             base.Update();

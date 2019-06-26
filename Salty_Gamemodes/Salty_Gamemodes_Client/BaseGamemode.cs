@@ -32,10 +32,13 @@ namespace Salty_Gamemodes_Client {
         }
 
         public virtual void Start() {
+            RemoveAllPedWeapons( PlayerPedId(), true );
+            GameMap.SpawnWeapons();
             inGame = true;
         }
 
         public virtual void End() {
+            GameMap.ClearWeapons();
             inGame = false;
         }
 
@@ -44,9 +47,14 @@ namespace Salty_Gamemodes_Client {
         }
 
         public virtual void PlayerSpawned( ExpandoObject spawnInfo ) {
-            if( inGame ) {
+
+            if( Team == 0 ) {
                 SetNoClip( true );
+            }
+
+            if( inGame ) {
                 SetTeam( 0 );
+                SetNoClip( true );
                 Game.Player.Character.Position = deathPos;
                 noclipPos = deathPos;
             }
@@ -79,8 +87,11 @@ namespace Salty_Gamemodes_Client {
             if( GameMap == null ) {
                 TeamText.Color = System.Drawing.Color.FromArgb( 150, 150, 0 );
                 TeamText.Caption = "Spectator";
-                SetFollowPedCamViewMode( 1 );
+                if( GetFollowPedCamViewMode() != 1 ) {
+                    SetFollowPedCamViewMode( 1 );
+                }
             }
+         
 
             if( isNoclip ) {
                 NoClipUpdate();

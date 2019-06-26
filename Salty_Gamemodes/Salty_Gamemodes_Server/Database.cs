@@ -45,6 +45,16 @@ namespace Salty_Gamemodes_Server {
                             map.AddSpawnPoint( new Vector3( float.Parse( vector[ 0 ] ), float.Parse( vector[ 1 ] ), float.Parse( vector[ 2 ] ) ) );
                         }
                     }
+
+                    string gunSpawns = MyDataReader.GetString( 8 );
+                    if( gunSpawns.Length > 2 ) {
+                        var points = gunSpawns.Split( ':' );
+                        for( var i = 0; i < points.Length; i++ ) {
+                            var vector = points[i].Split( ',' );
+                            map.AddWeaponSpawn( vector[0], new Vector3( float.Parse( vector[1] ), float.Parse( vector[2] ), float.Parse( vector[3] ) ) );
+                        }
+                    }
+                    
                     Maps.Add( name, map );
                 }
                 MyDataReader.Close();
@@ -52,37 +62,20 @@ namespace Salty_Gamemodes_Server {
             return Maps;
         }
 
-        private void AddSpawnPoint( Vector3 pos, string name, string spawnPoints ) {
-            MySqlCommand comm = new MySqlCommand( "", Connection );
-            comm.CommandText = "UPDATE maps SET spawnPoints = ?spawnPoints WHERE name = ?name";
-            comm.Parameters.AddWithValue( "spawnPoints", spawnPoints );
-            comm.Parameters.AddWithValue( "name", name );
-            comm.ExecuteNonQuery();
-        }
-
-        public string SpawnPointsAsString( List<Vector3> points ) {
-            string spawnPoints = "";
-            foreach( var vector in points ) {
-                spawnPoints += string.Format( "{0},{1},{2}:", vector.X, vector.Y, vector.Z );
-            }
-            if( spawnPoints == "" ) {
-                spawnPoints = "0,0,0:";
-            }
-            return spawnPoints.Substring( 0, spawnPoints.Length - 1 );
-        }
 
         public void SaveAll( Dictionary<string, Map> Maps ) {
             if( Connection.State == System.Data.ConnectionState.Open ) {
                 foreach( var map in Maps ) {
                     MySqlCommand comm = new MySqlCommand( "", Connection );
-                    comm.CommandText = "REPLACE INTO maps(name,x,y,z,width,height,spawnPoints) VALUES(?name, ?x, ?y, ?z, ?width, ?height, ?spawnPoints)";
+                    comm.CommandText = "REPLACE INTO maps(name,x,y,z,width,height,spawnPoints,gunSpawns) VALUES(?name, ?x, ?y, ?z, ?width, ?height, ?spawnPoints, ?gunSpawns)";
                     comm.Parameters.AddWithValue( "name", map.Key );
                     comm.Parameters.AddWithValue( "x", map.Value.Position.X );
                     comm.Parameters.AddWithValue( "y", map.Value.Position.Y );
                     comm.Parameters.AddWithValue( "z", map.Value.Position.Z );
                     comm.Parameters.AddWithValue( "width", map.Value.Size.X );
                     comm.Parameters.AddWithValue( "height", map.Value.Size.Y );
-                    comm.Parameters.AddWithValue( "spawnPoints", SpawnPointsAsString( map.Value.SpawnPoints ) );
+                    comm.Parameters.AddWithValue( "spawnPoints", map.Value.SpawnPointsAsString( ) );
+                    comm.Parameters.AddWithValue( "gunSpawns", map.Value.GunSpawnsAsString( ) );
                     comm.ExecuteNonQuery();
                 }
             }
@@ -91,14 +84,15 @@ namespace Salty_Gamemodes_Server {
         public void SaveMap( Map map ) {
             if( Connection.State == System.Data.ConnectionState.Open ) {
                 MySqlCommand comm = new MySqlCommand( "", Connection );
-                comm.CommandText = "REPLACE INTO maps(name,x,y,z,width,height,spawnPoints) VALUES(?name, ?x, ?y, ?z, ?width, ?height, ?spawnPoints)";
+                comm.CommandText = "REPLACE INTO maps(name,x,y,z,width,height,spawnPoints,gunSpawns) VALUES(?name, ?x, ?y, ?z, ?width, ?height, ?spawnPoints, ?gunSpawns)";
                 comm.Parameters.AddWithValue( "name", map.Name );
                 comm.Parameters.AddWithValue( "x", map.Position.X );
                 comm.Parameters.AddWithValue( "y", map.Position.Y );
-                comm.Parameters.AddWithValue( "z", map.Position.Z );
+                comm.Parameters.AddWithValue( "z", map.Position.Z ); 
                 comm.Parameters.AddWithValue( "width", map.Size.X );
                 comm.Parameters.AddWithValue( "height", map.Size.Y );
-                comm.Parameters.AddWithValue( "spawnPoints", SpawnPointsAsString( map.SpawnPoints ) );
+                comm.Parameters.AddWithValue( "spawnPoints", map.SpawnPointsAsString() );
+                comm.Parameters.AddWithValue( "gunSpawns", map.GunSpawnsAsString() );
                 comm.ExecuteNonQuery();
             }
         }

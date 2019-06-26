@@ -21,17 +21,20 @@ namespace Salty_Gamemodes_Client
             EventHandlers[ "onClientResourceStart" ] += new Action<string>( OnClientResourceStart );
             EventHandlers[ "playerSpawned" ] += new Action<ExpandoObject>( PlayerSpawn );
             EventHandlers[ "baseevents:onPlayerDied" ] += new Action<int, List<dynamic>>( PlayerDied );
-            EventHandlers[ "salty::StartGame" ] += new Action<int, int, Vector3, Vector3, Vector3>( StartGame );
+            EventHandlers[ "salty::StartGame" ] += new Action<int, int, Vector3, Vector3, Vector3, ExpandoObject>( StartGame );
             EventHandlers[ "salty::EndGame" ] += new Action( ActiveGame.End );
             EventHandlers[ "salty::CreateMap" ] += new Action( ActiveGame.CreateMap );
             EventHandlers[ "salty::SpawnPointGUI" ] += new Action<ExpandoObject, ExpandoObject>( SpawnGUI );
             ActiveGame.SetNoClip( false );
             Tick += Update;
-            SetMaxWantedLevel( 0 );
+            SetMaxWantedLevel( 0 );       
         }
 
-        public void StartGame( int id, int team, Vector3 mapPos, Vector3 mapSize, Vector3 startPos ) {
+        public void StartGame( int id, int team, Vector3 mapPos, Vector3 mapSize, Vector3 startPos, ExpandoObject gunSpawns ) {
+            ActiveGame.SetNoClip( false );
+            Debug.WriteLine( "Starting game" );
             Map map = new Map( mapPos, mapSize, "" );
+            map.GunSpawns = ExpandoToDictionary( gunSpawns );
             if( id == 1 ) { // Trouble in Terrorist Town
                 ActiveGame = new TTT(map, team);
                 if( team == 1 ) { // Traitor
@@ -46,11 +49,10 @@ namespace Salty_Gamemodes_Client
             Game.Player.Character.Position = startPos;
         }
 
-        private void SpawnGUI( ExpandoObject mapObj, ExpandoObject spawnObj ) {
-
-
+        public Dictionary<string,List<Vector3>> ExpandoToDictionary( ExpandoObject keyValuePairs ) {
             Dictionary<string, List<Vector3>> spawns = new Dictionary<string, List<Vector3>>();
-            foreach( var spawn in spawnObj ) {
+            foreach( var spawn in keyValuePairs ) {
+
                 List<Vector3> spawnPoints = new List<Vector3>();
                 List<object> conversion = spawn.Value as List<object>;
                 foreach( Vector3 vec in conversion ) {
@@ -58,6 +60,14 @@ namespace Salty_Gamemodes_Client
                 }
                 spawns.Add( spawn.Key.ToString(), spawnPoints );
             }
+            return spawns;
+        }
+
+
+        private void SpawnGUI( ExpandoObject mapObj, ExpandoObject spawnObj ) {
+
+
+            Dictionary<string, List<Vector3>> spawns = ExpandoToDictionary( spawnObj );
 
             Dictionary<string, Map> Maps = new Dictionary<string, Map>();
 
@@ -143,10 +153,56 @@ namespace Salty_Gamemodes_Client
                 TriggerServerEvent( "salty::netModifyMapPos", "add", "AUTO", Game.Player.Character.Position );
             } ), false );
 
+            RegisterCommand( "addweaponpoint", new Action<int, List<object>, string>( ( source, args, raw ) => {
+                TriggerServerEvent( "salty::netModifyWeaponPos", "add", "AUTO", args[0], Game.Player.Character.Position );
+            } ), false );
+
             RegisterCommand( "createmap", new Action<int, List<object>, string>( ( source, args, raw ) => {
                 if( args[ 2 ] == null )
                     return;
                 TriggerServerEvent( "salty::netModifyMap", "add", args[0], Game.Player.Character.Position, new Vector3( float.Parse( args[1].ToString() ), float.Parse( args[2].ToString() ), 0 ) );
+            } ), false );
+
+            RegisterCommand( "test", new Action<int, List<object>, string>( ( source, args, raw ) => {
+                //CreateObject( GetHashKey( "W_AR_ASSAULTRIFLE" ), Game.PlayerPed.Position.X, Game.PlayerPed.Position.Y, Game.PlayerPed.Position.Z + 1, true, true, true );
+                CreatePickup( (uint)GetHashKey( "PICKUP_WEAPON_SMG" ), Game.PlayerPed.Position.X, Game.PlayerPed.Position.Y, Game.PlayerPed.Position.Z + 1, 0, 0, true, (uint)GetHashKey( "W_SB_SMG" ) );
+
+            } ), false );
+
+
+            RegisterCommand( "weapon", new Action<int, List<object>, string>( ( source, args, raw ) => {
+                GiveWeaponToPed( Game.PlayerPed.Handle, (uint)GetHashKey( args[0].ToString() ), 999, false, true );
+            } ), false );
+
+            RegisterCommand( "car", new Action<int, List<object>, string>( async ( source, args, raw ) => {
+                // account for the argument not being passed
+                var model = "adder";
+                if( args.Count > 0 ) {
+                    model = args[0].ToString();
+                }
+
+                // check if the model actually exists
+                // assumes the directive `using static CitizenFX.Core.Native.API;`
+                var hash = (uint)GetHashKey( model );
+                if( !IsModelInCdimage( hash ) || !IsModelAVehicle( hash ) ) {
+                    TriggerEvent( "chat:addMessage", new {
+                        color = new[] { 255, 0, 0 },
+                        args = new[] { "[CarSpawner]", $"It might have been a good thing that you tried to spawn a {model}. Who even wants their spawning to actually ^*succeed?" }
+                    } );
+                    return;
+                }
+
+                // create the vehicle
+                var vehicle = await World.CreateVehicle( model, Game.PlayerPed.Position, Game.PlayerPed.Heading );
+
+                // set the player ped into the vehicle and driver seat
+                Game.PlayerPed.SetIntoVehicle( vehicle, VehicleSeat.Driver );
+
+                // tell the player
+                TriggerEvent( "chat:addMessage", new {
+                    color = new[] { 255, 0, 0 },
+                    args = new[] { "[CarSpawner]", $"Woohoo! Enjoy your new ^*{model}!" }
+                } );
             } ), false );
 
         }
