@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Dynamic;
+using CitizenFX.Core.Native;
 
 namespace Salty_Gamemodes_Client
 {
@@ -111,6 +112,18 @@ namespace Salty_Gamemodes_Client
                     map.Value.DrawSpawnPoints();
                 }
             }
+
+            Weapon w = Game.PlayerPed?.Weapons?.Current;
+
+            if (w != null) {
+                WeaponHash wHash = w.Hash;
+
+                if (API.GetHashKey(wHash.ToString()) != -1783943904) // add MarksmanRifle MKII
+                {
+                    API.HideHudComponentThisFrame(14);
+                }
+            }
+
         }
 
         private void OnClientResourceStart( string resourceName ) {
