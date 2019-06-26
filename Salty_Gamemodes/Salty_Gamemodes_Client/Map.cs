@@ -46,8 +46,12 @@ namespace Salty_Gamemodes_Client {
             Size = size;
             Name = name;
 
+            // get GunSpawns count and figure out how much to spawn, need lots of spawns for it to be good
+
             foreach( var wep in weapons ){
                 spawnedWeps.Add( wep.Key );
+
+
             }
 
         }
