@@ -10,22 +10,36 @@ using System.Threading.Tasks;
 namespace Salty_Gamemodes_Client {
     public class Map : BaseScript {
 
+        BaseGamemode Gamemode;
 
-        List<string> spawnedWeps = new List<string>();
-
-        Dictionary<string, string> weapons = new Dictionary<string, string>(){
-            { "W_PI_PISTOL", "PICKUP_WEAPON_PISTOL" },
-            { "W_PI_COMBATPISTOL", "PICKUP_WEAPON_COMBATPISTOL"  },
-            { "W_SB_SMG", "PICKUP_WEAPON_SMG"  },
-            { "W_AR_CARBINERIFLE", "PICKUP_WEAPON_CARBINERIFLE"  },
-            { "W_AR_ASSAULTRIFLE", "PICKUP_WEAPON_ASSAULTRIFLE"  },
-            { "W_SR_SNIPERRIFLE", "PICKUP_WEAPON_SNIPERRIFLE" },
-            { "W_SG_PUMPSHOTGUN", "PICKUP_WEAPON_PUMPSHOTGUN"  },
-            { "W_SB_MICROSMG", "PICKUP_WEAPON_MICROSMG" },
-            { "W_SG_SAWNOFF", "PICKUP_WEAPON_SAWNOFFSHOTGUN" }
+        public Dictionary<string, string> Weapons = new Dictionary<string, string>(){
+            { "WEAPON_PISTOL", "W_PI_PISTOL"  },
+            { "WEAPON_COMBATPISTOL", "W_PI_COMBATPISTOL" },
+            { "WEAPON_SMG", "W_SB_SMG" },
+            { "WEAPON_CARBINERIFLE", "W_AR_CARBINERIFLE"  },
+            { "WEAPON_ASSAULTRIFLE", "W_AR_ASSAULTRIFLE"  },
+            { "WEAPON_SNIPERRIFLE", "W_SR_SNIPERRIFLE" },
+            { "WEAPON_PUMPSHOTGUN", "W_SG_PUMPSHOTGUN"  },
+            { "WEAPON_MICROSMG", "W_SB_MICROSMG" },
+            { "WEAPON_SAWNOFFSHOTGUN", "W_SG_SAWNOFF" }
         };
 
-        List<int> weaponIDs = new List<int>();
+        Dictionary<string, int> weaponWeights = new Dictionary<string, int>() {
+            { "WEAPON_PISTOL", 10 },
+            { "WEAPON_COMBATPISTOL", 10  },
+            { "WEAPON_SMG", 6  },
+            { "WEAPON_CARBINERIFLE", 4  },
+            { "WEAPON_ASSAULTRIFLE", 6  },
+            { "WEAPON_SNIPERRIFLE", 2 },
+            { "WEAPON_PUMPSHOTGUN", 4  },
+            { "WEAPON_MICROSMG", 8 },
+            { "WEAPON_SAWNOFFSHOTGUN", 2 }
+        };
+
+        Dictionary<int, string> weaponIntervals = new Dictionary<int, string>();
+
+        public List<WeaponPickup> SpawnedWeapons = new List<WeaponPickup>();
+
 
         public int Blip = -1;
 
@@ -41,20 +55,14 @@ namespace Salty_Gamemodes_Client {
 
         public bool isVisible = false;
 
-        public Map( Vector3 position, Vector3 size, string name ) {
+        public Map( BaseGamemode gamemode, Vector3 position, Vector3 size, string name ) {
+            Gamemode = gamemode;
             Position = position;
             Size = size;
-            Name = name;
-
-            // get GunSpawns count and figure out how much to spawn, need lots of spawns for it to be good
-
-            foreach( var wep in weapons ){
-                spawnedWeps.Add( wep.Key );
-
-
-            }
+            Name = name;       
 
         }
+
 
         public void CreateBlip() {
             Blip = AddBlipForArea( Position.X, Position.Y, Position.Z, Size.X, Size.Y );
@@ -66,37 +74,59 @@ namespace Salty_Gamemodes_Client {
             AddTextComponentString( "Map bounds" );
             EndTextCommandSetBlipName( Blip );
             isVisible = true;
+            
+        }
+
+        public void Update() {
+            foreach( var wep in SpawnedWeapons.ToList() ) {
+                wep.Update();
+            }
+        }
+       
+
+        public void RemoveWeapon(WeaponPickup item) {
+            SpawnedWeapons.Remove( item );
         }
 
         public void SpawnWeapons() {
+
+            Random rand = new Random( DateTime.Now.Millisecond );
+
+
+            weaponIntervals = new Dictionary<int, string>();
+            int i = 0;
+            foreach( var wep in weaponWeights ) {
+                i += wep.Value;
+                weaponIntervals.Add( i, wep.Key );
+            }
+            
+
             foreach( var gunTypes in GunSpawns ) {
                 foreach( var gunPos in gunTypes.Value ) {
-                    if( gunTypes.Key == "random" || !weapons.ContainsKey(gunTypes.Key) ) {
-                        Random rand = new Random();
-                        int index;
-                        string worldModel, pickup;
-                        if( spawnedWeps.Count == 0 ) {
-                            index = rand.Next( 0, weapons.Count );
-                            worldModel = weapons.ElementAt( index ).Key;
-                            pickup = weapons.ElementAt( index ).Value;
+                    if( gunTypes.Key == "random" || !Weapons.ContainsKey(gunTypes.Key) ) {
 
+                        int index = rand.Next( 0, i );
+                        string prevItem = Weapons.ElementAt( 0 ).Key;
+                        string wepModel = Weapons.ElementAt( 0 ).Key, worldModel = Weapons.ElementAt( 0 ).Value ;
+                        foreach( var x in weaponIntervals ) {
+                            if( index < x.Key ) {
+                                wepModel = prevItem;
+                                worldModel = Weapons[prevItem];
+                                break;
+                            }
+                            prevItem = x.Value;
                         }
-                        else {
-                            index = rand.Next( 0, spawnedWeps.Count );
-                            worldModel = spawnedWeps[index];
-                            pickup = weapons[worldModel];
-
-                            spawnedWeps.Remove( worldModel );
-                        }
-                        Debug.WriteLine( string.Format( "pickup {0} spawning with model {1}", pickup, worldModel ));
-                        int item = CreatePickup( (uint)GetHashKey( pickup ), gunPos.X, gunPos.Y, gunPos.Z, 10, 10, true, (uint)GetHashKey( worldModel ) );
-                        weaponIDs.Add( item );
+                        uint pickupHash = (uint)GetHashKey( wepModel );
+                        int worldHash = GetHashKey( worldModel );
+                        WeaponPickup item = new WeaponPickup( this, pickupHash, worldHash, gunPos, false );
+                        SpawnedWeapons.Add( item );
 
                     }
                     else {
-                        int item = CreatePickup( (uint)GetHashKey( weapons[gunTypes.Key] ), gunPos.X, gunPos.Y, gunPos.Z, 10, 10, true, (uint)GetHashKey( gunTypes.Key ) );
-                        SetObjectPhysicsParams( item, 1, 1, 1, 1, 1, 5, 1, 1, 1, 1, 1 );
-                        weaponIDs.Add( item );
+
+                        WeaponPickup item = new WeaponPickup( this, (uint)GetHashKey( gunTypes.Key ), GetHashKey( Weapons[gunTypes.Key] ), gunPos, false );
+                        SpawnedWeapons.Add( item );
+
                     }
 
                 }
@@ -104,8 +134,9 @@ namespace Salty_Gamemodes_Client {
         }
 
         public void ClearWeapons() {
-            foreach( int obj in weaponIDs ) {
-                RemovePickup( obj );
+            foreach( var obj in SpawnedWeapons ) {
+                //RemovePickup( obj );
+                obj.Destroy();
             }
         }
 

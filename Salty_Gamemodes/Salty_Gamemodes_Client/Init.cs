@@ -33,7 +33,7 @@ namespace Salty_Gamemodes_Client
         public void StartGame( int id, int team, Vector3 mapPos, Vector3 mapSize, Vector3 startPos, ExpandoObject gunSpawns ) {
             ActiveGame.SetNoClip( false );
             Debug.WriteLine( "Starting game" );
-            Map map = new Map( mapPos, mapSize, "" );
+            Map map = new Map( ActiveGame, mapPos, mapSize, "" );
             map.GunSpawns = ExpandoToDictionary( gunSpawns );
             if( id == 1 ) { // Trouble in Terrorist Town
                 ActiveGame = new TTT(map, team);
@@ -85,7 +85,7 @@ namespace Salty_Gamemodes_Client
                     Maps[obj.Key].SpawnPoints = spawns[obj.Key];
                 }
                 else {
-                    Map map = new Map( bounds[0], bounds[1], obj.Key );
+                    Map map = new Map( ActiveGame, bounds[0], bounds[1], obj.Key );
                     map.SpawnPoints = spawns[obj.Key];
                     Maps.Add( obj.Key, map );
                 }
@@ -136,6 +136,7 @@ namespace Salty_Gamemodes_Client
 
         }
 
+
         private void OnClientResourceStart( string resourceName ) {
             if( GetCurrentResourceName() != resourceName ) return;
 
@@ -168,6 +169,8 @@ namespace Salty_Gamemodes_Client
                 CreatePickup( (uint)GetHashKey( "PICKUP_WEAPON_SMG" ), Game.PlayerPed.Position.X, Game.PlayerPed.Position.Y, Game.PlayerPed.Position.Z + 1, 0, 0, true, (uint)GetHashKey( "W_SB_SMG" ) );
 
             } ), false );
+
+
 
 
             RegisterCommand( "weapon", new Action<int, List<object>, string>( ( source, args, raw ) => {

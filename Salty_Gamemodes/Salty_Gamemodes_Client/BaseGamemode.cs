@@ -9,9 +9,14 @@ using System.Threading.Tasks;
 using System.Dynamic;
 
 namespace Salty_Gamemodes_Client {
-    class BaseGamemode : BaseScript {
+    public class BaseGamemode : BaseScript {
+
+        public static int WeaponCount = 0;
 
         public bool isNoclip = false;
+
+        List<string> weapons = new List<string>();
+
 
         public Text TeamText;
         public Text BoundText;
@@ -51,7 +56,7 @@ namespace Salty_Gamemodes_Client {
             if( Team == 0 ) {
                 SetNoClip( true );
             }
-
+            
             if( inGame ) {
                 SetTeam( 0 );
                 SetNoClip( true );
@@ -82,7 +87,65 @@ namespace Salty_Gamemodes_Client {
             }
         }
 
+        private void Controls() {
+            if( IsControlJustPressed(0, 23) && Game.PlayerPed.Weapons.Current.Hash.ToString() != "Unarmed" ) {
+
+
+                // Drop current weapon, basegameode handles everything weapon related, grab the name of weapon from current weapon that's all that is needed from weapons.
+                foreach( WeaponPickup wep in GameMap.SpawnedWeapons ) {
+
+                    if( (int)wep.WeaponHash == Game.PlayerPed.Weapons.Current.Hash.GetHashCode() ) {
+                        WeaponPickup item = new WeaponPickup( GameMap, wep.WeaponHash, wep.WorldModel, Game.Player.Character.Position + new Vector3(0,0,1), true );
+                        GameMap.SpawnedWeapons.Add( item );
+                        break;
+                    }
+                }
+                Game.PlayerPed.Weapons.Remove( Game.PlayerPed.Weapons.Current );
+            }
+        }
+
+
+        private void Events() {
+
+            if( GameMap == null )
+                return;
+
+            // Weapon change
+            foreach( var weps in GameMap.Weapons ) {
+                uint wepHash = (uint)GetHashKey( weps.Key  );
+                //uint wepHash = (uint)GetWeaponHashFromPickup( GetHashKey( weps.Value ) );
+                if( HasPedGotWeapon( PlayerPedId(), wepHash, false) && !weapons.Contains(weps.Key) ) {
+                    weapons.Add( weps.Key );
+                    WeaponCount++;
+                    PlayerPickedUpWeapon(weps.Key, weapons.Count);
+                }
+
+                if( !HasPedGotWeapon( PlayerPedId(), wepHash, false ) && weapons.Contains( weps.Key ) ) {
+                    weapons.Remove( weps.Key );
+                    WeaponCount--;
+                    PlayerDroppedWeapon( weps.Key, weapons.Count );
+                }
+
+            }
+                
+        }
+
+        public int GetWeaponCount() {
+            return weapons.Count;
+        }
+
+        public virtual void PlayerPickedUpWeapon(string wepName, int count) {
+            Debug.WriteLine( "Player has picked up " + wepName );
+        }
+
+        public virtual void PlayerDroppedWeapon( string wepName, int count ) {
+            Debug.WriteLine( "Player has dropped " + wepName );
+        }
+
         public virtual void Update() {
+
+            Events();
+            Controls();
 
             if( GameMap == null ) {
                 TeamText.Color = System.Drawing.Color.FromArgb( 150, 150, 0 );
@@ -90,6 +153,8 @@ namespace Salty_Gamemodes_Client {
                 if( GetFollowPedCamViewMode() != 1 ) {
                     SetFollowPedCamViewMode( 1 );
                 }
+            } else {
+                GameMap.Update();
             }
          
 

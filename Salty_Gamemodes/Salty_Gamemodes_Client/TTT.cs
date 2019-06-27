@@ -26,8 +26,6 @@ namespace Salty_Gamemodes_Client {
 
         public GameState CurrentState = GameState.None;
 
-       
-
         public TTT( Map gameMap, int team ) {
             GameMap = gameMap;
             GameMap.CreateBlip();
@@ -45,6 +43,19 @@ namespace Salty_Gamemodes_Client {
 
         }
 
+        public override void PlayerPickedUpWeapon( string wepName, int count ) {
+            if( count >= 2 ) {
+                WriteChat( "Disabling weapon pickup" );
+
+            }
+            base.PlayerPickedUpWeapon( wepName, count );
+        }
+
+        public override void PlayerDroppedWeapon( string wepName, int count ) {
+            WriteChat( "Dropped weapon" );
+            base.PlayerDroppedWeapon( wepName, count );
+        }
+
         public override void PlayerDied( int killerType, Vector3 deathcords ) {
             SetTeam( (int)Teams.Spectators );
             base.PlayerDied( killerType, deathcords );
@@ -55,6 +66,7 @@ namespace Salty_Gamemodes_Client {
         }
 
         public override void Update() {
+
 
             if( Team == (int)Teams.Traitors ) {
                 TeamText.Color = System.Drawing.Color.FromArgb( 200, 0, 0 );
