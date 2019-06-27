@@ -96,6 +96,7 @@ namespace Salty_Gamemodes_Client {
 
                     if( (int)wep.WeaponHash == Game.PlayerPed.Weapons.Current.Hash.GetHashCode() ) {
                         WeaponPickup item = new WeaponPickup( GameMap, wep.WeaponHash, wep.WorldModel, Game.Player.Character.Position + new Vector3(0,0,1), true );
+                        item.Throw();
                         GameMap.SpawnedWeapons.Add( item );
                         break;
                     }

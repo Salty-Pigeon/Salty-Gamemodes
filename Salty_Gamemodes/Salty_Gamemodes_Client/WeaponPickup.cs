@@ -41,6 +41,9 @@ namespace Salty_Gamemodes_Client {
             SetForceObjectThisFrame( WeaponID, 1, 1, 1 );
         }
 
+        public void Throw() {
+            SlideObject( WeaponID, Position.X, Position.Y + 1, Position.Z + 0.5f, 1, 1, 1, true );
+        }
         public void Update() {
             if( Position.DistanceToSquared(Game.PlayerPed.Position) <= pickupRange && BaseGamemode.WeaponCount < 2 && canPickup  ) {
                 GiveWeaponToPed( PlayerPedId(), WeaponHash, 50, false, true );
