@@ -24,10 +24,27 @@ namespace Salty_Gamemodes_Client {
             PostRound
         }
 
+        public Dictionary<int, string> WeaponInv = new Dictionary<int, string>();
+
+        public Dictionary<string, int> WeaponSlots = new Dictionary<string, int>() {
+            { "WEAPON_PISTOL", 1  },
+            { "WEAPON_COMBATPISTOL", 1 },
+            { "WEAPON_SMG", 2 },
+            { "WEAPON_CARBINERIFLE", 2  },
+            { "WEAPON_ASSAULTRIFLE", 2  },
+            { "WEAPON_SNIPERRIFLE", 2 },
+            { "WEAPON_PUMPSHOTGUN", 2  },
+            { "WEAPON_MICROSMG", 2 },
+            { "WEAPON_SAWNOFFSHOTGUN", 2 }
+        };
+
+
+
         public GameState CurrentState = GameState.None;
 
         public TTT( Map gameMap, int team ) {
             GameMap = gameMap;
+            GameMap.Gamemode = this;
             GameMap.CreateBlip();
             SetTeam( team );
         }
@@ -43,16 +60,50 @@ namespace Salty_Gamemodes_Client {
 
         }
 
-        public override void PlayerPickedUpWeapon( string wepName, int count ) {
-            if( count >= 2 ) {
-                WriteChat( "Disabling weapon pickup" );
+        public override void Controls() {
 
+            if( IsControlJustPressed(2, 15) ) {
+                ChangeSelectedWeapon( +1 );
             }
+
+            if( IsControlJustPressed( 2, 14 ) ) {
+                ChangeSelectedWeapon( -1 );
+            }
+
+            base.Controls();
+        }
+
+        public void ChangeSelectedWeapon( int offset ) {
+
+            int index = 0;
+            Weapon wepon = Game.PlayerPed.Weapons.Current;
+
+            foreach( var wep in WeaponInv ) {
+                if( GetHashKey( wep.Value ) == wepon.Hash.GetHashCode() ) {
+                    if( index + offset < 0 ) {
+                        SetCurrentPedWeapon( PlayerPedId(), (uint)GetHashKey(WeaponInv.ElementAt(WeaponInv.Count-1).Value), true );
+                    } else if ( index + offset >= WeaponInv.Count ) {
+                        SetCurrentPedWeapon( PlayerPedId(), (uint)GetHashKey( WeaponInv.ElementAt( 0 ).Value ), true );
+                    } else {
+                        SetCurrentPedWeapon( PlayerPedId(), (uint)GetHashKey( WeaponInv.ElementAt( index + offset ).Value ), true );
+                    }
+                    break;
+                }
+                index++;
+            }
+        }
+
+        public override bool CanPickupWeapon( string weaponModel ) {
+            return !WeaponInv.ContainsKey( WeaponSlots[weaponModel] );
+        }
+
+        public override void PlayerPickedUpWeapon( string wepName, int count ) {
+            WeaponInv[WeaponSlots[wepName]] = wepName;
             base.PlayerPickedUpWeapon( wepName, count );
         }
 
         public override void PlayerDroppedWeapon( string wepName, int count ) {
-            WriteChat( "Dropped weapon" );
+            WeaponInv.Remove( WeaponSlots[wepName] );
             base.PlayerDroppedWeapon( wepName, count );
         }
 
@@ -65,8 +116,9 @@ namespace Salty_Gamemodes_Client {
             base.PlayerSpawned( spawnInfo );
         }
 
-        public override void Update() {
+        public override void HUD() {
 
+            HideHudAndRadarThisFrame();
 
             if( Team == (int)Teams.Traitors ) {
                 TeamText.Color = System.Drawing.Color.FromArgb( 200, 0, 0 );
@@ -77,10 +129,13 @@ namespace Salty_Gamemodes_Client {
                 TeamText.Caption = "Innocent";
             }
 
-            if( Team != (int)Teams.Spectators ) {
-                if( GetFollowPedCamViewMode() != 4 )
-                    SetFollowPedCamViewMode( 4 );
-            }
+
+            base.HUD();
+        }
+
+        public override void Update() {
+
+            FirstPersonForAlive();
 
             base.Update();
 

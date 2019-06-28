@@ -11,11 +11,9 @@ using System.Dynamic;
 namespace Salty_Gamemodes_Client {
     public class BaseGamemode : BaseScript {
 
-        public static int WeaponCount = 0;
-
         public bool isNoclip = false;
 
-        List<string> weapons = new List<string>();
+        public List<string> PlayerWeapons = new List<string>();
 
 
         public Text TeamText;
@@ -89,12 +87,11 @@ namespace Salty_Gamemodes_Client {
 
         public void StripWeapons() {
             RemoveAllPedWeapons( PlayerPedId(), true );
-            weapons = new List<string>();
-            WeaponCount = 0;
+            PlayerWeapons = new List<string>();
 
         }
 
-        private void Controls() {
+        public virtual void Controls() {
             if( IsControlJustPressed(0, 23) && Game.PlayerPed.Weapons.Current.Hash.ToString() != "Unarmed" ) {
 
 
@@ -102,7 +99,7 @@ namespace Salty_Gamemodes_Client {
                 foreach( WeaponPickup wep in GameMap.SpawnedWeapons.ToList() ) {
 
                     if( (int)wep.WeaponHash == Game.PlayerPed.Weapons.Current.Hash.GetHashCode() ) {
-                        WeaponPickup item = new WeaponPickup( GameMap, wep.WeaponHash, wep.WorldModel, Game.Player.Character.Position, true );
+                        WeaponPickup item = new WeaponPickup( GameMap, wep.WeaponModel, wep.WeaponHash, wep.WorldModel, Game.Player.Character.Position, true );
                         item.Throw();
                         GameMap.SpawnedWeapons.Add( item );
                         break;
@@ -112,8 +109,11 @@ namespace Salty_Gamemodes_Client {
             }
         }
 
+        public virtual bool CanPickupWeapon( string weaponModel ) {
+            return true;
+        }
 
-        private void Events() {
+        public virtual void Events() {
 
             if( GameMap == null )
                 return;
@@ -122,24 +122,18 @@ namespace Salty_Gamemodes_Client {
             foreach( var weps in GameMap.Weapons ) {
                 uint wepHash = (uint)GetHashKey( weps.Key  );
                 //uint wepHash = (uint)GetWeaponHashFromPickup( GetHashKey( weps.Value ) );
-                if( HasPedGotWeapon( PlayerPedId(), wepHash, false) && !weapons.Contains(weps.Key) ) {
-                    weapons.Add( weps.Key );
-                    WeaponCount++;
-                    PlayerPickedUpWeapon(weps.Key, weapons.Count);
+                if( HasPedGotWeapon( PlayerPedId(), wepHash, false) && !PlayerWeapons.Contains(weps.Key) ) {
+                    PlayerWeapons.Add( weps.Key );
+                    PlayerPickedUpWeapon(weps.Key, PlayerWeapons.Count);
                 }
 
-                if( !HasPedGotWeapon( PlayerPedId(), wepHash, false ) && weapons.Contains( weps.Key ) ) {
-                    weapons.Remove( weps.Key );
-                    WeaponCount--;
-                    PlayerDroppedWeapon( weps.Key, weapons.Count );
+                if( !HasPedGotWeapon( PlayerPedId(), wepHash, false ) && PlayerWeapons.Contains( weps.Key ) ) {
+                    PlayerWeapons.Remove( weps.Key );
+                    PlayerDroppedWeapon( weps.Key, PlayerWeapons.Count );
                 }
 
             }
                 
-        }
-
-        public int GetWeaponCount() {
-            return weapons.Count;
         }
 
         public virtual void PlayerPickedUpWeapon(string wepName, int count) {
@@ -150,8 +144,15 @@ namespace Salty_Gamemodes_Client {
             Debug.WriteLine( "Player has dropped " + wepName );
         }
 
+        public virtual void HUD() {
+            if( inGame ) {
+                GameMap.DrawBoundarys();
+            }
+        }
+
         public virtual void Update() {
 
+            HUD();
             Events();
             Controls();
 
@@ -249,6 +250,13 @@ namespace Salty_Gamemodes_Client {
             }
 
             noclipPos = GetOffsetFromEntityInWorldCoords( PlayerPedId(), offset.X, offset.Y, offset.Z );
+        }
+
+        public void FirstPersonForAlive() {
+            if( Team != 0 ) {
+                if( GetFollowPedCamViewMode() != 4 )
+                    SetFollowPedCamViewMode( 4 );
+            }
         }
 
         public static Vector3 StringToVector3( string vector ) {

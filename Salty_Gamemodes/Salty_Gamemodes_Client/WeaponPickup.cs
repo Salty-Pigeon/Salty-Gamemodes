@@ -12,6 +12,7 @@ namespace Salty_Gamemodes_Client {
 
         Map GameMap;
 
+        public string WeaponModel;
         public uint WeaponHash;
         public int WorldModel;
         public Vector3 Position;
@@ -23,15 +24,16 @@ namespace Salty_Gamemodes_Client {
         float pickupTime;
         bool canPickup;
 
-        public WeaponPickup( Map map, uint weaponHash, int worldModel, Vector3 position, bool playerDropped ) {
+        public WeaponPickup( Map map, string weaponModel, uint weaponHash, int worldModel, Vector3 position, bool playerDropped ) {
             GameMap = map;
+            WeaponModel = weaponModel;
             WeaponHash = weaponHash;
             WorldModel = worldModel;
             Position = position;
             PlayerDropped = playerDropped;
             if( playerDropped ) {
                 canPickup = false;
-                pickupTime = GetGameTimer() + (3 * 1000);
+                pickupTime = GetGameTimer() + (2 * 1000);
             } else {
                 canPickup = true;
             }
@@ -48,12 +50,19 @@ namespace Salty_Gamemodes_Client {
         }
 
         public void Update() {
-            if( Position.DistanceToSquared(Game.PlayerPed.Position) <= pickupRange && BaseGamemode.WeaponCount < 2 && canPickup  ) {
+            int wepCount = 0;
+            if( GameMap.Gamemode != null )
+                wepCount = GameMap.Gamemode.PlayerWeapons.Count;
+            bool canPickupEvent = true;
+            if( GameMap.Gamemode != null )
+                canPickupEvent = GameMap.Gamemode.CanPickupWeapon( WeaponModel );
+
+            if( Position.DistanceToSquared(Game.PlayerPed.Position) <= pickupRange && wepCount < 2 && canPickup && canPickupEvent ) {
                 GiveWeaponToPed( PlayerPedId(), WeaponHash, 50, false, true );
                 Destroy();
             }
 
-            if( GetGameTimer() - pickupTime > 1 * 1000 ) {
+            if( GetGameTimer() - pickupTime > 0 ) {
                 canPickup = true;
             }
         }

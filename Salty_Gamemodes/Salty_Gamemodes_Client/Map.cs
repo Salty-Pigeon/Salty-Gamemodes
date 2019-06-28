@@ -10,6 +10,8 @@ using System.Threading.Tasks;
 namespace Salty_Gamemodes_Client {
     public class Map : BaseScript {
 
+        public BaseGamemode Gamemode;
+
         public Dictionary<string, string> Weapons = new Dictionary<string, string>(){
             { "WEAPON_PISTOL", "W_PI_PISTOL"  },
             { "WEAPON_COMBATPISTOL", "W_PI_COMBATPISTOL" },
@@ -60,7 +62,6 @@ namespace Salty_Gamemodes_Client {
 
         }
 
-
         public void CreateBlip() {
             Blip = AddBlipForArea( Position.X, Position.Y, Position.Z, Size.X, Size.Y );
             SetBlipAsShortRange( Blip, true );
@@ -80,6 +81,24 @@ namespace Salty_Gamemodes_Client {
             }
         }
        
+
+        public void DrawBoundarys() {
+
+            // Top box
+            DrawBox( Position.X - (Size.X / 2), Position.Y - (Size.Y / 2), 0, Position.X + (Size.X / 2), Position.Y - (Size.Y / 2) - 0.1f, 1000, 0, 0, 0, 200 ); 
+
+            // Left box
+            DrawBox( Position.X - (Size.X / 2), Position.Y - (Size.Y / 2), 0, Position.X - (Size.X / 2) - 0.1f, Position.Y + (Size.Y / 2), 1000, 0, 0, 0, 200 );
+
+            // Right box
+            DrawBox( Position.X + (Size.X / 2), Position.Y + (Size.Y / 2), 0, Position.X + (Size.X / 2) + 0.1f, Position.Y - (Size.Y / 2), 1000, 0, 0, 0, 200 );
+
+            // Bottom box
+            DrawBox( Position.X - (Size.X / 2), Position.Y + (Size.Y / 2), 0, Position.X + (Size.X / 2), Position.Y + (Size.Y / 2) + 0.1f, 1000, 0, 0, 0, 200 );
+
+            // Roof
+            DrawBox( Position.X - (Size.X / 2), Position.Y - (Size.Y / 2), 1000, Position.X + (Size.X / 2), Position.Y + (Size.Y / 2), 1000.1f, 0, 0, 0, 200 );
+        }
 
         public void RemoveWeapon(WeaponPickup item) {
             SpawnedWeapons.Remove( item );
@@ -115,13 +134,13 @@ namespace Salty_Gamemodes_Client {
                         }
                         uint pickupHash = (uint)GetHashKey( wepModel );
                         int worldHash = GetHashKey( worldModel );
-                        WeaponPickup item = new WeaponPickup( this, pickupHash, worldHash, gunPos, false );
+                        WeaponPickup item = new WeaponPickup( this, wepModel, pickupHash, worldHash, gunPos, false );
                         SpawnedWeapons.Add( item );
 
                     }
                     else {
 
-                        WeaponPickup item = new WeaponPickup( this, (uint)GetHashKey( gunTypes.Key ), GetHashKey( Weapons[gunTypes.Key] ), gunPos, false );
+                        WeaponPickup item = new WeaponPickup( this, gunTypes.Key, ( uint)GetHashKey( gunTypes.Key ), GetHashKey( Weapons[gunTypes.Key] ), gunPos, false );
                         SpawnedWeapons.Add( item );
 
                     }
