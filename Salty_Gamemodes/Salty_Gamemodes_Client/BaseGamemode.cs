@@ -30,7 +30,7 @@ namespace Salty_Gamemodes_Client {
         public int Team;
 
         public BaseGamemode() {
-            TeamText = new Text( "Spectator", new System.Drawing.PointF( 20, 100 ), 1.0f );
+            TeamText = new Text( "Spectator", new System.Drawing.PointF( Screen.Width * 0.033f, Screen.Height * 0.855f ), 1.0f );
             BoundText = new Text( "", new System.Drawing.PointF( Screen.Width * 0.2f, Screen.Height * 0.1f), 1.0f );
         }
 
@@ -89,6 +89,10 @@ namespace Salty_Gamemodes_Client {
             RemoveAllPedWeapons( PlayerPedId(), true );
             PlayerWeapons = new List<string>();
 
+        }
+
+        public void DrawRectangle( float x, float y, float width, float height, int r, int g, int b, int alpha ) {
+            DrawRect( x + (width / 2), y + (height / 2), width, height, r, g, b, alpha );
         }
 
         public virtual void Controls() {

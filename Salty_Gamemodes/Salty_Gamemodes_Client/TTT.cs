@@ -121,13 +121,20 @@ namespace Salty_Gamemodes_Client {
             HideHudAndRadarThisFrame();
 
             if( Team == (int)Teams.Traitors ) {
-                TeamText.Color = System.Drawing.Color.FromArgb( 200, 0, 0 );
+                TeamText.Color = System.Drawing.Color.FromArgb( 255, 255, 255 );
+                TeamText.Scale = 0.5f;
                 TeamText.Caption = "Traitor";
+                DrawRectangle( 0.025f, 0.86f, 0.07f, 0.03f, 200, 0, 0, 200 );
+
             }
             if( Team == (int)Teams.Innocents ) {
                 TeamText.Color = System.Drawing.Color.FromArgb( 0, 200, 0 );
                 TeamText.Caption = "Innocent";
             }
+
+            DrawRectangle( 0.025f, 0.9f, 0.1f, 0.03f, 0, 0, 0, 200 );
+            float healthPercent = (float)Game.PlayerPed.Health / (float)Game.PlayerPed.MaxHealth;
+            DrawRectangle( 0.025f, 0.9f, (healthPercent) * 0.1f, 0.03f, 200, 0, 0, 200 );
 
 
             base.HUD();
