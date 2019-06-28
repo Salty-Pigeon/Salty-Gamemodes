@@ -65,6 +65,7 @@ namespace Salty_Gamemodes_Client {
             if( GetGameTimer() - pickupTime > 0 ) {
                 canPickup = true;
             }
+
         }
 
         public void Destroy() {

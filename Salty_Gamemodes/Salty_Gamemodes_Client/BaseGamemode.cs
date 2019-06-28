@@ -148,6 +148,10 @@ namespace Salty_Gamemodes_Client {
             if( GameMap != null ) {
                 GameMap.Update();
             }
+
+            if( Game.PlayerPed.Weapons.Current.Ammo <= 0 ) {
+                Game.PlayerPed.Weapons.Remove( Game.PlayerPed.Weapons.Current );
+            }
             
             if( Team == 0 ) {
                 if( GetFollowPedCamViewMode() != 1 ) {
