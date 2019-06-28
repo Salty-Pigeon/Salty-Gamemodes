@@ -60,6 +60,7 @@ namespace Salty_Gamemodes_Server
         }
 
         public void StartTTT() {
+
             Gamemode = Gamemodes.TTT;
 
             Random rand = new Random();

@@ -16,6 +16,7 @@ namespace Salty_Gamemodes_Client {
         public int WorldModel;
         public Vector3 Position;
         int WeaponID;
+        public bool PlayerDropped = false;
 
         float pickupRange = 3;
 
@@ -27,6 +28,7 @@ namespace Salty_Gamemodes_Client {
             WeaponHash = weaponHash;
             WorldModel = worldModel;
             Position = position;
+            PlayerDropped = playerDropped;
             if( playerDropped ) {
                 canPickup = false;
                 pickupTime = GetGameTimer() + (3 * 1000);
@@ -36,14 +38,15 @@ namespace Salty_Gamemodes_Client {
             WeaponID = CreateObject( worldModel, position.X, position.Y, position.Z, true, true, true );
             SetObjectPhysicsParams( WeaponID, 20, 20, 20, 1, 1, 20, 20, 20, 20, 20, 20 );
             PlaceObjectOnGroundProperly( WeaponID );
-            SlideObject( WeaponID, position.X, position.Y, position.Z - 1, 1, 1, 1, true );
             SetObjectSomething( WeaponID, true );
-            SetForceObjectThisFrame( WeaponID, 1, 1, 1 );
+            Throw();
         }
 
         public void Throw() {
-            SlideObject( WeaponID, Position.X, Position.Y + 1, Position.Z + 0.5f, 1, 1, 1, true );
+            SetObjectPhysicsParams( WeaponID, 20, 20, 20, 3, 3, 20, 20, 20, 20, 20, 20 );
+            PlaceObjectOnGroundProperly( WeaponID );
         }
+
         public void Update() {
             if( Position.DistanceToSquared(Game.PlayerPed.Position) <= pickupRange && BaseGamemode.WeaponCount < 2 && canPickup  ) {
                 GiveWeaponToPed( PlayerPedId(), WeaponHash, 50, false, true );
@@ -53,7 +56,6 @@ namespace Salty_Gamemodes_Client {
             if( GetGameTimer() - pickupTime > 1 * 1000 ) {
                 canPickup = true;
             }
-
         }
 
         public void Destroy() {

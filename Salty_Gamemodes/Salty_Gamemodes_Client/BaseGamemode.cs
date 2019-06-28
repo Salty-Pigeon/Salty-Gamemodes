@@ -92,10 +92,10 @@ namespace Salty_Gamemodes_Client {
 
 
                 // Drop current weapon, basegameode handles everything weapon related, grab the name of weapon from current weapon that's all that is needed from weapons.
-                foreach( WeaponPickup wep in GameMap.SpawnedWeapons ) {
+                foreach( WeaponPickup wep in GameMap.SpawnedWeapons.ToList() ) {
 
                     if( (int)wep.WeaponHash == Game.PlayerPed.Weapons.Current.Hash.GetHashCode() ) {
-                        WeaponPickup item = new WeaponPickup( GameMap, wep.WeaponHash, wep.WorldModel, Game.Player.Character.Position + new Vector3(0,0,1), true );
+                        WeaponPickup item = new WeaponPickup( GameMap, wep.WeaponHash, wep.WorldModel, Game.Player.Character.Position, true );
                         item.Throw();
                         GameMap.SpawnedWeapons.Add( item );
                         break;

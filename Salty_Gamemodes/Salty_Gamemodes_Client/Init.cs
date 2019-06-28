@@ -31,9 +31,11 @@ namespace Salty_Gamemodes_Client
         }
 
         public void StartGame( int id, int team, Vector3 mapPos, Vector3 mapSize, Vector3 startPos, ExpandoObject gunSpawns ) {
+            if( ActiveGame.inGame )
+                ActiveGame.End();
             ActiveGame.SetNoClip( false );
             Debug.WriteLine( "Starting game" );
-            Map map = new Map( ActiveGame, mapPos, mapSize, "" );
+            Map map = new Map( mapPos, mapSize, "" );
             map.GunSpawns = ExpandoToDictionary( gunSpawns );
             if( id == 1 ) { // Trouble in Terrorist Town
                 ActiveGame = new TTT(map, team);
@@ -85,7 +87,7 @@ namespace Salty_Gamemodes_Client
                     Maps[obj.Key].SpawnPoints = spawns[obj.Key];
                 }
                 else {
-                    Map map = new Map( ActiveGame, bounds[0], bounds[1], obj.Key );
+                    Map map = new Map( bounds[0], bounds[1], obj.Key );
                     map.SpawnPoints = spawns[obj.Key];
                     Maps.Add( obj.Key, map );
                 }

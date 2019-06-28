@@ -10,8 +10,6 @@ using System.Threading.Tasks;
 namespace Salty_Gamemodes_Client {
     public class Map : BaseScript {
 
-        BaseGamemode Gamemode;
-
         public Dictionary<string, string> Weapons = new Dictionary<string, string>(){
             { "WEAPON_PISTOL", "W_PI_PISTOL"  },
             { "WEAPON_COMBATPISTOL", "W_PI_COMBATPISTOL" },
@@ -55,8 +53,7 @@ namespace Salty_Gamemodes_Client {
 
         public bool isVisible = false;
 
-        public Map( BaseGamemode gamemode, Vector3 position, Vector3 size, string name ) {
-            Gamemode = gamemode;
+        public Map( Vector3 position, Vector3 size, string name ) {
             Position = position;
             Size = size;
             Name = name;       
@@ -134,10 +131,17 @@ namespace Salty_Gamemodes_Client {
         }
 
         public void ClearWeapons() {
-            foreach( var obj in SpawnedWeapons ) {
-                //RemovePickup( obj );
-                obj.Destroy();
+
+
+            foreach( var wep in SpawnedWeapons.ToList() ) {
+                try {
+                    wep.Destroy();
+                } catch {
+                    Debug.WriteLine( string.Format("{0} failed to delete, player dropped? {1}", wep.WorldModel, wep.PlayerDropped ));
+                }
             }
+
+            
         }
 
         public void DrawSpawnPoints() {
