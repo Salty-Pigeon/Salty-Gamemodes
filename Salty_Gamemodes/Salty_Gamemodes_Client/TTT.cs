@@ -11,6 +11,11 @@ using System.Dynamic;
 namespace Salty_Gamemodes_Client {
     class TTT : BaseGamemode {
 
+
+        public Text TeamText;
+        public Text HealthText;
+        public Text AmmoText;
+
         public enum Teams {
             Spectators,
             Traitors,
@@ -43,6 +48,9 @@ namespace Salty_Gamemodes_Client {
         public GameState CurrentState = GameState.None;
 
         public TTT( Map gameMap, int team ) {
+            TeamText = new Text( "Spectator", new System.Drawing.PointF( Screen.Width * 0.033f, Screen.Height * 0.855f ), 0.5f );
+            HealthText = new Text( "Health: ", new System.Drawing.PointF( Screen.Width * 0.033f, Screen.Height * 0.895f ), 0.5f );
+            AmmoText = new Text( "Ammo: ", new System.Drawing.PointF( Screen.Width * 0.033f, Screen.Height * 0.935f ), 0.5f );
             GameMap = gameMap;
             GameMap.Gamemode = this;
             GameMap.CreateBlip();
@@ -50,6 +58,8 @@ namespace Salty_Gamemodes_Client {
         }
 
         public override void Start() {
+            Game.Player.Character.MaxHealth = 100;
+            Game.Player.Character.Health = 100;
             WriteChat( "Game starting" );
             base.Start();
         }
@@ -113,6 +123,8 @@ namespace Salty_Gamemodes_Client {
         }
 
         public override void PlayerSpawned( ExpandoObject spawnInfo ) {
+            Game.Player.Character.MaxHealth = 100;
+            Game.Player.Character.Health = 100;
             base.PlayerSpawned( spawnInfo );
         }
 
@@ -121,23 +133,46 @@ namespace Salty_Gamemodes_Client {
             HideHudAndRadarThisFrame();
 
             if( Team == (int)Teams.Traitors ) {
-                TeamText.Color = System.Drawing.Color.FromArgb( 255, 255, 255 );
-                TeamText.Scale = 0.5f;
-                TeamText.Caption = "Traitor";
                 DrawRectangle( 0.025f, 0.86f, 0.07f, 0.03f, 200, 0, 0, 200 );
+            }
 
-            }
-            if( Team == (int)Teams.Innocents ) {
-                TeamText.Color = System.Drawing.Color.FromArgb( 0, 200, 0 );
-                TeamText.Caption = "Innocent";
-            }
+            HealthText.Caption = Game.Player.Character.Health.ToString();
+            AmmoText.Caption = Game.PlayerPed.Weapons.Current.AmmoInClip + " / " + Game.PlayerPed.Weapons.Current.Ammo;
 
             DrawRectangle( 0.025f, 0.9f, 0.1f, 0.03f, 0, 0, 0, 200 );
-            float healthPercent = (float)Game.PlayerPed.Health / (float)Game.PlayerPed.MaxHealth;
+            float healthPercent = (float)Game.Player.Character.Health / Game.Player.Character.MaxHealth;
+            if( healthPercent < 0 )
+                healthPercent = 0;
+            if( healthPercent > 1 )
+                healthPercent = 1;
             DrawRectangle( 0.025f, 0.9f, (healthPercent) * 0.1f, 0.03f, 200, 0, 0, 200 );
 
+            DrawRectangle( 0.025f, 0.94f, 0.1f, 0.03f, 200, 200, 0, 200 );
+
+
+            TeamText.Draw();
+            HealthText.Draw();
+            AmmoText.Draw();
 
             base.HUD();
+        }
+
+        public override void SetTeam( int team ) {
+            switch( team ) {
+                case (0):
+                    TeamText.Caption = "Spectator";
+                    TeamText.Color = System.Drawing.Color.FromArgb( 150, 150, 0 );
+                    break;
+                case (1):
+                    TeamText.Caption = "Traitor";
+                    TeamText.Color = System.Drawing.Color.FromArgb( 255, 255, 255 );
+                    break;
+                case (2):
+                    TeamText.Caption = "Innocent";
+                    TeamText.Color = System.Drawing.Color.FromArgb( 255, 255, 255 );
+                    break;
+            }
+            base.SetTeam( team );
         }
 
         public override void Update() {

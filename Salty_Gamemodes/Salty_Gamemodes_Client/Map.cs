@@ -85,19 +85,19 @@ namespace Salty_Gamemodes_Client {
         public void DrawBoundarys() {
 
             // Top box
-            DrawBox( Position.X - (Size.X / 2), Position.Y - (Size.Y / 2), 0, Position.X + (Size.X / 2), Position.Y - (Size.Y / 2) - 0.1f, 1000, 0, 0, 0, 200 ); 
+            DrawBox( Position.X - (Size.X / 2), Position.Y - (Size.Y / 2), 0, Position.X + (Size.X / 2), Position.Y - (Size.Y / 2) - 0.1f, 1000, 0, 0, 0, 100 ); 
 
             // Left box
-            DrawBox( Position.X - (Size.X / 2), Position.Y - (Size.Y / 2), 0, Position.X - (Size.X / 2) - 0.1f, Position.Y + (Size.Y / 2), 1000, 0, 0, 0, 200 );
+            DrawBox( Position.X - (Size.X / 2), Position.Y - (Size.Y / 2), 0, Position.X - (Size.X / 2) - 0.1f, Position.Y + (Size.Y / 2), 1000, 0, 0, 0, 100 );
 
             // Right box
-            DrawBox( Position.X + (Size.X / 2), Position.Y + (Size.Y / 2), 0, Position.X + (Size.X / 2) + 0.1f, Position.Y - (Size.Y / 2), 1000, 0, 0, 0, 200 );
+            DrawBox( Position.X + (Size.X / 2), Position.Y + (Size.Y / 2), 0, Position.X + (Size.X / 2) + 0.1f, Position.Y - (Size.Y / 2), 1000, 0, 0, 0, 100 );
 
             // Bottom box
-            DrawBox( Position.X - (Size.X / 2), Position.Y + (Size.Y / 2), 0, Position.X + (Size.X / 2), Position.Y + (Size.Y / 2) + 0.1f, 1000, 0, 0, 0, 200 );
+            DrawBox( Position.X - (Size.X / 2), Position.Y + (Size.Y / 2), 0, Position.X + (Size.X / 2), Position.Y + (Size.Y / 2) + 0.1f, 1000, 0, 0, 0, 100 );
 
             // Roof
-            DrawBox( Position.X - (Size.X / 2), Position.Y - (Size.Y / 2), 1000, Position.X + (Size.X / 2), Position.Y + (Size.Y / 2), 1000.1f, 0, 0, 0, 200 );
+            DrawBox( Position.X - (Size.X / 2), Position.Y - (Size.Y / 2), 1000, Position.X + (Size.X / 2), Position.Y + (Size.Y / 2), 1000.1f, 0, 0, 0, 100 );
         }
 
         public void RemoveWeapon(WeaponPickup item) {

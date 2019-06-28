@@ -16,7 +16,7 @@ namespace Salty_Gamemodes_Client {
         public List<string> PlayerWeapons = new List<string>();
 
 
-        public Text TeamText;
+        
         public Text BoundText;
 
         public bool inGame = false;
@@ -30,7 +30,6 @@ namespace Salty_Gamemodes_Client {
         public int Team;
 
         public BaseGamemode() {
-            TeamText = new Text( "Spectator", new System.Drawing.PointF( Screen.Width * 0.033f, Screen.Height * 0.855f ), 1.0f );
             BoundText = new Text( "", new System.Drawing.PointF( Screen.Width * 0.2f, Screen.Height * 0.1f), 1.0f );
         }
 
@@ -67,28 +66,14 @@ namespace Salty_Gamemodes_Client {
             return !(GetType().IsSubclassOf( typeof( BaseGamemode ) ));
         }
 
-        public void SetTeam( int team ) {
-            Team = team;
-            switch( team ) {
-                case ( 0 ):
-                    TeamText.Caption = "Spectator";
-                    TeamText.Color = System.Drawing.Color.FromArgb( 150, 150, 0 );
-                    break;
-                case ( 1 ):
-                    TeamText.Caption = "Traitor";
-                    TeamText.Color = System.Drawing.Color.FromArgb( 200, 0, 0 );
-                    break;
-                case ( 2 ):
-                    TeamText.Caption = "Innocent";
-                    TeamText.Color = System.Drawing.Color.FromArgb( 0, 200, 0 );
-                    break;
-            }
-        }
-
         public void StripWeapons() {
             RemoveAllPedWeapons( PlayerPedId(), true );
             PlayerWeapons = new List<string>();
 
+        }
+
+        public virtual void SetTeam( int team ) {
+            Team = team;
         }
 
         public void DrawRectangle( float x, float y, float width, float height, int r, int g, int b, int alpha ) {
@@ -160,16 +145,15 @@ namespace Salty_Gamemodes_Client {
             Events();
             Controls();
 
-            if( GameMap == null ) {
-                TeamText.Color = System.Drawing.Color.FromArgb( 150, 150, 0 );
-                TeamText.Caption = "Spectator";
+            if( GameMap != null ) {
+                GameMap.Update();
+            }
+            
+            if( Team == 0 ) {
                 if( GetFollowPedCamViewMode() != 1 ) {
                     SetFollowPedCamViewMode( 1 );
                 }
-            } else {
-                GameMap.Update();
             }
-         
 
             if( isNoclip ) {
                 NoClipUpdate();
@@ -197,7 +181,7 @@ namespace Salty_Gamemodes_Client {
                 }
             }
 
-            TeamText.Draw();
+            
         }
 
         public virtual void SetNoClip( bool toggle ) {
