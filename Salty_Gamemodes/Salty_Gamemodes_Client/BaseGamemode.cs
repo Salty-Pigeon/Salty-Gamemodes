@@ -37,7 +37,7 @@ namespace Salty_Gamemodes_Client {
         }
 
         public virtual void Start() {
-            RemoveAllPedWeapons( PlayerPedId(), true );
+            StripWeapons();
             GameMap.SpawnWeapons();
             inGame = true;
         }
@@ -85,6 +85,13 @@ namespace Salty_Gamemodes_Client {
                     TeamText.Color = System.Drawing.Color.FromArgb( 0, 200, 0 );
                     break;
             }
+        }
+
+        public void StripWeapons() {
+            RemoveAllPedWeapons( PlayerPedId(), true );
+            weapons = new List<string>();
+            WeaponCount = 0;
+
         }
 
         private void Controls() {
