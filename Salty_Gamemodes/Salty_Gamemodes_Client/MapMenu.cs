@@ -13,25 +13,21 @@ namespace Salty_Gamemodes_Client {
     class MapMenu : BaseScript {
 
 
+        private double DegreeToRadian( double angle ) {
+            return Math.PI * angle / 180.0;
+        }
+
         public MapMenu( Init instance, string name, string subtitle, Dictionary<string, Map> Maps ) {
 
             MenuController.MenuAlignment = MenuController.MenuAlignmentOption.Right;
             Menu mapMenu = new Menu( name, subtitle ) { Visible = true };
             MenuController.AddMenu( mapMenu );
 
-            // Create a third menu without a banner.
-
-            //Debug.WriteLine( Maps.Count.ToString() );
-            //Debug.WriteLine( Maps.ElementAt(0).Key );
-            // you can use AddSubmenu or AddMenu, both will work but if you want to link this menu from another menu,
-            // you should use AddSubmenu.
-
-
 
 
             foreach( var map in Maps ) {
-                Debug.WriteLine( map.Value.isVisible.ToString() );
-                Vector3 selectedVector = map.Value.SpawnPoints[0];
+                Vector3 selectedVector = map.Value.SpawnPoints[0][0];
+                int selectedTeam = 0;
 
                 Menu mapEditor = AddSubMenu( mapMenu, "Edit " + map.Key );
 
@@ -52,7 +48,6 @@ namespace Salty_Gamemodes_Client {
                         deleteMapMenu.CloseMenu();
                     }
                 };
-
                 mapEditor.AddMenuItem( new MenuItem( "Show/Hide" ) );
 
                 mapEditor.OnItemSelect += ( _menu, _item, _index ) => {
@@ -66,15 +61,58 @@ namespace Salty_Gamemodes_Client {
 
                 Menu modifyPosMenu = AddSubMenu( playerSpawnMenu, "Edit position" );
 
+                MenuSliderItem sliderX = new MenuSliderItem( "Centre X", -999999, 999999, (int)map.Value.Position.X, false );
+                MenuSliderItem sliderY = new MenuSliderItem( "Centre Y", -999999, 999999, (int)map.Value.Position.Y, false );
+                MenuSliderItem sliderWidth = new MenuSliderItem( "Width", 0, 999999, (int)map.Value.Size.X, false );
+                MenuSliderItem sliderLength = new MenuSliderItem( "Length", 0, 999999, (int)map.Value.Size.Y, false );
+                MenuSliderItem sliderRotation = new MenuSliderItem( "Rotation", 0, 360, 180, false );
+
+                mapEditor.AddMenuItem( sliderX );
+                mapEditor.AddMenuItem( sliderY );
+                mapEditor.AddMenuItem( sliderWidth );
+                mapEditor.AddMenuItem( sliderLength );
+                mapEditor.AddMenuItem( sliderRotation );
+
                 MenuItem playerSpawnItem = AddMenuItem( mapEditor, playerSpawnMenu, "Player Spawns", "Modify player spawn points", ">>", true );
                 MenuItem deleteMapItem = AddMenuItem( mapEditor, deleteMapMenu, "Delete Map", "Delete entire map", ">", true );
 
                 modifyPosMenu.AddMenuItem( new MenuItem( "Delete", "Deletes the selected position" ) );
+                mapEditor.AddMenuItem( new MenuItem( "Save", "Saves new position and size" ) );
 
+
+
+
+                mapEditor.OnSliderPositionChange += ( _menu, _sliderItem, _oldPosition, _newPosition, _itemIndex ) => {
+                    if( _sliderItem.Text == "Centre X" ) {
+                        map.Value.Position.X = _newPosition;
+                    }
+                    if( _sliderItem.Text == "Centre Y" ) {
+                        map.Value.Position.Y = _newPosition;
+                    }
+                    if( _sliderItem.Text == "Width" ) {
+                        map.Value.Size.X = _newPosition;
+                    }
+                    if( _sliderItem.Text == "Length" ) {
+                        map.Value.Size.Y = _newPosition;
+                    }
+                    if( _sliderItem.Text == "Rotation" ) {
+                        map.Value.Position.X = (float)(map.Value.Position.X * Math.Cos( DegreeToRadian( _itemIndex ) ) - map.Value.Position.Y * Math.Sin( DegreeToRadian( _itemIndex ) ));
+                        map.Value.Position.Y = (float)(map.Value.Position.X * Math.Sin( DegreeToRadian( _itemIndex ) ) + map.Value.Position.Y * Math.Cos( DegreeToRadian( _itemIndex ) ));
+                
+                    }
+                    
+
+                };
+
+                mapEditor.OnItemSelect += ( _menu, _item, _index ) => {
+                    if( _item.Text == "Save" ) {
+                        TriggerServerEvent( "salty::netModifyMap", "add", map.Key, 0, map.Value.Position, map.Value.Size );
+                    }
+                };
 
                 modifyPosMenu.OnItemSelect += ( _menu, _item, _index ) => {
                     if( _item.Text == "Delete" ) {
-                        TriggerServerEvent( "salty::netModifyMapPos", "delete", map.Key, selectedVector );
+                        TriggerServerEvent( "salty::netModifyMapPos", "delete", map.Key, selectedTeam, selectedVector );
                         MenuController.CloseAllMenus();
                         TriggerServerEvent( "salty::netSpawnPointGUI" );
 
@@ -82,10 +120,15 @@ namespace Salty_Gamemodes_Client {
                 };
 
                 foreach( var spawns in map.Value.SpawnPoints ) {
-                    MenuItem playerPositionItem = AddMenuItem( playerSpawnMenu, modifyPosMenu, spawns.ToString(), "Modify player spawn point", ">", true );
+                    foreach( var spawn in spawns.Value ) {
+                        MenuItem playerPositionItem = AddMenuItem( playerSpawnMenu, modifyPosMenu, string.Format( "{0} | {1}", spawns.Key.ToString(), spawn.ToString() ), "Modify player spawn point", ">", true );
+
+                    }
 
                     playerSpawnMenu.OnIndexChange += ( _menu, _oldItem, _newItem, _oldIndex, _newIndex ) => {
-                        selectedVector = BaseGamemode.StringToVector3( _newItem.Text );
+                        string[] vector = _newItem.Text.Split( '|' );
+                        selectedTeam = Convert.ToInt32( vector[0].Split( ' ' )[0] );
+                        selectedVector = BaseGamemode.StringToVector3( vector[1].Substring(1) );
                     };
                 }
 

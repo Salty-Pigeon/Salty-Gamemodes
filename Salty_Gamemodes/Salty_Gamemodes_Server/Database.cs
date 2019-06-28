@@ -42,7 +42,8 @@ namespace Salty_Gamemodes_Server {
                         var points = spawnPoints.Split( ':' );
                         for( var i = 0; i < points.Length; i++ ) {
                             var vector = points[ i ].Split( ',' );
-                            map.AddSpawnPoint( new Vector3( float.Parse( vector[ 0 ] ), float.Parse( vector[ 1 ] ), float.Parse( vector[ 2 ] ) ) );
+                            //map.AddSpawnPoint( Convert.ToInt32(vector[0]), new Vector3( float.Parse( vector[1] ), float.Parse( vector[2] ), float.Parse( vector[3] ) ) );
+                            map.AddSpawnPoint( Convert.ToInt32(vector[0]), new Vector3( float.Parse( vector[1] ), float.Parse( vector[2] ), float.Parse( vector[3] ) ) );
                         }
                     }
 

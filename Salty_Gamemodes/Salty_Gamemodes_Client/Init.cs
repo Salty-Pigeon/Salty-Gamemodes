@@ -34,7 +34,6 @@ namespace Salty_Gamemodes_Client
             if( ActiveGame.inGame )
                 ActiveGame.End();
             ActiveGame.SetNoClip( false );
-            Debug.WriteLine( "Starting game" );
             Map map = new Map( mapPos, mapSize, "" );
             map.GunSpawns = ExpandoToDictionary( gunSpawns );
             if( id == 1 ) { // Trouble in Terrorist Town
@@ -69,7 +68,17 @@ namespace Salty_Gamemodes_Client
         private void SpawnGUI( ExpandoObject mapObj, ExpandoObject spawnObj ) {
 
 
-            Dictionary<string, List<Vector3>> spawns = ExpandoToDictionary( spawnObj );
+            Dictionary<string, Dictionary<int, List<Vector3>>> spawns = new Dictionary<string, Dictionary<int, List<Vector3>>>();
+            
+            foreach( var map in spawnObj ) {
+                spawns.Add( map.Key, new Dictionary<int, List<Vector3>>() );
+                foreach( var mapSpawns in map.Value as ExpandoObject ) {
+                    spawns[map.Key].Add( Convert.ToInt32(mapSpawns.Key), new List<Vector3>() );
+                    foreach( Vector3 spawn in mapSpawns.Value as List<object> ) {
+                        spawns[map.Key][Convert.ToInt32(mapSpawns.Key)].Add( spawn );
+                    }
+                }
+            }
 
             Dictionary<string, Map> Maps = new Dictionary<string, Map>();
 
@@ -79,7 +88,6 @@ namespace Salty_Gamemodes_Client
                 foreach( Vector3 vec in conversion ) {
                     bounds.Add( vec );
                 }
-                Debug.WriteLine( obj.Key );
 
                 if( Maps.ContainsKey(obj.Key) ) {
                     Maps[obj.Key].Position = bounds[0];
@@ -122,6 +130,7 @@ namespace Salty_Gamemodes_Client
             foreach( var map in Maps ) {
                 if( map.Value.isVisible ) {
                     map.Value.DrawSpawnPoints();
+                    map.Value.DrawBoundarys();
                 }
             }
 
@@ -153,7 +162,7 @@ namespace Salty_Gamemodes_Client
             } ), false );
 
             RegisterCommand( "addspawnpoint", new Action<int, List<object>, string>( ( source, args, raw ) => {
-                TriggerServerEvent( "salty::netModifyMapPos", "add", "AUTO", Game.Player.Character.Position );
+                TriggerServerEvent( "salty::netModifyMapPos", "add", "AUTO", Convert.ToInt32(args[0]), Game.Player.Character.Position );
             } ), false );
 
             RegisterCommand( "addweaponpoint", new Action<int, List<object>, string>( ( source, args, raw ) => {
@@ -163,7 +172,7 @@ namespace Salty_Gamemodes_Client
             RegisterCommand( "createmap", new Action<int, List<object>, string>( ( source, args, raw ) => {
                 if( args[ 2 ] == null )
                     return;
-                TriggerServerEvent( "salty::netModifyMap", "add", args[0], Game.Player.Character.Position, new Vector3( float.Parse( args[1].ToString() ), float.Parse( args[2].ToString() ), 0 ) );
+                TriggerServerEvent( "salty::netModifyMap", "add", args[0], 0, Game.Player.Character.Position, new Vector3( float.Parse( args[1].ToString() ), float.Parse( args[2].ToString() ), 0 ) );
             } ), false );
 
             RegisterCommand( "test", new Action<int, List<object>, string>( ( source, args, raw ) => {

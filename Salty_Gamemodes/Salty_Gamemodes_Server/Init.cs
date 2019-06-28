@@ -12,7 +12,8 @@ namespace Salty_Gamemodes_Server
 
         enum Gamemodes {
             None,
-            TTT
+            TTT,
+            DriveOrDie
         }
 
 
@@ -29,9 +30,9 @@ namespace Salty_Gamemodes_Server
             EventHandlers[ "salty::netStartGame" ] += new Action( ActiveGame.Start );
             EventHandlers[ "salty::netEndGame" ] += new Action( ActiveGame.End );
             EventHandlers[ "salty::netSpawnPointGUI" ] += new Action<Player>( SpawnPointGUI );
-            EventHandlers[ "salty::netModifyMapPos" ] += new Action<Player, string, string, Vector3>( ModifyMapPosition );
+            EventHandlers[ "salty::netModifyMapPos" ] += new Action<Player, string, string, int, Vector3>( ModifyMapPosition );
             EventHandlers[ "salty::netModifyWeaponPos" ] += new Action<Player, string, string, string, Vector3>( ModifyWeaponPosition );
-            EventHandlers[ "salty::netModifyMap" ] += new Action<Player, string, string, Vector3, Vector3>( ModifyMap );
+            EventHandlers[ "salty::netModifyMap" ] += new Action<Player, string, string, int, Vector3, Vector3>( ModifyMap );
 
             SQLConnection = new Database();
             MapManager = new MapManager( SQLConnection.Load() );
@@ -44,6 +45,13 @@ namespace Salty_Gamemodes_Server
                 EndGame();
             } ), false );
 
+            RegisterCommand( "loadSQL", new Action<int, List<object>, string>( ( source, args, raw ) => {
+                SQLConnection.Load();
+            } ), false );
+
+            RegisterCommand( "saveSQL", new Action<int, List<object>, string>( ( source, args, raw ) => {
+                SQLConnection.SaveAll(MapManager.Maps);
+            } ), false );
 
             Tick += Init_Tick;
         }
@@ -58,6 +66,7 @@ namespace Salty_Gamemodes_Server
             Gamemode = Gamemodes.None;
             ActiveGame = new BaseGamemode( (int)Gamemodes.None );
         }
+
 
         public void StartTTT() {
 
@@ -74,50 +83,52 @@ namespace Salty_Gamemodes_Server
            
         }
 
-        private void ModifyMap([FromSource] Player ply, string setting, string mapName, Vector3 position, Vector3 size ) {
+        private void ModifyMap([FromSource] Player ply, string setting, string mapName, int team, Vector3 position, Vector3 size ) {
             if( setting == "delete" ) {
-                Debug.WriteLine( "Deleteing " + mapName );
                 MapManager.Maps.Remove( mapName );
                 SQLConnection.Remove( mapName );
             }
             if( setting == "add" ) {
-                Debug.WriteLine( "Creating " + mapName );
                 if( MapManager.Maps.ContainsKey( mapName ) )
                     return;
                 Map map = new Map( position, size, mapName );
                 MapManager.Maps.Add( mapName, map );
-                MapManager.Maps[mapName].AddSpawnPoint( position );
+                MapManager.Maps[mapName].AddSpawnPoint( team, position );
                 SQLConnection.SaveMap( MapManager.Maps[ mapName ] );
+            }
+            if( setting == "edit" ) {
+                if( !MapManager.Maps.ContainsKey( mapName ) )
+                    return;
+                MapManager.Maps[mapName].Position = position;
+                MapManager.Maps[mapName].Size = size;
+                SQLConnection.SaveMap( MapManager.Maps[mapName] );
             }
         }
 
         private void ModifyWeaponPosition( [FromSource] Player ply, string setting, string mapName, string weapon, Vector3 position ) {
             if( setting == "delete" ) {
-                MapManager.Maps[mapName].DeleteWeaponSpawn( position );
+                MapManager.Maps[mapName].DeleteWeaponSpawn( weapon, position );
                 SQLConnection.SaveMap( MapManager.Maps[mapName] );
             }
             if( setting == "add" ) {
                 if( mapName == "AUTO" ) {
                     mapName = MapManager.FindInsideMap( position ).Name;
                     MapManager.Maps[mapName].AddWeaponSpawn( weapon, position );
-                    Debug.WriteLine( string.Format( "Adding {0} weapon at {1} on {2}", weapon, position.ToString(), mapName ) );
                     SQLConnection.SaveMap( MapManager.Maps[mapName] );
                 }
             }
         }
 
-        private void ModifyMapPosition([FromSource] Player ply, string setting, string mapName, Vector3 pos ) {
+        private void ModifyMapPosition([FromSource] Player ply, string setting, string mapName, int team, Vector3 pos ) {
             if( setting == "delete" ) {
-                Debug.WriteLine( "Deleteing " + pos.ToString() + " from map " + mapName );
-                MapManager.Maps[ mapName ].DeleteSpawnPoint( pos );
+                MapManager.Maps[ mapName ].DeleteSpawnPoint( team, pos );
                 SQLConnection.SaveMap( MapManager.Maps[mapName] );
             }
             if( setting == "add" ) {
                 if( mapName == "AUTO" ) {
                     mapName = MapManager.FindInsideMap( pos ).Name;
                 }
-                Debug.WriteLine( "Adding " + pos.ToString() + " to map " + mapName );
-                MapManager.Maps[mapName].AddSpawnPoint( pos );
+                MapManager.Maps[mapName].AddSpawnPoint( team, pos );
                 SQLConnection.SaveMap( MapManager.Maps[ mapName ] );
             }
         }

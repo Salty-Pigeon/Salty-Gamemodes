@@ -80,6 +80,22 @@ namespace Salty_Gamemodes_Client {
                 ChangeSelectedWeapon( -1 );
             }
 
+            if( IsControlJustPressed( 0, 23 ) && Game.PlayerPed.Weapons.Current.Hash.ToString() != "Unarmed" ) {
+
+
+                // Drop current weapon, basegameode handles everything weapon related, grab the name of weapon from current weapon that's all that is needed from weapons.
+                foreach( WeaponPickup wep in GameMap.SpawnedWeapons.ToList() ) {
+
+                    if( (int)wep.WeaponHash == Game.PlayerPed.Weapons.Current.Hash.GetHashCode() ) {
+                        WeaponPickup item = new WeaponPickup( GameMap, wep.WeaponModel, wep.WeaponHash, wep.WorldModel, Game.Player.Character.Position, true, Game.PlayerPed.Weapons.Current.Ammo );
+                        item.Throw();
+                        GameMap.SpawnedWeapons.Add( item );
+                        break;
+                    }
+                }
+                Game.PlayerPed.Weapons.Remove( Game.PlayerPed.Weapons.Current );
+            }
+
             base.Controls();
         }
 

@@ -47,7 +47,7 @@ namespace Salty_Gamemodes_Client {
         public Vector3 Size;
         public string Name;
 
-        public List<Vector3> SpawnPoints = new List<Vector3>();
+        public Dictionary<int, List<Vector3>> SpawnPoints = new Dictionary<int, List<Vector3>>();
         public Dictionary<string, List<Vector3>> GunSpawns = new Dictionary<string, List<Vector3>>();
 
 
@@ -72,7 +72,7 @@ namespace Salty_Gamemodes_Client {
             AddTextComponentString( "Map bounds" );
             EndTextCommandSetBlipName( Blip );
             isVisible = true;
-            
+
         }
 
         public void Update() {
@@ -134,13 +134,13 @@ namespace Salty_Gamemodes_Client {
                         }
                         uint pickupHash = (uint)GetHashKey( wepModel );
                         int worldHash = GetHashKey( worldModel );
-                        WeaponPickup item = new WeaponPickup( this, wepModel, pickupHash, worldHash, gunPos, false );
+                        WeaponPickup item = new WeaponPickup( this, wepModel, pickupHash, worldHash, gunPos, false, 50 );
                         SpawnedWeapons.Add( item );
 
                     }
                     else {
 
-                        WeaponPickup item = new WeaponPickup( this, gunTypes.Key, ( uint)GetHashKey( gunTypes.Key ), GetHashKey( Weapons[gunTypes.Key] ), gunPos, false );
+                        WeaponPickup item = new WeaponPickup( this, gunTypes.Key, ( uint)GetHashKey( gunTypes.Key ), GetHashKey( Weapons[gunTypes.Key] ), gunPos, false, 50 );
                         SpawnedWeapons.Add( item );
 
                     }
@@ -164,8 +164,12 @@ namespace Salty_Gamemodes_Client {
         }
 
         public void DrawSpawnPoints() {
-            foreach(Vector3 spawnCoords in SpawnPoints ) {
-                DrawMarker( 2, spawnCoords.X, spawnCoords.Y, spawnCoords.Z, 0.0f, 0.0f, 0.0f, 0.0f, 180.0f, 0.0f, 2.0f, 2.0f, 2.0f, 255, 128, 0, 200, false, true, 2, false, null, null, false );
+            int i = 0;
+            foreach(var spawns in SpawnPoints ) {             
+                foreach( var vector in spawns.Value ) {
+                    DrawMarker( 2, vector.X, vector.Y, vector.Z, 0.0f, 0.0f, 0.0f, 0.0f, 180.0f, 0.0f, 2.0f, 2.0f, 2.0f, i/10*6, i, i/3, 200, false, true, 2, false, null, null, false );
+                }
+                i += 50;
             }
         }
 

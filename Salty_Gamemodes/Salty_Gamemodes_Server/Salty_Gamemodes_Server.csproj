@@ -50,6 +50,7 @@
   <ItemGroup>
     <Compile Include="BaseGamemode.cs" />
     <Compile Include="Database.cs" />
+    <Compile Include="DriveOrDie.cs" />
     <Compile Include="Init.cs" />
     <Compile Include="Map.cs" />
     <Compile Include="MapManager.cs" />

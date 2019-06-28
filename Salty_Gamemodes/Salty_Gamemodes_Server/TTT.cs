@@ -40,7 +40,7 @@ namespace Salty_Gamemodes_Server {
             Random rand = new Random();
             List<Player> players = Players.ToList();
 
-            List<Vector3> spawns = GameMap.SpawnPoints.ToList();
+            List<Vector3> spawns = GameMap.SpawnPoints[0].ToList();
             if( spawns.Count == 0 ) {
                 spawns.Add( GameMap.Position );
             }

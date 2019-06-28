@@ -81,21 +81,7 @@ namespace Salty_Gamemodes_Client {
         }
 
         public virtual void Controls() {
-            if( IsControlJustPressed(0, 23) && Game.PlayerPed.Weapons.Current.Hash.ToString() != "Unarmed" ) {
 
-
-                // Drop current weapon, basegameode handles everything weapon related, grab the name of weapon from current weapon that's all that is needed from weapons.
-                foreach( WeaponPickup wep in GameMap.SpawnedWeapons.ToList() ) {
-
-                    if( (int)wep.WeaponHash == Game.PlayerPed.Weapons.Current.Hash.GetHashCode() ) {
-                        WeaponPickup item = new WeaponPickup( GameMap, wep.WeaponModel, wep.WeaponHash, wep.WorldModel, Game.Player.Character.Position, true );
-                        item.Throw();
-                        GameMap.SpawnedWeapons.Add( item );
-                        break;
-                    }
-                }
-                Game.PlayerPed.Weapons.Remove( Game.PlayerPed.Weapons.Current );
-            }
         }
 
         public virtual bool CanPickupWeapon( string weaponModel ) {
@@ -126,11 +112,11 @@ namespace Salty_Gamemodes_Client {
         }
 
         public virtual void PlayerPickedUpWeapon(string wepName, int count) {
-            Debug.WriteLine( "Player has picked up " + wepName );
+
         }
 
         public virtual void PlayerDroppedWeapon( string wepName, int count ) {
-            Debug.WriteLine( "Player has dropped " + wepName );
+
         }
 
         public virtual void HUD() {

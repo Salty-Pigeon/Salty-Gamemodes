@@ -13,7 +13,7 @@ namespace Salty_Gamemodes_Server {
         public Vector3 Position;
         public Vector3 Size;
 
-        public List<Vector3> SpawnPoints = new List<Vector3>();
+        public Dictionary<int, List<Vector3>> SpawnPoints = new Dictionary<int, List<Vector3>>();
         public Dictionary<string, List<Vector3>> GunSpawns = new Dictionary<string, List<Vector3>>();
 
 
@@ -27,12 +27,17 @@ namespace Salty_Gamemodes_Server {
             return ( pos.X > Position.X - ( Size.X / 2 ) && pos.X < Position.X + ( Size.X / 2 ) && pos.Y > Position.Y - ( Size.Y / 2 ) && pos.Y < Position.Y + ( Size.Y / 2 ) );
         }
 
-        public void AddSpawnPoint( Vector3 spawnPoint ) {
-            SpawnPoints.Add( spawnPoint );
+        public void AddSpawnPoint( int team, Vector3 spawnPoint ) {
+            if( SpawnPoints.ContainsKey( team ) ) {
+                SpawnPoints[team].Add( spawnPoint );
+            }
+            else {
+                SpawnPoints.Add( team, new List<Vector3> { spawnPoint } );
+            }
         }
 
-        public void DeleteSpawnPoint( Vector3 spawnPoint ) {
-            SpawnPoints.Remove( spawnPoint );
+        public void DeleteSpawnPoint( int team, Vector3 spawnPoint ) {
+            SpawnPoints[team].Remove( spawnPoint );
         }
 
 
@@ -44,22 +49,21 @@ namespace Salty_Gamemodes_Server {
             }
         }
 
-        public void DeleteWeaponSpawn( Vector3 pos ) {
-            foreach( var weapSpawns in GunSpawns ) {
-                if( weapSpawns.Value.Contains(pos) ) {
-                    GunSpawns[weapSpawns.Key].Remove( pos );
-                    break;
-                }
-            }
+        public void DeleteWeaponSpawn( string weaponType, Vector3 pos ) {
+            GunSpawns[weaponType].Remove( pos );
         }
 
         public string SpawnPointsAsString( ) {
             string spawnPoints = "";
+
             foreach( var vector in SpawnPoints ) {
-                spawnPoints += string.Format( "{0},{1},{2}:", vector.X, vector.Y, vector.Z );
+                foreach( var spawn in vector.Value ) {
+                    spawnPoints += string.Format( "{0},{1},{2},{3}:", vector.Key, spawn.X, spawn.Y, spawn.Z );
+                }
             }
+
             if( spawnPoints == "" ) {
-                spawnPoints = "0,0,0:";
+                spawnPoints = string.Format("0,{0},{1},{2}:", Position.X, Position.Y, Position.Z);
             }
             return spawnPoints.Substring( 0, spawnPoints.Length - 1 );
         }
