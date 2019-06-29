@@ -62,7 +62,7 @@ namespace Salty_Gamemodes_Client {
             if( Position.DistanceToSquared(Game.PlayerPed.Position) <= pickupRange && canPickup ) {
 
                 if( canPickupEvent ) {
-                    if( wepCount == 0 ) {
+                    if( wepCount <= 1 ) {
                         GiveWeaponToPed( PlayerPedId(), WeaponHash, AmmoCount, false, true );
                         SetPedAmmo( PlayerPedId(), WeaponHash, AmmoCount );
                     } else {

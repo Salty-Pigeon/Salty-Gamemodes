@@ -12,9 +12,20 @@ using CitizenFX.Core.Native;
 namespace Salty_Gamemodes_Client {
     public class BaseGamemode : BaseScript {
 
+
+        public Text HealthText;
+        public Text AmmoText;
+
+        public List<Text> WeaponTexts = new List<Text>();
+
         public bool isNoclip = false;
 
-        public List<string> PlayerWeapons = new List<string>();
+        public float lastScroll = 0;
+
+
+        public List<string> PlayerWeapons = new List<string>() {
+            "WEAPON_UNARMED"
+        };
 
         //private Scaleform playerNameHUD = new Scaleform( "mp_mission_name_freemode" );
         //private Scaleform playerNameHUD = new Scaleform( "RACE_MESSAGE" );
@@ -38,9 +49,14 @@ namespace Salty_Gamemodes_Client {
         public int Team;
 
         public BaseGamemode() {
+            HealthText = new Text( "Health: ", new System.Drawing.PointF( Screen.Width * 0.033f, Screen.Height * 0.895f ), 0.5f );
+            AmmoText = new Text( "Ammo: ", new System.Drawing.PointF( Screen.Width * 0.033f, Screen.Height * 0.935f ), 0.5f );
+
             BoundText = new Text( "", new System.Drawing.PointF( Screen.Width * 0.2f, Screen.Height * 0.1f), 1.0f );
             HUDText = new Text( "", new System.Drawing.PointF( Screen.Width * 0.5f, Screen.Height * 0.5f), 1.0f );
             HUDText.Centered = true;
+
+            
         }
 
         public virtual void Start() {
@@ -50,8 +66,71 @@ namespace Salty_Gamemodes_Client {
                     GameMap.Weapons.Remove( wep.Key );
                 }
             }
-            GameMap.SpawnWeapons();
             inGame = true;
+        }
+
+        public void DrawBaseHealthHUD() {
+            HideHudAndRadarThisFrame();
+
+            HealthText.Caption = Game.Player.Character.Health.ToString();
+            AmmoText.Caption = Game.PlayerPed.Weapons.Current.AmmoInClip + " / " + Game.PlayerPed.Weapons.Current.Ammo;
+
+            DrawRectangle( 0.025f, 0.9f, 0.1f, 0.03f, 0, 0, 0, 200 );
+            float healthPercent = (float)Game.Player.Character.Health / Game.Player.Character.MaxHealth;
+            if( healthPercent < 0 )
+                healthPercent = 0;
+            if( healthPercent > 1 )
+                healthPercent = 1;
+            DrawRectangle( 0.025f, 0.9f, (healthPercent) * 0.1f, 0.03f, 200, 0, 0, 200 );
+
+            DrawRectangle( 0.025f, 0.94f, 0.1f, 0.03f, 200, 200, 0, 200 );
+        }
+
+        public void DrawBaseWeaponHUD() {
+            if( lastScroll + (2 * 1000) > GetGameTimer() ) {
+                int index = 0;
+                var resolution = Screen.Resolution;
+                foreach( var weapon in PlayerWeapons ) {
+                    if( WeaponTexts.Count <= index ) {
+                        WeaponTexts.Add( new Text( weapon, new System.Drawing.PointF( Screen.Width * 0.85f, Screen.Height * 0.85f + (index * 0.4f) ), 0.3f ) );
+                    }
+
+                    if( Game.PlayerPed.Weapons.Current.Hash.GetHashCode() == GetHashKey( weapon ) ) {
+                        DrawRectangle( 0.85f, 0.85f + (0.04f * index), 0.1f, 0.03f, 200, 200, 0, 200 );
+                    }
+                    else {
+                        DrawRectangle( 0.85f, 0.85f + (0.04f * index), 0.1f, 0.03f, 0, 0, 0, 200 );
+                    }
+
+                    WeaponTexts[index].Caption = GameWeapons[weapon];
+                    WeaponTexts[index].Position = new System.Drawing.PointF( Screen.Width * 0.85f, Screen.Height * (0.85f + (index * 0.04f)) );
+                    WeaponTexts[index].Draw();
+
+                    index++;
+                }
+            }
+        }
+
+        public void ChangeSelectedWeapon( int offset ) {
+            lastScroll = GetGameTimer();
+            int index = 0;
+            Weapon wepon = Game.PlayerPed.Weapons.Current;
+
+            foreach( var wep in PlayerWeapons ) {
+                if( GetHashKey( wep ) == wepon.Hash.GetHashCode() ) {
+                    if( index + offset < 0 ) {
+                        SetCurrentPedWeapon( PlayerPedId(), (uint)GetHashKey( PlayerWeapons[PlayerWeapons.Count - 1 ] ), true );
+                    }
+                    else if( index + offset >= PlayerWeapons.Count ) {
+                        SetCurrentPedWeapon( PlayerPedId(), (uint)GetHashKey( PlayerWeapons[0] ), true );
+                    }
+                    else {
+                        SetCurrentPedWeapon( PlayerPedId(), (uint)GetHashKey( PlayerWeapons[index + offset] ), true );
+                    }
+                    break;
+                }
+                index++;
+            }
         }
 
         public virtual void End() {
@@ -90,7 +169,7 @@ namespace Salty_Gamemodes_Client {
 
         public void StripWeapons() {
             RemoveAllPedWeapons( PlayerPedId(), true );
-            PlayerWeapons = new List<string>();
+            PlayerWeapons = new List<string>() { "WEAPON_UNARMED" };
 
         }
 

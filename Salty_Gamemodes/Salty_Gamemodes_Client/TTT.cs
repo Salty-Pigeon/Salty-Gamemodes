@@ -13,12 +13,7 @@ namespace Salty_Gamemodes_Client {
 
 
         public Text TeamText;
-        public Text HealthText;
-        public Text AmmoText;
-
-        public Text PrimaryGunText;
-        public Text SecondaryGunText;
-        public Text SpecialGunText;
+        
 
         public enum Teams {
             Spectators,
@@ -33,20 +28,19 @@ namespace Salty_Gamemodes_Client {
             PostRound
         }
 
-        public float lastScroll = 0;
-
         public Dictionary<int, string> WeaponInv = new Dictionary<int, string>();
 
         public Dictionary<string, int> WeaponSlots = new Dictionary<string, int>() {
-            { "WEAPON_PISTOL", 2  },
-            { "WEAPON_COMBATPISTOL", 2 },
-            { "WEAPON_MICROSMG", 2 },
-            { "WEAPON_SMG", 1 },
-            { "WEAPON_CARBINERIFLE", 1  },
-            { "WEAPON_ASSAULTRIFLE", 1  },
+            { "WEAPON_UNARMED", 0 },
+            { "WEAPON_PISTOL", 1  },
+            { "WEAPON_COMBATPISTOL", 1 },
+            { "WEAPON_MICROSMG", 1 },
+            { "WEAPON_SMG", 2 },
+            { "WEAPON_CARBINERIFLE", 2  },
+            { "WEAPON_ASSAULTRIFLE", 2  },
             //{ "WEAPON_SNIPERRIFLE", 1 },
-            { "WEAPON_PUMPSHOTGUN", 1  },
-            { "WEAPON_COMBATMG", 1 }
+            { "WEAPON_PUMPSHOTGUN", 2  },
+            { "WEAPON_COMBATMG", 2 },
         };
 
 
@@ -55,6 +49,7 @@ namespace Salty_Gamemodes_Client {
         public TTT( Map gameMap, int team ) {
 
             GameWeapons = new Dictionary<string, string>() {
+                { "WEAPON_UNARMED", "Unarmed" },
                 { "WEAPON_PISTOL", "Pistol"  },
                 { "WEAPON_COMBATPISTOL", "Combat Pistol" },
                 { "WEAPON_SMG", "SMG" },
@@ -67,12 +62,7 @@ namespace Salty_Gamemodes_Client {
             };
 
             TeamText = new Text( "Spectator", new System.Drawing.PointF( Screen.Width * 0.033f, Screen.Height * 0.855f ), 0.5f );
-            HealthText = new Text( "Health: ", new System.Drawing.PointF( Screen.Width * 0.033f, Screen.Height * 0.895f ), 0.5f );
-            AmmoText = new Text( "Ammo: ", new System.Drawing.PointF( Screen.Width * 0.033f, Screen.Height * 0.935f ), 0.5f );
 
-            PrimaryGunText = new Text( "", new System.Drawing.PointF( Screen.Width * 0.8f, Screen.Height * 0.935f ), 0.3f );
-            SecondaryGunText = new Text( "", new System.Drawing.PointF( Screen.Width * 0.8f, Screen.Height * 0.895f ), 0.3f );
-            SpecialGunText = new Text( "", new System.Drawing.PointF( Screen.Width * 0.8f, Screen.Height * 0.855f ), 0.3f );
 
 
             GameMap = gameMap;
@@ -84,6 +74,7 @@ namespace Salty_Gamemodes_Client {
         public override void Start() {
             Game.Player.Character.MaxHealth = 100;
             Game.Player.Character.Health = 100;
+            GameMap.SpawnWeapons();
             WriteChat( "Game starting" );
             base.Start();
         }
@@ -124,26 +115,6 @@ namespace Salty_Gamemodes_Client {
             base.Controls();
         }
 
-        public void ChangeSelectedWeapon( int offset ) {
-            lastScroll = GetGameTimer();
-            int index = 0;
-            Weapon wepon = Game.PlayerPed.Weapons.Current;
-
-            foreach( var wep in WeaponInv ) {
-                if( GetHashKey( wep.Value ) == wepon.Hash.GetHashCode() ) {
-                    if( index + offset < 0 ) {
-                        SetCurrentPedWeapon( PlayerPedId(), (uint)GetHashKey(WeaponInv.ElementAt(WeaponInv.Count-1).Value), true );
-                    } else if ( index + offset >= WeaponInv.Count ) {
-                        SetCurrentPedWeapon( PlayerPedId(), (uint)GetHashKey( WeaponInv.ElementAt( 0 ).Value ), true );
-                    } else {
-                        SetCurrentPedWeapon( PlayerPedId(), (uint)GetHashKey( WeaponInv.ElementAt( index + offset ).Value ), true );
-                    }
-                    break;
-                }
-                index++;
-            }
-        }
-
         public override bool CanPickupWeapon( string weaponModel ) {
             bool canPickup = true;
             if( WeaponInv.ContainsKey( WeaponSlots[weaponModel] ) )
@@ -175,70 +146,46 @@ namespace Salty_Gamemodes_Client {
         }
 
         public override void HUD() {
-            
-            if( Game.PlayerPed.Weapons.Current.Hash.ToString() == "SniperRifle" && isScoped ) {
 
-            } else {
-                HideHudAndRadarThisFrame();
-            }
             HideReticle();
 
             if( Team == (int)Teams.Traitors ) {
                 DrawRectangle( 0.025f, 0.86f, 0.07f, 0.03f, 200, 0, 0, 200 );
             }
 
-            HealthText.Caption = Game.Player.Character.Health.ToString();
-            AmmoText.Caption = Game.PlayerPed.Weapons.Current.AmmoInClip + " / " + Game.PlayerPed.Weapons.Current.Ammo;
-
-            DrawRectangle( 0.025f, 0.9f, 0.1f, 0.03f, 0, 0, 0, 200 );
-            float healthPercent = (float)Game.Player.Character.Health / Game.Player.Character.MaxHealth;
-            if( healthPercent < 0 )
-                healthPercent = 0;
-            if( healthPercent > 1 )
-                healthPercent = 1;
-            DrawRectangle( 0.025f, 0.9f, (healthPercent) * 0.1f, 0.03f, 200, 0, 0, 200 );
-
-            DrawRectangle( 0.025f, 0.94f, 0.1f, 0.03f, 200, 200, 0, 200 );
-
 
             TeamText.Draw();
             HealthText.Draw();
             AmmoText.Draw();
 
+            DrawBaseHealthHUD();
+            //DrawBaseWeaponHUD();
             DrawWeaponHUD();
 
             base.HUD();
         }
 
+        
         public void DrawWeaponHUD() {
             if( lastScroll + (2 * 1000) > GetGameTimer() ) {
-                var resolution = Screen.Resolution;
-                foreach( var weapon in PlayerWeapons ) {
-                    int boxIndex = WeaponSlots[weapon] - 1;
-                    if( Game.PlayerPed.Weapons.Current.Hash.GetHashCode() == GetHashKey(weapon) ) {
-                        DrawRectangle( 0.85f, 0.9f + (0.04f * boxIndex), 0.1f, 0.03f, 200, 200, 0, 200 );
+                foreach( var weapon in WeaponSlots ) {
+                    if( !PlayerWeapons.Contains( weapon.Key ) )
+                        continue;
+                    if( WeaponTexts.Count <= weapon.Value ) {
+                        WeaponTexts.Add( new Text( weapon.Key, new System.Drawing.PointF( Screen.Width * 0.85f, Screen.Height * 0.85f + (weapon.Value * 0.4f) ), 0.3f ) );
+                    }
+
+                    if( Game.PlayerPed.Weapons.Current.Hash.GetHashCode() == GetHashKey( weapon.Key ) ) {
+                        DrawRectangle( 0.85f, 0.85f + (0.04f * weapon.Value), 0.1f, 0.03f, 200, 200, 0, 200 );
                     }
                     else {
-                        DrawRectangle( 0.85f, 0.9f + (0.04f * boxIndex), 0.1f, 0.03f, 0, 0, 0, 200 );
+                        DrawRectangle( 0.85f, 0.85f + (0.04f * weapon.Value), 0.1f, 0.03f, 0, 0, 0, 200 );
                     }
 
-                    if( WeaponSlots[weapon] == 1 ) {
-                        PrimaryGunText.Caption = GameWeapons[weapon];
-                        PrimaryGunText.Position = new System.Drawing.PointF( Screen.Width * 0.85f, Screen.Height * 0.9f );
-                        PrimaryGunText.Draw();
-                    } else if ( WeaponSlots[weapon] == 2 ) {
-                        SecondaryGunText.Caption = GameWeapons[weapon]; 
-                        SecondaryGunText.Position = new System.Drawing.PointF( Screen.Width * 0.85f, Screen.Height * 0.94f );
-                        SecondaryGunText.Draw();
-                    }
-                    else if( WeaponSlots[weapon] == 3 ) {
-
-                    }
+                    WeaponTexts[weapon.Value].Caption = GameWeapons[weapon.Key];
+                    WeaponTexts[weapon.Value].Position = new System.Drawing.PointF( Screen.Width * 0.85f, Screen.Height * (0.85f + (weapon.Value * 0.04f)) );
+                    WeaponTexts[weapon.Value].Draw();
                 }
-
-                
-                SpecialGunText.Draw();
-
             }
 
         }

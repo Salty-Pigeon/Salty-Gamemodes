@@ -13,7 +13,8 @@ namespace Salty_Gamemodes_Server
         enum Gamemodes {
             None,
             TTT,
-            DriveOrDie
+            DriveOrDie,
+            Murder
         }
 
 
@@ -39,6 +40,10 @@ namespace Salty_Gamemodes_Server
 
             RegisterCommand( "startTTT", new Action<int, List<object>, string>( ( source, args, raw ) => {
                 StartTTT();
+            } ), false );
+
+            RegisterCommand( "startMurder", new Action<int, List<object>, string>( ( source, args, raw ) => {
+                StartMurder();
             } ), false );
 
             RegisterCommand( "endGame", new Action<int, List<object>, string>( ( source, args, raw ) => {
@@ -67,6 +72,19 @@ namespace Salty_Gamemodes_Server
             ActiveGame = new BaseGamemode( (int)Gamemodes.None );
         }
 
+        public void StartMurder() {
+            Gamemode = Gamemodes.Murder;
+
+            Random rand = new Random();
+            List<Map> maps = MapManager.MapList( "mmm" );
+            Map map = maps[rand.Next( 0, maps.Count )];
+
+            PlayerList players = new PlayerList();
+
+            ActiveGame = new Murder( map, players, (int)Gamemodes.Murder );
+            ActiveGame.Start();
+
+        }
 
         public void StartTTT() {
 

@@ -46,6 +46,22 @@ namespace Salty_Gamemodes_Client
 
                 }
             }
+            if( id == 2 ) { // Drive or die
+
+            }
+            if( id == 3 ) { // Murder
+                ActiveGame = new Murder( map, team );
+                if( team == 1 ) { // Murderer
+
+                }
+                else if( team == 2 ) { // Innocent
+
+                }
+                else { // Spectator
+
+                }
+            }
+
             ActiveGame.Start();
             Game.Player.Character.Position = startPos;
         }
