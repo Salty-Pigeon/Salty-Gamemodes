@@ -65,13 +65,11 @@ namespace Salty_Gamemodes_Client {
                 MenuSliderItem sliderY = new MenuSliderItem( "Centre Y", -999999, 999999, (int)map.Value.Position.Y, false );
                 MenuSliderItem sliderWidth = new MenuSliderItem( "Width", 0, 999999, (int)map.Value.Size.X, false );
                 MenuSliderItem sliderLength = new MenuSliderItem( "Length", 0, 999999, (int)map.Value.Size.Y, false );
-                MenuSliderItem sliderRotation = new MenuSliderItem( "Rotation", 0, 360, 180, false );
 
                 mapEditor.AddMenuItem( sliderX );
                 mapEditor.AddMenuItem( sliderY );
                 mapEditor.AddMenuItem( sliderWidth );
                 mapEditor.AddMenuItem( sliderLength );
-                mapEditor.AddMenuItem( sliderRotation );
 
                 MenuItem playerSpawnItem = AddMenuItem( mapEditor, playerSpawnMenu, "Player Spawns", "Modify player spawn points", ">>", true );
                 MenuItem deleteMapItem = AddMenuItem( mapEditor, deleteMapMenu, "Delete Map", "Delete entire map", ">", true );
@@ -95,18 +93,13 @@ namespace Salty_Gamemodes_Client {
                     if( _sliderItem.Text == "Length" ) {
                         map.Value.Size.Y = _newPosition;
                     }
-                    if( _sliderItem.Text == "Rotation" ) {
-                        map.Value.Position.X = (float)(map.Value.Position.X * Math.Cos( DegreeToRadian( _itemIndex ) ) - map.Value.Position.Y * Math.Sin( DegreeToRadian( _itemIndex ) ));
-                        map.Value.Position.Y = (float)(map.Value.Position.X * Math.Sin( DegreeToRadian( _itemIndex ) ) + map.Value.Position.Y * Math.Cos( DegreeToRadian( _itemIndex ) ));
-                
-                    }
                     
 
                 };
 
                 mapEditor.OnItemSelect += ( _menu, _item, _index ) => {
                     if( _item.Text == "Save" ) {
-                        TriggerServerEvent( "salty::netModifyMap", "add", map.Key, 0, map.Value.Position, map.Value.Size );
+                        TriggerServerEvent( "salty::netModifyMap", "edit", map.Key, 0, map.Value.Position, map.Value.Size );
                     }
                 };
 

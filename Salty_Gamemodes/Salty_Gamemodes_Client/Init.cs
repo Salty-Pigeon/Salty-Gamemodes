@@ -134,17 +134,6 @@ namespace Salty_Gamemodes_Client
                 }
             }
 
-            Weapon w = Game.PlayerPed?.Weapons?.Current;
-
-            if (w != null) {
-                WeaponHash wHash = w.Hash;
-
-                if (API.GetHashKey(wHash.ToString()) != -1783943904) // add MarksmanRifle MKII
-                {
-                    API.HideHudComponentThisFrame(14);
-                }
-            }
-
         }
 
 

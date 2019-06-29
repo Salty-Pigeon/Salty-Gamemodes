@@ -84,6 +84,7 @@ namespace Salty_Gamemodes_Server
         }
 
         private void ModifyMap([FromSource] Player ply, string setting, string mapName, int team, Vector3 position, Vector3 size ) {
+            Debug.WriteLine( string.Format( "{0} {1} {2} {3} {4}", setting, mapName, team.ToString(), position.ToString(), size.ToString() ) );
             if( setting == "delete" ) {
                 MapManager.Maps.Remove( mapName );
                 SQLConnection.Remove( mapName );

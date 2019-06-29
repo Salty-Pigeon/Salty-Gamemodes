@@ -59,11 +59,24 @@ namespace Salty_Gamemodes_Client {
             if( GameMap.Gamemode != null )
                 canPickupEvent = GameMap.Gamemode.CanPickupWeapon( WeaponModel );
 
-            if( Position.DistanceToSquared(Game.PlayerPed.Position) <= pickupRange && wepCount < 2 && canPickup && canPickupEvent ) {
-                GiveWeaponToPed( PlayerPedId(), WeaponHash, AmmoCount, false, true );
-                SetPedAmmo( PlayerPedId(), WeaponHash, AmmoCount );
-                Destroy();
-                canPickup = false;
+            if( Position.DistanceToSquared(Game.PlayerPed.Position) <= pickupRange && canPickup ) {
+
+                if( canPickupEvent ) {
+                    if( wepCount == 0 ) {
+                        GiveWeaponToPed( PlayerPedId(), WeaponHash, AmmoCount, false, true );
+                        SetPedAmmo( PlayerPedId(), WeaponHash, AmmoCount );
+                    } else {
+                        GiveWeaponToPed( PlayerPedId(), WeaponHash, AmmoCount, false, false );
+                        SetPedAmmo( PlayerPedId(), WeaponHash, AmmoCount );
+                    }
+                    Destroy();
+                    canPickup = false;
+                } else if (GameMap.Gamemode.HasWeapon( WeaponModel ) ) {
+                    int ammo = GetAmmoInPedWeapon( PlayerPedId(), WeaponHash );
+                    SetPedAmmo( PlayerPedId(), WeaponHash, ammo + AmmoCount );
+                    Destroy();
+                    canPickup = false;
+                }
             }
 
             if( GetGameTimer() - pickupTime > 0 ) {

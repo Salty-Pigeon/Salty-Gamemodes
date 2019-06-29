@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Dynamic;
+using CitizenFX.Core.Native;
 
 namespace Salty_Gamemodes_Client {
     public class BaseGamemode : BaseScript {
@@ -15,9 +16,16 @@ namespace Salty_Gamemodes_Client {
 
         public List<string> PlayerWeapons = new List<string>();
 
+        //private Scaleform playerNameHUD = new Scaleform( "mp_mission_name_freemode" );
+        //private Scaleform playerNameHUD = new Scaleform( "RACE_MESSAGE" );
 
-        
+        public Dictionary<string, string> GameWeapons = new Dictionary<string, string>();
+        public float lastLooked = 0;
+
         public Text BoundText;
+        public Text HUDText;
+
+        public bool isScoped = false;
 
         public bool inGame = false;
         public Map GameMap;
@@ -31,10 +39,17 @@ namespace Salty_Gamemodes_Client {
 
         public BaseGamemode() {
             BoundText = new Text( "", new System.Drawing.PointF( Screen.Width * 0.2f, Screen.Height * 0.1f), 1.0f );
+            HUDText = new Text( "", new System.Drawing.PointF( Screen.Width * 0.5f, Screen.Height * 0.5f), 1.0f );
+            HUDText.Centered = true;
         }
 
         public virtual void Start() {
             StripWeapons();
+            foreach( var wep in GameMap.Weapons.ToList() ) {
+                if( !GameWeapons.ContainsKey(wep.Key) ) {
+                    GameMap.Weapons.Remove( wep.Key );
+                }
+            }
             GameMap.SpawnWeapons();
             inGame = true;
         }
@@ -62,6 +77,13 @@ namespace Salty_Gamemodes_Client {
             }
         }
 
+        public void AddGunToSpawns( string weaponModel, string name ) {
+            if( GameWeapons.ContainsKey( weaponModel ) )
+                GameWeapons[weaponModel] = name;
+            else
+                GameWeapons.Add( weaponModel, name );
+        }
+
         public virtual bool IsBase() {
             return !(GetType().IsSubclassOf( typeof( BaseGamemode ) ));
         }
@@ -81,11 +103,15 @@ namespace Salty_Gamemodes_Client {
         }
 
         public virtual void Controls() {
-
+            isScoped = IsControlPressed( 1, 25 );
         }
 
         public virtual bool CanPickupWeapon( string weaponModel ) {
             return true;
+        }
+
+        public bool HasWeapon( string weaponModel ) {
+            return PlayerWeapons.Contains( weaponModel );
         }
 
         public virtual void Events() {
@@ -111,6 +137,12 @@ namespace Salty_Gamemodes_Client {
                 
         }
 
+        public static RaycastResult Raycast( Vector3 source, Vector3 direction, float maxDistance, IntersectOptions options, Entity ignoreEntity = null ) {
+            Vector3 target = source + direction * maxDistance;
+
+            return new RaycastResult( Function.Call<int>( Hash._CAST_RAY_POINT_TO_POINT, source.X, source.Y, source.Z, target.X, target.Y, target.Z, options, ignoreEntity == null ? 0 : ignoreEntity.Handle, 7 ) );
+        }
+
         public virtual void PlayerPickedUpWeapon(string wepName, int count) {
 
         }
@@ -122,6 +154,36 @@ namespace Salty_Gamemodes_Client {
         public virtual void HUD() {
             if( inGame ) {
                 GameMap.DrawBoundarys();
+            }
+
+            Vector3 position = Game.PlayerPed.ForwardVector;
+
+            RaycastResult result = Raycast( Game.PlayerPed.Position, position, 75, IntersectOptions.Peds1, null );
+            if( result.DitHitEntity ) {
+                if( result.HitEntity != Game.PlayerPed ) {
+                    HUDText.Caption = result.HitEntity.Model.Hash.ToString();
+                    lastLooked = GetGameTimer();
+                }
+            
+            }
+
+            if( lastLooked + 300 > GetGameTimer() ) {
+                HUDText.Draw();
+            }
+
+        }
+
+        public void HideReticle() {
+            Weapon w = Game.PlayerPed?.Weapons?.Current;
+
+            if( w != null ) {
+                WeaponHash wHash = w.Hash;
+                if( wHash.ToString() != "SniperRifle" ) {
+                    HideHudComponentThisFrame( 14 );
+                }
+                else if( !isScoped ) {                 
+                    HideHudComponentThisFrame( 14 );
+                }
             }
         }
 
@@ -141,7 +203,7 @@ namespace Salty_Gamemodes_Client {
             
             if( Team == 0 ) {
                 if( GetFollowPedCamViewMode() != 1 ) {
-                    SetFollowPedCamViewMode( 1 );
+                    //SetFollowPedCamViewMode( 1 );
                 }
             }
 

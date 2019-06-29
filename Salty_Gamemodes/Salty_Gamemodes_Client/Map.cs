@@ -21,7 +21,7 @@ namespace Salty_Gamemodes_Client {
             { "WEAPON_SNIPERRIFLE", "W_SR_SNIPERRIFLE" },
             { "WEAPON_PUMPSHOTGUN", "W_SG_PUMPSHOTGUN"  },
             { "WEAPON_MICROSMG", "W_SB_MICROSMG" },
-            { "WEAPON_SAWNOFFSHOTGUN", "W_SG_SAWNOFF" }
+            { "WEAPON_COMBATMG", "W_MG_COMBATMG" }
         };
 
         Dictionary<string, int> weaponWeights = new Dictionary<string, int>() {
@@ -33,8 +33,10 @@ namespace Salty_Gamemodes_Client {
             { "WEAPON_SNIPERRIFLE", 2 },
             { "WEAPON_PUMPSHOTGUN", 4  },
             { "WEAPON_MICROSMG", 8 },
-            { "WEAPON_SAWNOFFSHOTGUN", 2 }
+            { "WEAPON_COMBATMG", 2 }
         };
+
+        public Dictionary<string, WeaponPickup> CreatedWeapons = new Dictionary<string, WeaponPickup>();
 
         Dictionary<int, string> weaponIntervals = new Dictionary<int, string>();
 
@@ -85,19 +87,19 @@ namespace Salty_Gamemodes_Client {
         public void DrawBoundarys() {
 
             // Top box
-            DrawBox( Position.X - (Size.X / 2), Position.Y - (Size.Y / 2), 0, Position.X + (Size.X / 2), Position.Y - (Size.Y / 2) - 0.1f, 1000, 0, 0, 0, 100 ); 
+            DrawBox( Position.X - (Size.X / 2), Position.Y - (Size.Y / 2), 0, Position.X + (Size.X / 2), Position.Y - (Size.Y / 2) - 0.1f, 1000, 255, 255, 255, 100 ); 
 
             // Left box
-            DrawBox( Position.X - (Size.X / 2), Position.Y - (Size.Y / 2), 0, Position.X - (Size.X / 2) - 0.1f, Position.Y + (Size.Y / 2), 1000, 0, 0, 0, 100 );
+            DrawBox( Position.X - (Size.X / 2), Position.Y - (Size.Y / 2), 0, Position.X - (Size.X / 2) - 0.1f, Position.Y + (Size.Y / 2), 1000, 255, 255, 255, 100 );
 
             // Right box
-            DrawBox( Position.X + (Size.X / 2), Position.Y + (Size.Y / 2), 0, Position.X + (Size.X / 2) + 0.1f, Position.Y - (Size.Y / 2), 1000, 0, 0, 0, 100 );
+            DrawBox( Position.X + (Size.X / 2), Position.Y + (Size.Y / 2), 0, Position.X + (Size.X / 2) + 0.1f, Position.Y - (Size.Y / 2), 1000, 255, 255, 255, 100 );
 
             // Bottom box
-            DrawBox( Position.X - (Size.X / 2), Position.Y + (Size.Y / 2), 0, Position.X + (Size.X / 2), Position.Y + (Size.Y / 2) + 0.1f, 1000, 0, 0, 0, 100 );
+            DrawBox( Position.X - (Size.X / 2), Position.Y + (Size.Y / 2), 0, Position.X + (Size.X / 2), Position.Y + (Size.Y / 2) + 0.1f, 1000, 255, 255, 255, 100 );
 
             // Roof
-            DrawBox( Position.X - (Size.X / 2), Position.Y - (Size.Y / 2), 1000, Position.X + (Size.X / 2), Position.Y + (Size.Y / 2), 1000.1f, 0, 0, 0, 100 );
+            //DrawBox( Position.X - (Size.X / 2), Position.Y - (Size.Y / 2), 1000, Position.X + (Size.X / 2), Position.Y + (Size.Y / 2), 1000.1f, 255, 255, 255, 100 );
         }
 
         public void RemoveWeapon(WeaponPickup item) {
@@ -111,8 +113,8 @@ namespace Salty_Gamemodes_Client {
 
             weaponIntervals = new Dictionary<int, string>();
             int i = 0;
-            foreach( var wep in weaponWeights ) {
-                i += wep.Value;
+            foreach( var wep in Gamemode.GameWeapons ) {
+                i += weaponWeights[wep.Key];
                 weaponIntervals.Add( i, wep.Key );
             }
             
@@ -136,13 +138,15 @@ namespace Salty_Gamemodes_Client {
                         int worldHash = GetHashKey( worldModel );
                         WeaponPickup item = new WeaponPickup( this, wepModel, pickupHash, worldHash, gunPos, false, 50 );
                         SpawnedWeapons.Add( item );
-
+                        if( !CreatedWeapons.ContainsKey( wepModel ) )
+                            CreatedWeapons.Add( wepModel, item );
                     }
                     else {
 
                         WeaponPickup item = new WeaponPickup( this, gunTypes.Key, ( uint)GetHashKey( gunTypes.Key ), GetHashKey( Weapons[gunTypes.Key] ), gunPos, false, 50 );
                         SpawnedWeapons.Add( item );
-
+                        if( !CreatedWeapons.ContainsKey( gunTypes.Key ) )
+                            CreatedWeapons.Add( gunTypes.Key, item );
                     }
 
                 }
