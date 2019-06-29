@@ -88,6 +88,10 @@ namespace Salty_Gamemodes_Client {
             DrawRectangle( 0.025f, 0.9f, (healthPercent) * 0.1f, 0.03f, 200, 0, 0, 200 );
 
             DrawRectangle( 0.025f, 0.94f, 0.1f, 0.03f, 200, 200, 0, 200 );
+
+            HealthText.Draw();
+            AmmoText.Draw();
+
         }
 
         public void DrawBaseWeaponHUD() {
@@ -259,12 +263,8 @@ namespace Salty_Gamemodes_Client {
         public virtual void PlayerDroppedWeapon( string wepName, int count ) {
 
         }
-
-        public virtual void HUD() {
-            if( inGame ) {
-                GameMap.DrawBoundarys();
-            }
-
+        
+        public void ShowNames() {
             Vector3 position = Game.PlayerPed.ForwardVector;
 
             RaycastResult result = Raycast( Game.PlayerPed.Position, position, 75, IntersectOptions.Peds1, null );
@@ -273,9 +273,16 @@ namespace Salty_Gamemodes_Client {
                     HUDText.Caption = result.HitEntity.Model.Hash.ToString();
                     lastLooked = GetGameTimer();
                 }
-            
+
+            }
+        }
+
+        public virtual void HUD() {
+            if( inGame ) {
+                GameMap.DrawBoundarys();
             }
 
+           
             if( lastLooked + 300 > GetGameTimer() ) {
                 HUDText.Draw();
             }

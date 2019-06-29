@@ -27,7 +27,9 @@ namespace Salty_Gamemodes_Client {
 
             GameWeapons = new Dictionary<string, string>() {
                 { "WEAPON_UNARMED", "Paper Fists" },
-                { "WEAPON_KNIFE", "Knife" }
+                { "WEAPON_KNIVE", "Knife" },
+                { "WEAPON_BAT", "Bat" },
+                { "WEAPON_PISTOL", "Pistol" }
             };
 
             GameMap = gameMap;
@@ -43,12 +45,15 @@ namespace Salty_Gamemodes_Client {
             Game.Player.Character.MaxHealth = 100;
             Game.Player.Character.Health = 100;
             if( Team == (int)Teams.Murderer ) {
-                GiveWeaponToPed( PlayerPedId(), (uint)GetHashKey("WEAPON_KNIFE"), 100, false, true );
+                //GiveWeaponToPed( PlayerPedId(), (uint)GetHashKey("WEAPON_PISTOL"), 100, false, true );
             } else if( Team == (int)Teams.Civilian ) {
 
             }
-            //GiveWeaponToPed( PlayerPedId(), (uint)GetHashKey( "WEAPON_BAT" ), 100, false, true );
-            
+            //RemoveWeaponFromPed( PlayerPedId(), (uint)GetHashKey( "WEAPON_UNARMED" ) );
+            GiveWeaponToPed( PlayerPedId(), (uint)GetHashKey( "WEAPON_BAT" ), 100, false, true );
+            Game.PlayerPed.Weapons.Select(Game.PlayerPed.Weapons.BestWeapon);
+            SetCurrentPedWeapon( PlayerPedId(), (uint)GetHashKey( "WEAPON_BAT" ), true );
+
         }
 
         public override void End() {

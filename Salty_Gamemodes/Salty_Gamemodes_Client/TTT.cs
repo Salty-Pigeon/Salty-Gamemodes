@@ -73,6 +73,7 @@ namespace Salty_Gamemodes_Client {
             Game.Player.Character.MaxHealth = 100;
             Game.Player.Character.Health = 100;
             GameMap.SpawnWeapons();
+            SetPlayerMayNotEnterAnyVehicle( PlayerId() );
             WriteChat( "Game starting" );
             base.Start();
         }
@@ -145,11 +146,11 @@ namespace Salty_Gamemodes_Client {
 
 
             TeamText.Draw();
-            HealthText.Draw();
-            AmmoText.Draw();
 
             DrawBaseHealthHUD();
             DrawWeaponHUD();
+            ShowNames();
+
 
             base.HUD();
         }
