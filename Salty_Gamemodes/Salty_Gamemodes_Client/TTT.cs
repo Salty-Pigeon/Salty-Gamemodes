@@ -28,22 +28,6 @@ namespace Salty_Gamemodes_Client {
             PostRound
         }
 
-        public Dictionary<int, string> WeaponInv = new Dictionary<int, string>();
-
-        public Dictionary<string, int> WeaponSlots = new Dictionary<string, int>() {
-            { "WEAPON_UNARMED", 0 },
-            { "WEAPON_PISTOL", 1  },
-            { "WEAPON_COMBATPISTOL", 1 },
-            { "WEAPON_MICROSMG", 1 },
-            { "WEAPON_SMG", 2 },
-            { "WEAPON_CARBINERIFLE", 2  },
-            { "WEAPON_ASSAULTRIFLE", 2  },
-            //{ "WEAPON_SNIPERRIFLE", 1 },
-            { "WEAPON_PUMPSHOTGUN", 2  },
-            { "WEAPON_COMBATMG", 2 },
-        };
-
-
         public GameState CurrentState = GameState.None;
 
         public TTT( Map gameMap, int team ) {
@@ -60,6 +44,20 @@ namespace Salty_Gamemodes_Client {
                 { "WEAPON_MICROSMG", "Micro-SMG" },
                 { "WEAPON_COMBATMG", "Light Machine Gun" }
             };
+
+            WeaponSlots = new Dictionary<string, int>() {
+                { "WEAPON_UNARMED", 0 },
+                { "WEAPON_PISTOL", 1  },
+                { "WEAPON_COMBATPISTOL", 1 },
+                { "WEAPON_MICROSMG", 1 },
+                { "WEAPON_SMG", 2 },
+                { "WEAPON_CARBINERIFLE", 2  },
+                { "WEAPON_ASSAULTRIFLE", 2  },
+                //{ "WEAPON_SNIPERRIFLE", 1 },
+                { "WEAPON_PUMPSHOTGUN", 2  },
+                { "WEAPON_COMBATMG", 2 },
+            };
+           
 
             TeamText = new Text( "Spectator", new System.Drawing.PointF( Screen.Width * 0.033f, Screen.Height * 0.855f ), 0.5f );
 
@@ -88,14 +86,6 @@ namespace Salty_Gamemodes_Client {
 
         public override void Controls() {
 
-            if( IsControlJustPressed(2, 15) ) {
-                ChangeSelectedWeapon( +1 );
-            }
-
-            if( IsControlJustPressed( 2, 14 ) ) {
-                ChangeSelectedWeapon( -1 );
-            }
-
             if( IsControlJustPressed( 0, 23 ) && Game.PlayerPed.Weapons.Current.Hash.ToString() != "Unarmed" ) {
 
 
@@ -117,7 +107,7 @@ namespace Salty_Gamemodes_Client {
 
         public override bool CanPickupWeapon( string weaponModel ) {
             bool canPickup = true;
-            if( WeaponInv.ContainsKey( WeaponSlots[weaponModel] ) )
+            if( PlayerWeapons.ContainsKey( WeaponSlots[weaponModel] ) )
                 canPickup = false;
            
             return canPickup;
@@ -125,12 +115,12 @@ namespace Salty_Gamemodes_Client {
 
         public override void PlayerPickedUpWeapon( string wepName, int count ) {
             lastScroll = GetGameTimer();
-            WeaponInv[WeaponSlots[wepName]] = wepName;
+            PlayerWeapons[WeaponSlots[wepName]] = wepName;
             base.PlayerPickedUpWeapon( wepName, count );
         }
 
         public override void PlayerDroppedWeapon( string wepName, int count ) {
-            WeaponInv.Remove( WeaponSlots[wepName] );
+            PlayerWeapons.Remove( WeaponSlots[wepName] );
             base.PlayerDroppedWeapon( wepName, count );
         }
 
@@ -159,7 +149,6 @@ namespace Salty_Gamemodes_Client {
             AmmoText.Draw();
 
             DrawBaseHealthHUD();
-            //DrawBaseWeaponHUD();
             DrawWeaponHUD();
 
             base.HUD();
@@ -168,27 +157,40 @@ namespace Salty_Gamemodes_Client {
         
         public void DrawWeaponHUD() {
             if( lastScroll + (2 * 1000) > GetGameTimer() ) {
+                int index = 0;
                 foreach( var weapon in WeaponSlots ) {
-                    if( !PlayerWeapons.Contains( weapon.Key ) )
+                    int offset = weapon.Value;
+                    if( PlayerWeapons.Count-1 < offset ) {
+                        offset--;
+                    }
+                    if( !PlayerWeapons.ContainsValue( weapon.Key ) )
                         continue;
                     if( WeaponTexts.Count <= weapon.Value ) {
-                        WeaponTexts.Add( new Text( weapon.Key, new System.Drawing.PointF( Screen.Width * 0.85f, Screen.Height * 0.85f + (weapon.Value * 0.4f) ), 0.3f ) );
+                        WeaponTexts.Add( new Text( weapon.Key, new System.Drawing.PointF( Screen.Width * 0.85f, Screen.Height * 0.85f + (offset * 0.4f) ), 0.3f ) );
                     }
 
                     if( Game.PlayerPed.Weapons.Current.Hash.GetHashCode() == GetHashKey( weapon.Key ) ) {
-                        DrawRectangle( 0.85f, 0.85f + (0.04f * weapon.Value), 0.1f, 0.03f, 200, 200, 0, 200 );
+                        DrawRectangle( 0.85f, 0.85f + (0.04f * offset), 0.1f, 0.03f, 200, 200, 0, 200 );
                     }
                     else {
-                        DrawRectangle( 0.85f, 0.85f + (0.04f * weapon.Value), 0.1f, 0.03f, 0, 0, 0, 200 );
+                        DrawRectangle( 0.85f, 0.85f + (0.04f * offset), 0.1f, 0.03f, 0, 0, 0, 200 );
                     }
 
                     WeaponTexts[weapon.Value].Caption = GameWeapons[weapon.Key];
-                    WeaponTexts[weapon.Value].Position = new System.Drawing.PointF( Screen.Width * 0.85f, Screen.Height * (0.85f + (weapon.Value * 0.04f)) );
+                    WeaponTexts[weapon.Value].Position = new System.Drawing.PointF( Screen.Width * 0.85f, Screen.Height * (0.85f + (offset * 0.04f)) );
                     WeaponTexts[weapon.Value].Draw();
+                    index++;
                 }
             }
+            if( IsControlJustPressed( 2, 15 ) ) {
+                ChangeSelectedWeapon( -1 );
+            }
 
+            if( IsControlJustPressed( 2, 14 ) ) {
+                ChangeSelectedWeapon( +1 );
+            }
         }
+
 
         public override void SetTeam( int team ) {
             switch( team ) {

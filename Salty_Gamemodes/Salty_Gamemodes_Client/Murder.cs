@@ -24,9 +24,15 @@ namespace Salty_Gamemodes_Client {
         }
 
         public Murder( Map gameMap, int team ) {
+
+            GameWeapons = new Dictionary<string, string>() {
+                { "WEAPON_UNARMED", "Paper Fists" }
+            };
+
             GameMap = gameMap;
             GameMap.Gamemode = this;
             GameMap.CreateBlip();
+
             SetTeam( team );
         }
 

@@ -23,8 +23,12 @@ namespace Salty_Gamemodes_Client {
         public float lastScroll = 0;
 
 
-        public List<string> PlayerWeapons = new List<string>() {
-            "WEAPON_UNARMED"
+        public Dictionary<int, string> PlayerWeapons = new Dictionary<int, string> {
+            { 0, "WEAPON_UNARMED" }
+        };
+
+        public Dictionary<string, int> WeaponSlots = new Dictionary<string, int>() {
+            { "WEAPON_UNARMED", 0 },
         };
 
         //private Scaleform playerNameHUD = new Scaleform( "mp_mission_name_freemode" );
@@ -92,45 +96,60 @@ namespace Salty_Gamemodes_Client {
                 var resolution = Screen.Resolution;
                 foreach( var weapon in PlayerWeapons ) {
                     if( WeaponTexts.Count <= index ) {
-                        WeaponTexts.Add( new Text( weapon, new System.Drawing.PointF( Screen.Width * 0.85f, Screen.Height * 0.85f + (index * 0.4f) ), 0.3f ) );
+                        WeaponTexts.Add( new Text( weapon.Value, new System.Drawing.PointF( Screen.Width * 0.85f, Screen.Height * 0.85f + (index * 0.4f) ), 0.3f ) );
                     }
 
-                    if( Game.PlayerPed.Weapons.Current.Hash.GetHashCode() == GetHashKey( weapon ) ) {
+                    if( Game.PlayerPed.Weapons.Current.Hash.GetHashCode() == GetHashKey( weapon.Value ) ) {
                         DrawRectangle( 0.85f, 0.85f + (0.04f * index), 0.1f, 0.03f, 200, 200, 0, 200 );
                     }
                     else {
                         DrawRectangle( 0.85f, 0.85f + (0.04f * index), 0.1f, 0.03f, 0, 0, 0, 200 );
                     }
 
-                    WeaponTexts[index].Caption = GameWeapons[weapon];
+                    WeaponTexts[index].Caption = GameWeapons[weapon.Value];
                     WeaponTexts[index].Position = new System.Drawing.PointF( Screen.Width * 0.85f, Screen.Height * (0.85f + (index * 0.04f)) );
                     WeaponTexts[index].Draw();
 
                     index++;
                 }
             }
+
+            if( IsControlJustPressed( 2, 15 ) ) {
+                ChangeSelectedWeapon( +1 );
+            }
+
+            if( IsControlJustPressed( 2, 14 ) ) {
+                ChangeSelectedWeapon( -1 );
+            }
+
         }
 
-        public void ChangeSelectedWeapon( int offset ) {
-            lastScroll = GetGameTimer();
+        public int GetNextWeapon( int offset ) {
             int index = 0;
-            Weapon wepon = Game.PlayerPed.Weapons.Current;
-
+            int currentWep = Game.PlayerPed.Weapons.Current.Hash.GetHashCode();
             foreach( var wep in PlayerWeapons ) {
-                if( GetHashKey( wep ) == wepon.Hash.GetHashCode() ) {
-                    if( index + offset < 0 ) {
-                        SetCurrentPedWeapon( PlayerPedId(), (uint)GetHashKey( PlayerWeapons[PlayerWeapons.Count - 1 ] ), true );
-                    }
-                    else if( index + offset >= PlayerWeapons.Count ) {
-                        SetCurrentPedWeapon( PlayerPedId(), (uint)GetHashKey( PlayerWeapons[0] ), true );
-                    }
-                    else {
-                        SetCurrentPedWeapon( PlayerPedId(), (uint)GetHashKey( PlayerWeapons[index + offset] ), true );
-                    }
-                    break;
+                if( GetHashKey( wep.Value ) == currentWep ) {
+                    if( index + offset > PlayerWeapons.Count-1 && offset > 0)
+                        return PlayerWeapons.ElementAt( 0 ).Key;
+
+                    if( index + offset < 0 && offset < 0 )
+                        return PlayerWeapons.ElementAt( PlayerWeapons.Count - 1 ).Key;
+
+                    if( offset > 0 )
+                        return PlayerWeapons.ElementAt( index + 1 ).Key;
+                    else
+                        return PlayerWeapons.ElementAt( index - 1 ).Key;
                 }
                 index++;
             }
+            return -1;
+        }
+
+        public virtual void ChangeSelectedWeapon( int offset ) {
+            lastScroll = GetGameTimer();
+            int next = GetNextWeapon( offset );
+            SetCurrentPedWeapon( PlayerPedId(), (uint)GetHashKey( PlayerWeapons[next] ), true );
+
         }
 
         public virtual void End() {
@@ -156,20 +175,13 @@ namespace Salty_Gamemodes_Client {
             }
         }
 
-        public void AddGunToSpawns( string weaponModel, string name ) {
-            if( GameWeapons.ContainsKey( weaponModel ) )
-                GameWeapons[weaponModel] = name;
-            else
-                GameWeapons.Add( weaponModel, name );
-        }
-
         public virtual bool IsBase() {
             return !(GetType().IsSubclassOf( typeof( BaseGamemode ) ));
         }
 
         public void StripWeapons() {
             RemoveAllPedWeapons( PlayerPedId(), true );
-            PlayerWeapons = new List<string>() { "WEAPON_UNARMED" };
+            PlayerWeapons = new Dictionary<int, string>() { { 0, "WEAPON_UNARMED" } };
 
         }
 
@@ -190,7 +202,14 @@ namespace Salty_Gamemodes_Client {
         }
 
         public bool HasWeapon( string weaponModel ) {
-            return PlayerWeapons.Contains( weaponModel );
+            return PlayerWeapons.ContainsValue( weaponModel );
+        }
+
+        public void RemoveWeapon( string weaponName ) {
+            foreach( var i in PlayerWeapons.Keys.ToList() )  {
+                if( PlayerWeapons[i] == weaponName )
+                    PlayerWeapons.Remove( i );
+            }
         }
 
         public virtual void Events() {
@@ -202,13 +221,14 @@ namespace Salty_Gamemodes_Client {
             foreach( var weps in GameMap.Weapons ) {
                 uint wepHash = (uint)GetHashKey( weps.Key  );
                 //uint wepHash = (uint)GetWeaponHashFromPickup( GetHashKey( weps.Value ) );
-                if( HasPedGotWeapon( PlayerPedId(), wepHash, false) && !PlayerWeapons.Contains(weps.Key) ) {
-                    PlayerWeapons.Add( weps.Key );
+                if( HasPedGotWeapon( PlayerPedId(), wepHash, false) && !PlayerWeapons.ContainsValue(weps.Key) ) {
+                    PlayerWeapons.Add( WeaponSlots[weps.Key], weps.Key );
                     PlayerPickedUpWeapon(weps.Key, PlayerWeapons.Count);
                 }
 
-                if( !HasPedGotWeapon( PlayerPedId(), wepHash, false ) && PlayerWeapons.Contains( weps.Key ) ) {
-                    PlayerWeapons.Remove( weps.Key );
+                if( !HasPedGotWeapon( PlayerPedId(), wepHash, false ) && PlayerWeapons.ContainsValue( weps.Key ) ) {
+                    PlayerWeapons.Remove( WeaponSlots[weps.Key] );
+                    WeaponTexts = new List<Text>();
                     PlayerDroppedWeapon( weps.Key, PlayerWeapons.Count );
                 }
 
