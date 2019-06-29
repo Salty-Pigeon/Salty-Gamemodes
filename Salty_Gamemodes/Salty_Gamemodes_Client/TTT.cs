@@ -176,9 +176,9 @@ namespace Salty_Gamemodes_Client {
                         DrawRectangle( 0.85f, 0.85f + (0.04f * offset), 0.1f, 0.03f, 0, 0, 0, 200 );
                     }
 
-                    WeaponTexts[weapon.Value].Caption = GameWeapons[weapon.Key];
-                    WeaponTexts[weapon.Value].Position = new System.Drawing.PointF( Screen.Width * 0.85f, Screen.Height * (0.85f + (offset * 0.04f)) );
-                    WeaponTexts[weapon.Value].Draw();
+                    WeaponTexts[index].Caption = GameWeapons[weapon.Key];
+                    WeaponTexts[index].Position = new System.Drawing.PointF( Screen.Width * 0.85f, Screen.Height * (0.85f + (offset * 0.04f)) );
+                    WeaponTexts[index].Draw();
                     index++;
                 }
             }

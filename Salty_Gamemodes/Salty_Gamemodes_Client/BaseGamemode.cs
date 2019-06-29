@@ -127,18 +127,20 @@ namespace Salty_Gamemodes_Client {
         public int GetNextWeapon( int offset ) {
             int index = 0;
             int currentWep = Game.PlayerPed.Weapons.Current.Hash.GetHashCode();
-            foreach( var wep in PlayerWeapons ) {
+            var playerWeapons = PlayerWeapons.OrderBy( i => i.Key );
+            foreach( var wep in playerWeapons ) {
                 if( GetHashKey( wep.Value ) == currentWep ) {
-                    if( index + offset > PlayerWeapons.Count-1 && offset > 0)
-                        return PlayerWeapons.ElementAt( 0 ).Key;
 
-                    if( index + offset < 0 && offset < 0 )
-                        return PlayerWeapons.ElementAt( PlayerWeapons.Count - 1 ).Key;
+                    if( index + offset > PlayerWeapons.Count-1 && offset > 0 ) 
+                        return playerWeapons.ElementAt( 0 ).Key;
 
-                    if( offset > 0 )
-                        return PlayerWeapons.ElementAt( index + 1 ).Key;
+                    if( index + offset < 0 && offset < 0 ) 
+                        return playerWeapons.ElementAt( PlayerWeapons.Count - 1 ).Key;
+
+                    if( offset > 0 ) 
+                        return playerWeapons.ElementAt( index + 1 ).Key;
                     else
-                        return PlayerWeapons.ElementAt( index - 1 ).Key;
+                        return playerWeapons.ElementAt( index - 1 ).Key;
                 }
                 index++;
             }
@@ -222,12 +224,20 @@ namespace Salty_Gamemodes_Client {
                 uint wepHash = (uint)GetHashKey( weps.Key  );
                 //uint wepHash = (uint)GetWeaponHashFromPickup( GetHashKey( weps.Value ) );
                 if( HasPedGotWeapon( PlayerPedId(), wepHash, false) && !PlayerWeapons.ContainsValue(weps.Key) ) {
-                    PlayerWeapons.Add( WeaponSlots[weps.Key], weps.Key );
+
+                    int slot;
+                    if( WeaponSlots.Count == 1 )
+                        slot = PlayerWeapons.Count;
+                    else {
+                        slot = WeaponSlots[weps.Key];
+                    }
+
+                    PlayerWeapons.Add( slot, weps.Key );
                     PlayerPickedUpWeapon(weps.Key, PlayerWeapons.Count);
                 }
 
                 if( !HasPedGotWeapon( PlayerPedId(), wepHash, false ) && PlayerWeapons.ContainsValue( weps.Key ) ) {
-                    PlayerWeapons.Remove( WeaponSlots[weps.Key] );
+                    RemoveWeapon( weps.Key );
                     WeaponTexts = new List<Text>();
                     PlayerDroppedWeapon( weps.Key, PlayerWeapons.Count );
                 }

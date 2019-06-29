@@ -26,7 +26,8 @@ namespace Salty_Gamemodes_Client {
         public Murder( Map gameMap, int team ) {
 
             GameWeapons = new Dictionary<string, string>() {
-                { "WEAPON_UNARMED", "Paper Fists" }
+                { "WEAPON_UNARMED", "Paper Fists" },
+                { "WEAPON_KNIFE", "Knife" }
             };
 
             GameMap = gameMap;
@@ -42,11 +43,11 @@ namespace Salty_Gamemodes_Client {
             Game.Player.Character.MaxHealth = 100;
             Game.Player.Character.Health = 100;
             if( Team == (int)Teams.Murderer ) {
-                //GiveWeaponToPed( PlayerPedId(), (uint)GetHashKey("WEAPON_KNIFE"), 100, false, true );
+                GiveWeaponToPed( PlayerPedId(), (uint)GetHashKey("WEAPON_KNIFE"), 100, false, true );
             } else if( Team == (int)Teams.Civilian ) {
 
             }
-            GiveWeaponToPed( PlayerPedId(), (uint)GetHashKey( "WEAPON_BAT" ), 100, false, true );
+            //GiveWeaponToPed( PlayerPedId(), (uint)GetHashKey( "WEAPON_BAT" ), 100, false, true );
             
         }
 
