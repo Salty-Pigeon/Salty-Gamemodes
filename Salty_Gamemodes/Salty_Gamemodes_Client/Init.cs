@@ -21,10 +21,13 @@ namespace Salty_Gamemodes_Client
             EventHandlers[ "onClientResourceStart" ] += new Action<string>( OnClientResourceStart );
             EventHandlers[ "playerSpawned" ] += new Action<ExpandoObject>( PlayerSpawn );
             EventHandlers[ "baseevents:onPlayerDied" ] += new Action<int, List<dynamic>>( PlayerDied );
+            EventHandlers[ "baseevents:onPlayerKilled" ] += new Action<int, ExpandoObject>( PlayerKilled );
             EventHandlers[ "salty::StartGame" ] += new Action<int, int, Vector3, Vector3, Vector3, ExpandoObject>( StartGame );
             EventHandlers[ "salty::EndGame" ] += new Action( ActiveGame.End );
             EventHandlers[ "salty::CreateMap" ] += new Action( ActiveGame.CreateMap );
             EventHandlers[ "salty::SpawnPointGUI" ] += new Action<ExpandoObject, ExpandoObject>( SpawnGUI );
+            EventHandlers[ "salty::GiveGun" ] += new Action<string, int>( GiveGun );
+
             ActiveGame.SetNoClip( false );
             Tick += Update;
             SetMaxWantedLevel( 0 );       
@@ -47,7 +50,16 @@ namespace Salty_Gamemodes_Client
                 }
             }
             if( id == 2 ) { // Drive or die
+                ActiveGame = new DriveOrDie( map, team );
+                if( team == 1 ) { // Traitor
 
+                }
+                else if( team == 2 ) { // Innocent
+
+                }
+                else { // Spectator
+
+                }
             }
             if( id == 3 ) { // Murder
                 ActiveGame = new Murder( map, team );
@@ -131,6 +143,13 @@ namespace Salty_Gamemodes_Client
             MapMenu menu = new MapMenu( this, "Maps", "Modify maps", this.Maps );
         }
 
+        private void PlayerKilled( int killerID, ExpandoObject deathData  ) {
+            int killerType = (int)deathData.ElementAt( 3 ).Value;
+            List<dynamic> deathCoords = deathData.ElementAt( 2 ).Value as List<dynamic>;
+            PlayerDied( killerType, deathCoords );
+            ActiveGame.PlayerKilled( killerID, deathData );
+        }
+
         private void PlayerDied( int killerType, List<dynamic> deathcords ) {
             Vector3 coords = new Vector3( (float)deathcords[ 0 ], (float)deathcords[ 1 ], (float)deathcords[ 2 ] );
             ActiveGame.PlayerDied( killerType, coords );
@@ -153,6 +172,11 @@ namespace Salty_Gamemodes_Client
         }
 
 
+        public void GiveGun( string weapon, int ammo ) {
+            GiveWeaponToPed( PlayerPedId(), (uint)GetHashKey( weapon ), ammo, false, true );
+            SetPedAmmo( PlayerPedId(), (uint)GetHashKey( weapon ), ammo );
+        }
+
         private void OnClientResourceStart( string resourceName ) {
             if( GetCurrentResourceName() != resourceName ) return;
 
@@ -174,16 +198,14 @@ namespace Salty_Gamemodes_Client
                 TriggerServerEvent( "salty::netModifyWeaponPos", "add", "AUTO", args[0], Game.Player.Character.Position );
             } ), false );
 
+            RegisterCommand( "test", new Action<int, List<object>, string>( ( source, args, raw ) => {
+                TriggerEvent( "salty::GiveGun", "WEAPON_PISTOL", 1 );
+            } ), false );
+
             RegisterCommand( "createmap", new Action<int, List<object>, string>( ( source, args, raw ) => {
                 if( args[ 2 ] == null )
                     return;
                 TriggerServerEvent( "salty::netModifyMap", "add", args[0], 0, Game.Player.Character.Position, new Vector3( float.Parse( args[1].ToString() ), float.Parse( args[2].ToString() ), 0 ) );
-            } ), false );
-
-            RegisterCommand( "test", new Action<int, List<object>, string>( ( source, args, raw ) => {
-                //CreateObject( GetHashKey( "W_AR_ASSAULTRIFLE" ), Game.PlayerPed.Position.X, Game.PlayerPed.Position.Y, Game.PlayerPed.Position.Z + 1, true, true, true );
-                CreatePickup( (uint)GetHashKey( "PICKUP_WEAPON_SMG" ), Game.PlayerPed.Position.X, Game.PlayerPed.Position.Y, Game.PlayerPed.Position.Z + 1, 0, 0, true, (uint)GetHashKey( "W_SB_SMG" ) );
-
             } ), false );
 
 
@@ -213,7 +235,21 @@ namespace Salty_Gamemodes_Client
 
                 // create the vehicle
                 var vehicle = await World.CreateVehicle( model, Game.PlayerPed.Position, Game.PlayerPed.Heading );
-
+                vehicle.CanBeVisiblyDamaged = false;
+                vehicle.CanEngineDegrade = false;
+                vehicle.CanTiresBurst = false;
+                vehicle.CanWheelsBreak = false;
+                //vehicle.EnginePowerMultiplier = 500;
+                SetVehicleEngineCanDegrade( vehicle.NetworkId, false );
+                SetVehicleForwardSpeed( vehicle.NetworkId, 300 );
+                SetVehicleHandlingFloat( vehicle.NetworkId, "CHandlingData", "fCamberStiffnesss", 0.1f );
+                SetVehicleHandlingField( vehicle.NetworkId, "CHandlingData", "fDownForceModifier", 10000 );
+                SetVehicleHandlingField( vehicle.NetworkId, "CHandlingData", "fDriveInertia", 2 );
+                SetVehicleHandlingFloat( vehicle.NetworkId, "CHandlingData", "fDriveBiasFront", 0.5f );
+                SetVehicleHasStrongAxles( vehicle.NetworkId, true );
+                SetVehicleHighGear( vehicle.NetworkId, 12 );
+                SetVehicleStrong( vehicle.NetworkId, true );
+                SetVehicleSteeringScale( vehicle.NetworkId, 2 );
                 // set the player ped into the vehicle and driver seat
                 Game.PlayerPed.SetIntoVehicle( vehicle, VehicleSeat.Driver );
 

@@ -26,8 +26,8 @@ namespace Salty_Gamemodes_Client {
 
 
             foreach( var map in Maps ) {
-                Vector3 selectedVector = map.Value.SpawnPoints[0][0];
-                int selectedTeam = 0;
+                Vector3 selectedVector = map.Value.SpawnPoints.ElementAt( 0 ).Value[0];
+                int selectedTeam = map.Value.SpawnPoints.ElementAt( 0 ).Key;
 
                 Menu mapEditor = AddSubMenu( mapMenu, "Edit " + map.Key );
 
@@ -61,11 +61,13 @@ namespace Salty_Gamemodes_Client {
 
                 Menu modifyPosMenu = AddSubMenu( playerSpawnMenu, "Edit position" );
 
+                MenuSliderItem sliderOffset = new MenuSliderItem( "Offset", -25, 25, 0, false );
                 MenuSliderItem sliderX = new MenuSliderItem( "Centre X", -999999, 999999, (int)map.Value.Position.X, false );
                 MenuSliderItem sliderY = new MenuSliderItem( "Centre Y", -999999, 999999, (int)map.Value.Position.Y, false );
-                MenuSliderItem sliderWidth = new MenuSliderItem( "Width", 0, 999999, (int)map.Value.Size.X, false );
-                MenuSliderItem sliderLength = new MenuSliderItem( "Length", 0, 999999, (int)map.Value.Size.Y, false );
+                MenuSliderItem sliderWidth = new MenuSliderItem( "Width", -9999, 9999, (int)map.Value.Size.X, false );
+                MenuSliderItem sliderLength = new MenuSliderItem( "Length", -9999, 9999, (int)map.Value.Size.Y, false );
 
+                mapEditor.AddMenuItem( sliderOffset );
                 mapEditor.AddMenuItem( sliderX );
                 mapEditor.AddMenuItem( sliderY );
                 mapEditor.AddMenuItem( sliderWidth );
@@ -82,16 +84,16 @@ namespace Salty_Gamemodes_Client {
 
                 mapEditor.OnSliderPositionChange += ( _menu, _sliderItem, _oldPosition, _newPosition, _itemIndex ) => {
                     if( _sliderItem.Text == "Centre X" ) {
-                        map.Value.Position.X = _newPosition;
+                        map.Value.Position.X += (_newPosition - _oldPosition) * sliderOffset.Position;
                     }
                     if( _sliderItem.Text == "Centre Y" ) {
-                        map.Value.Position.Y = _newPosition;
+                        map.Value.Position.Y += (_newPosition - _oldPosition) * sliderOffset.Position;
                     }
                     if( _sliderItem.Text == "Width" ) {
-                        map.Value.Size.X = _newPosition;
+                        map.Value.Size.X += (_newPosition - _oldPosition) * sliderOffset.Position;
                     }
                     if( _sliderItem.Text == "Length" ) {
-                        map.Value.Size.Y = _newPosition;
+                        map.Value.Size.Y += (_newPosition - _oldPosition) * sliderOffset.Position;
                     }
                     
 

@@ -47,6 +47,10 @@ namespace Salty_Gamemodes_Server {
             murder.TriggerEvent( "salty::StartGame", ID, (int)Teams.Murderer, GameMap.Position, GameMap.Size, spawns[spawn], GameMap.GunSpawns );
             players.RemoveAt( murdererID );
             spawns.RemoveAt( spawn );
+            Player playerGun = null;
+            if( players.Count > 0 ) {
+                playerGun = players[rand.Next( 0, players.Count )];
+            }
             // Set innocents
             foreach( var ply in players ) {
                 civilians.Add( ply );
@@ -60,13 +64,23 @@ namespace Salty_Gamemodes_Server {
                 }
 
             }
-
+            if( playerGun != null )
+                playerGun.TriggerEvent( "salty::GiveGun", "WEAPON_PISTOL", 1 );
             // create map
             TriggerClientEvent( "salty::CreateMap", GameMap.Position, GameMap.Size, GameMap.Name );
         }
 
-        public override void End() {
 
+        public override void PlayerDied( Player player, int killerType, Vector3 deathcords ) {
+            if( murderer.Contains(player) ) {
+                WriteChat( "Mike Tyson defeated, civilians win." );
+
+            }
+            base.PlayerDied( player, killerType, deathcords );
+        }
+
+        public override void End() {
+            
         }
     }
 }

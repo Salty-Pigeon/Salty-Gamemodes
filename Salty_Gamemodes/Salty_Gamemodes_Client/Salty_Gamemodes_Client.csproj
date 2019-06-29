@@ -58,6 +58,7 @@
     <Compile Include="Murder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TTT.cs" />
+    <Compile Include="VoteMenu.cs" />
     <Compile Include="WeaponPickup.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

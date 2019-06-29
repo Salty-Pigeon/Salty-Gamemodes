@@ -26,10 +26,13 @@ namespace Salty_Gamemodes_Client {
         public Murder( Map gameMap, int team ) {
 
             GameWeapons = new Dictionary<string, string>() {
-                { "WEAPON_UNARMED", "Paper Fists" },
-                { "WEAPON_KNIVE", "Knife" },
-                { "WEAPON_BAT", "Bat" },
+                { "WEAPON_UNARMED", "Helpless" },
                 { "WEAPON_PISTOL", "Pistol" }
+            };
+
+            WeaponMaxAmmo = new Dictionary<string, int>() {
+                { "WEAPON_UNARMED", 0 },
+                { "WEAPON_PISTOL", 1  },
             };
 
             GameMap = gameMap;
@@ -45,14 +48,14 @@ namespace Salty_Gamemodes_Client {
             Game.Player.Character.MaxHealth = 100;
             Game.Player.Character.Health = 100;
             if( Team == (int)Teams.Murderer ) {
-                //GiveWeaponToPed( PlayerPedId(), (uint)GetHashKey("WEAPON_PISTOL"), 100, false, true );
+                GiveWeaponToPed( PlayerPedId(), (uint)GetHashKey( "WEAPON_UNARMED" ), 1, false, true );
+                SetPlayerMeleeWeaponDamageModifier( PlayerId(), 20 );
+                GameWeapons["WEAPON_UNARMED"] = "1 Hit KO";
             } else if( Team == (int)Teams.Civilian ) {
-
+                RemoveWeaponFromPed( PlayerPedId(), (uint)GetHashKey( "WEAPON_UNARMED" ) );
+                SetPlayerMeleeWeaponDamageModifier( PlayerId(), 0 );
+                SetPlayerWeaponDamageModifier( PlayerId(), 20 );
             }
-            //RemoveWeaponFromPed( PlayerPedId(), (uint)GetHashKey( "WEAPON_UNARMED" ) );
-            GiveWeaponToPed( PlayerPedId(), (uint)GetHashKey( "WEAPON_BAT" ), 100, false, true );
-            Game.PlayerPed.Weapons.Select(Game.PlayerPed.Weapons.BestWeapon);
-            SetCurrentPedWeapon( PlayerPedId(), (uint)GetHashKey( "WEAPON_BAT" ), true );
 
         }
 
@@ -61,8 +64,7 @@ namespace Salty_Gamemodes_Client {
         }
 
         public override void HUD() {
-
-            DrawBaseHealthHUD();
+            HideHudAndRadarThisFrame();
             DrawBaseWeaponHUD();
 
             base.HUD();
@@ -72,7 +74,14 @@ namespace Salty_Gamemodes_Client {
             return base.CanPickupWeapon( weaponModel );
         }
 
+        public override void PlayerPickedUpWeapon( string wepName, int count ) {
+
+            base.PlayerPickedUpWeapon( wepName, count );
+        }
+
         public override void PlayerDroppedWeapon( string wepName, int count ) {
+            WeaponPickup item = new WeaponPickup( GameMap, "WEAPON_PISTOL", (uint)GetHashKey( "WEAPON_PISTOL" ), GetHashKey( "W_PI_PISTOL"), Game.Player.Character.Position, true, 5000, 1 );
+            item.Throw();
             base.PlayerDroppedWeapon( wepName, count );
         }
 

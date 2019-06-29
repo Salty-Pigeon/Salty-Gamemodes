@@ -31,6 +31,10 @@ namespace Salty_Gamemodes_Client {
             { "WEAPON_UNARMED", 0 },
         };
 
+        public Dictionary<string, int> WeaponMaxAmmo = new Dictionary<string, int>() {
+            { "WEAPON_UNARMED", 0 },
+        };
+
         //private Scaleform playerNameHUD = new Scaleform( "mp_mission_name_freemode" );
         //private Scaleform playerNameHUD = new Scaleform( "RACE_MESSAGE" );
 
@@ -163,6 +167,10 @@ namespace Salty_Gamemodes_Client {
             inGame = false;
         }
 
+        public virtual void PlayerKilled( int killerID, ExpandoObject deathData ) {
+
+        }
+
         public virtual void PlayerDied( int killerType, Vector3 deathcords ) {
             deathPos = deathcords;
         }
@@ -235,8 +243,11 @@ namespace Salty_Gamemodes_Client {
                     else {
                         slot = WeaponSlots[weps.Key];
                     }
-
-                    PlayerWeapons.Add( slot, weps.Key );
+                    if( PlayerWeapons.ContainsKey(slot) ) {
+                        RemoveWeaponFromPed( PlayerPedId(), wepHash );
+                    } else {
+                        PlayerWeapons.Add( slot, weps.Key );
+                    }
                     PlayerPickedUpWeapon(weps.Key, PlayerWeapons.Count);
                 }
 

@@ -57,7 +57,20 @@ namespace Salty_Gamemodes_Client {
                 { "WEAPON_PUMPSHOTGUN", 2  },
                 { "WEAPON_COMBATMG", 2 },
             };
-           
+
+            WeaponMaxAmmo = new Dictionary<string, int>() {
+                { "WEAPON_UNARMED", 0 },
+                { "WEAPON_PISTOL", 38  },
+                { "WEAPON_COMBATPISTOL", 38 },
+                { "WEAPON_MICROSMG", 96 },
+                { "WEAPON_SMG", 180 },
+                { "WEAPON_CARBINERIFLE", 180  },
+                { "WEAPON_ASSAULTRIFLE", 180  },
+                //{ "WEAPON_SNIPERRIFLE", 1 },
+                { "WEAPON_PUMPSHOTGUN", 24  },
+                { "WEAPON_COMBATMG", 300 },
+            };
+
 
             TeamText = new Text( "Spectator", new System.Drawing.PointF( Screen.Width * 0.033f, Screen.Height * 0.855f ), 0.5f );
 
@@ -94,9 +107,8 @@ namespace Salty_Gamemodes_Client {
                 
                 foreach( WeaponPickup wep in GameMap.CreatedWeapons.Values.ToList() ) {
                     if( (wep.WorldModel == Game.PlayerPed.Weapons.Current.Model.GetHashCode()) ) {
-                        WeaponPickup item = new WeaponPickup( GameMap, wep.WeaponModel, wep.WeaponHash, wep.WorldModel, Game.Player.Character.Position, true, Game.PlayerPed.Weapons.Current.Ammo );
+                        WeaponPickup item = new WeaponPickup( GameMap, wep.WeaponModel, wep.WeaponHash, wep.WorldModel, Game.Player.Character.Position, true, 1500, Game.PlayerPed.Weapons.Current.Ammo );
                         item.Throw();
-                        GameMap.SpawnedWeapons.Add( item );
                         Game.PlayerPed.Weapons.Remove( Game.PlayerPed.Weapons.Current );
                         break;
                     }

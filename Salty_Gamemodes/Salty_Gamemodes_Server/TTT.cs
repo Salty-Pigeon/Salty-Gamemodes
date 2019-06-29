@@ -69,6 +69,7 @@ namespace Salty_Gamemodes_Server {
             TriggerClientEvent( "salty::CreateMap", GameMap.Position, GameMap.Size, GameMap.Name );
         }
 
+
         public override void End() {
             Debug.WriteLine( "Game ending" );
         }
