@@ -52,6 +52,7 @@
   <ItemGroup>
     <Compile Include="BaseGamemode.cs" />
     <Compile Include="DriveOrDie.cs" />
+    <Compile Include="IceCreamMan.cs" />
     <Compile Include="Init.cs" />
     <Compile Include="Map.cs" />
     <Compile Include="MapMenu.cs" />

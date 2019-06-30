@@ -12,10 +12,13 @@ using CitizenFX.Core.Native;
 namespace Salty_Gamemodes_Client {
     public class BaseGamemode : BaseScript {
 
+        public Vector3 PlayerSpawn =  Vector3.Zero;
 
         public Text HealthText;
         public Text AmmoText;
         public Text GameTimeText;
+
+        public int Score;
 
         public double GameTime = 0;
         public bool isTimed = false;

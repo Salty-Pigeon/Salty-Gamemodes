@@ -38,6 +38,12 @@ namespace Salty_Gamemodes_Client {
             SetTeam( team );
         }
 
+
+        public override void HUD() {
+
+            base.HUD();
+        }
+
         public override void Start() {
             base.Start();
         }

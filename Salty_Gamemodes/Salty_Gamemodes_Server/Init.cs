@@ -15,7 +15,8 @@ namespace Salty_Gamemodes_Server
             None,
             TTT,
             DriveOrDie,
-            Murder
+            Murder,
+            IceCreamMan
         }
 
 
@@ -40,6 +41,8 @@ namespace Salty_Gamemodes_Server
             EventHandlers[ "salty::netModifyWeaponPos" ] += new Action<Player, string, string, string, Vector3>( ModifyWeaponPosition );
             EventHandlers[ "salty::netModifyMap" ] += new Action<Player, string, string, int, Vector3, Vector3>( ModifyMap );
 
+            EventHandlers[ "salty::netAddScore" ] += new Action<Player, int>( AddScoreToPlayer );
+
             EventHandlers[ "salty::netVoteMap" ] += new Action<Player, string>( MapManager.PlayerVote );
 
             EventHandlers[ "salty::netJoined" ] += new Action<Player>( PlayerJoined );
@@ -59,6 +62,11 @@ namespace Salty_Gamemodes_Server
             RegisterCommand( "startDod", new Action<int, List<object>, string>( ( source, args, raw ) => {
                 StartDriveOrDie();
             } ), false );
+
+            RegisterCommand( "startIceCreamMan", new Action<int, List<object>, string>( ( source, args, raw ) => {
+                StartIceCreamMan();
+            } ), false );
+
 
             RegisterCommand( "endGame", new Action<int, List<object>, string>( ( source, args, raw ) => {
                 EndGame();
@@ -97,6 +105,12 @@ namespace Salty_Gamemodes_Server
             ActiveGame.End();
         }
 
+        public void StartIceCreamMan() {
+            ActiveGame = new IceCreamMan( MapManager, new PlayerList(), (int)Gamemodes.IceCreamMan, "icm" );
+            ActiveGame.CreateGameTimer( 3 * 60 );
+            ActiveGame.Start();
+        }
+
         public void StartMurder() {
             ActiveGame = new Murder( MapManager, new PlayerList(), (int)Gamemodes.Murder, "mmm" );
             ActiveGame.CreateGameTimer( 3 * 60 );
@@ -132,6 +146,10 @@ namespace Salty_Gamemodes_Server
         private void PlayerDied( [FromSource] Player ply, int killerType, List<dynamic> deathcords ) {
             Vector3 coords = new Vector3( (float)deathcords[0], (float)deathcords[1], (float)deathcords[2] );
             ActiveGame.PlayerDied( ply, killerType, coords );
+        }
+
+        private void AddScoreToPlayer( [FromSource] Player ply, int amount ) {
+            ActiveGame.AddScore( ply, amount );
         }
 
         private void ModifyMap([FromSource] Player ply, string setting, string mapName, int team, Vector3 position, Vector3 size ) {

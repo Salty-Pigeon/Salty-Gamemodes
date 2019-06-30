@@ -42,16 +42,18 @@ namespace Salty_Gamemodes_Client {
                 canPickup = true;
             }
             WeaponID = CreateObject( worldModel, position.X, position.Y, position.Z, true, true, true );
-            SetObjectPhysicsParams( WeaponID, 20, 20, 20, 1, 1, 20, 20, 20, 20, 20, 20 );
+            SetObjectPhysicsParams( WeaponID, 10, 10, 10, 3, 3, 10, 10, 10, 10, 10, 10 );
             PlaceObjectOnGroundProperly( WeaponID );
             SetObjectSomething( WeaponID, true );
             Throw();
+            ActivatePhysics( WeaponID );
             map.SpawnedWeapons.Add( this );
         }
 
         public void Throw() {
-            SetObjectPhysicsParams( WeaponID, 20, 20, 20, 3, 3, 20, 20, 20, 20, 20, 20 );
+            SetObjectPhysicsParams( WeaponID, 10, 10, 10, 3, 3, 10, 10, 10, 10, 10, 10 );
             PlaceObjectOnGroundProperly( WeaponID );
+            ActivatePhysics( WeaponID );
         }
 
         public void Update() {

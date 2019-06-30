@@ -46,42 +46,21 @@ namespace Salty_Gamemodes_Client
             map.GunSpawns = ExpandoToDictionary( gunSpawns );
             if( id == 1 ) { // Trouble in Terrorist Town
                 ActiveGame = new TTT(map, team);
-                if( team == 1 ) { // Traitor
-                    
-                } else if( team == 2 ) { // Innocent
-
-                } else { // Spectator
-
-                }
             }
             if( id == 2 ) { // Drive or die
                 ActiveGame = new DriveOrDie( map, team );
-                if( team == 1 ) { // Traitor
-
-                }
-                else if( team == 2 ) { // Innocent
-
-                }
-                else { // Spectator
-
-                }
             }
             if( id == 3 ) { // Murder
                 ActiveGame = new Murder( map, team );
-                if( team == 1 ) { // Murderer
-
-                }
-                else if( team == 2 ) { // Innocent
-
-                }
-                else { // Spectator
-
-                }
+            }
+            if( id == 4 ) { // Ice Cream Man
+                ActiveGame = new IceCreamMan( map, team );
             }
             if( duration > 0 )
                 ActiveGame.CreateGameTimer( duration );
-            ActiveGame.Start();
+            ActiveGame.PlayerSpawn = startPos;
             Game.Player.Character.Position = startPos;
+            ActiveGame.Start();
         }
 
         public void EndGame() {
@@ -95,7 +74,6 @@ namespace Salty_Gamemodes_Client
             Map map = new Map( mapPos, mapSize, "" );
             if( id == 1 ) { // Trouble in Terrorist Town
                 ActiveGame = new TTT( map, 0 );            
-
             }
             if( id == 2 ) { // Drive or die
                 ActiveGame = new DriveOrDie( map, 0 );
@@ -103,6 +81,9 @@ namespace Salty_Gamemodes_Client
             }
             if( id == 3 ) { // Murder
                 ActiveGame = new Murder( map, 0 );
+            }
+            if( id == 4 ) { // Murder
+                ActiveGame = new IceCreamMan( map, 0 );
             }
             ActiveGame.inGame = true;
             if( duration > 0 )
@@ -132,6 +113,7 @@ namespace Salty_Gamemodes_Client
             VoteMenu menu = new VoteMenu( this, "Vote Map", "Vote for next map", mapsList );
 
         }
+
 
         private void SpawnGUI( ExpandoObject mapObj, ExpandoObject spawnObj ) {
 
@@ -249,6 +231,20 @@ namespace Salty_Gamemodes_Client
                 ActiveGame.SetNoClip(!ActiveGame.isNoclip);
             } ), false );
 
+            RegisterCommand( "mouse", new Action<int, List<object>, string>( ( source, args, raw ) => {
+                Debug.WriteLine( string.Format( "{0} {1} {2}", GetGameplayCamRot( 0 ).X, GetGameplayCamRot( 0 ).Y, GetGameplayCamRot( 0 ).Z ) );
+            } ), false );
+
+            RegisterCommand( "respawn", new Action<int, List<object>, string>( ( source, args, raw ) => {
+                if( ActiveGame is IceCreamMan ) {
+                    (ActiveGame as IceCreamMan).Respawn();
+                }
+            } ), false );
+
+            RegisterCommand( "heading", new Action<int, List<object>, string>( ( source, args, raw ) => {
+                Debug.WriteLine( Game.PlayerPed.Heading.ToString() );
+            } ), false );
+
             RegisterCommand( "spawnPoints", new Action<int, List<object>, string>( ( source, args, raw ) => {
                 TriggerServerEvent( "salty::netSpawnPointGUI" );
             } ), false );
@@ -265,6 +261,13 @@ namespace Salty_Gamemodes_Client
                 if( args[ 2 ] == null )
                     return;
                 TriggerServerEvent( "salty::netModifyMap", "add", args[0], 0, Game.Player.Character.Position, new Vector3( float.Parse( args[1].ToString() ), float.Parse( args[2].ToString() ), 0 ) );
+            } ), false );
+
+            RegisterCommand( "street", new Action<int, List<object>, string>( ( source, args, raw ) => {
+                uint streetName = 0;
+                uint crossingRoad = 0;
+                GetStreetNameAtCoord( Game.PlayerPed.Position.X, Game.PlayerPed.Position.Y, Game.PlayerPed.Position.Z, ref streetName, ref crossingRoad );
+                Debug.WriteLine( streetName + " : " + GetStreetNameFromHashKey( streetName ) );
             } ), false );
 
 

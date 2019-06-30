@@ -6,11 +6,17 @@ using System.Dynamic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Net;
+using System.IO;
+using System.Net.Http;
 
 namespace Salty_Gamemodes_Server {
     public class BaseGamemode : BaseScript {
 
         public MapManager MapManager;
+
+        public Dictionary<Player, int> PlayerScores = new Dictionary<Player, int>();
+
 
         public Map GameMap;
         public PlayerList players;
@@ -75,11 +81,21 @@ namespace Salty_Gamemodes_Server {
         public virtual void PlayerDied( Player player, int killerType, Vector3 deathcords ) {
 
         }
+s
 
         public virtual bool IsBase() {
             return !(GetType().IsSubclassOf( typeof( BaseGamemode ) ));
         }
 
+        public void AddScore( Player ply, int amount ) {
+            if( PlayerScores.ContainsKey(ply) ) {
+                PlayerScores[ply] += amount;
+            }
+            else {
+                PlayerScores.Add( ply, amount );
+            }
+            Debug.WriteLine( ply.Name + " has score: " + PlayerScores[ply] );
+        }
 
         public void WriteChat( string str ) {
             TriggerClientEvent( "chat:addMessage", new {
