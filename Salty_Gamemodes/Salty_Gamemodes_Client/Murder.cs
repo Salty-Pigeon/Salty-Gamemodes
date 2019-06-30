@@ -66,6 +66,7 @@ namespace Salty_Gamemodes_Client {
         public override void HUD() {
             HideHudAndRadarThisFrame();
             DrawBaseWeaponHUD();
+            DrawGameTimer();
 
             base.HUD();
         }

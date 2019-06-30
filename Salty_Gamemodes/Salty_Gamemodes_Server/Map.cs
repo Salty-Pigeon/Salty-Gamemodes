@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Salty_Gamemodes_Server {
-    class Map {
+    public class Map {
 
         public string Name = "None";
         public bool isActive = false;

@@ -46,7 +46,7 @@ namespace Salty_Gamemodes_Client {
         public override void Update() {
 
             if( Game.PlayerPed.IsInVehicle() ) {
-                Game.PlayerPed.CurrentVehicle.EngineTorqueMultiplier = 600;
+                //Game.PlayerPed.CurrentVehicle.EngineTorqueMultiplier = 200;
             }
 
             if( !GameMap.IsInZone( Game.PlayerPed.Position ) ) {

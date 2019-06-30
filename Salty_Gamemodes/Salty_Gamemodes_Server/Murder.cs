@@ -25,12 +25,15 @@ namespace Salty_Gamemodes_Server {
             PostRound
         }
 
-        public Murder( Map gameMap, PlayerList players, int ID ) : base( ID ) {
-            GameMap = gameMap;
+        public Murder( MapManager manager, PlayerList players, int ID, string MapTag ) : base( manager, ID, MapTag ) {
             this.players = players;
         }
 
         public override void Start() {
+
+            base.Start();
+
+
             Debug.WriteLine( "Murder starting on " + GameMap.Name );
             Random rand = new Random();
             List<Player> players = Players.ToList();
@@ -44,7 +47,7 @@ namespace Salty_Gamemodes_Server {
             int spawn = rand.Next( 0, spawns.Count );
             Player murder = players[murdererID];
             murderer.Add( murder );
-            murder.TriggerEvent( "salty::StartGame", ID, (int)Teams.Murderer, GameMap.Position, GameMap.Size, spawns[spawn], GameMap.GunSpawns );
+            SpawnClient( murder, (int)Teams.Murderer, spawns[spawn] );
             players.RemoveAt( murdererID );
             spawns.RemoveAt( spawn );
             Player playerGun = null;
@@ -56,11 +59,11 @@ namespace Salty_Gamemodes_Server {
                 civilians.Add( ply );
                 if( spawns.Count > 0 ) {
                     spawn = rand.Next( 0, spawns.Count );
-                    ply.TriggerEvent( "salty::StartGame", ID, (int)Teams.Civilian, GameMap.Position, GameMap.Size, spawns[spawn], GameMap.GunSpawns );
+                    SpawnClient( ply, (int)Teams.Civilian, spawns[spawn] );
                     spawns.RemoveAt( spawn );
                 }
                 else {
-                    ply.TriggerEvent( "salty::StartGame", ID, (int)Teams.Civilian, GameMap.Position, GameMap.Size, GameMap.SpawnPoints[rand.Next( 0, GameMap.SpawnPoints.Count )], GameMap.GunSpawns );
+                    SpawnClient( ply, (int)Teams.Civilian, GameMap.SpawnPoints[0][rand.Next( 0, GameMap.SpawnPoints.Count )] );
                 }
 
             }
@@ -68,6 +71,7 @@ namespace Salty_Gamemodes_Server {
                 playerGun.TriggerEvent( "salty::GiveGun", "WEAPON_PISTOL", 1 );
             // create map
             TriggerClientEvent( "salty::CreateMap", GameMap.Position, GameMap.Size, GameMap.Name );
+
         }
 
 
@@ -80,7 +84,7 @@ namespace Salty_Gamemodes_Server {
         }
 
         public override void End() {
-            
+            base.End();
         }
     }
 }

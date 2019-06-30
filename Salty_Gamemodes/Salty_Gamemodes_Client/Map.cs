@@ -99,7 +99,7 @@ namespace Salty_Gamemodes_Client {
             DrawBox( Position.X - (Size.X / 2), Position.Y + (Size.Y / 2), 0, Position.X + (Size.X / 2), Position.Y + (Size.Y / 2) + 0.1f, 1000, 255, 255, 255, 100 );
 
             // Roof
-            //DrawBox( Position.X - (Size.X / 2), Position.Y - (Size.Y / 2), 1000, Position.X + (Size.X / 2), Position.Y + (Size.Y / 2), 1000.1f, 255, 255, 255, 100 );
+            DrawBox( Position.X - (Size.X / 2), Position.Y - (Size.Y / 2), 1000, Position.X + (Size.X / 2), Position.Y + (Size.Y / 2), 1000.1f, 255, 255, 255, 100 );
         }
 
         public void RemoveWeapon(WeaponPickup item) {

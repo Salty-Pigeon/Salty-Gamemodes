@@ -24,16 +24,19 @@ namespace Salty_Gamemodes_Server {
             PostRound
         }
 
-        public DriveOrDie( Map gameMap, PlayerList players, int ID ) : base( ID ) {
-            GameMap = gameMap;
+        public DriveOrDie( MapManager manager, PlayerList players, int ID, string MapTag ) : base( manager, ID, MapTag ) {
             this.players = players;
         }
 
         public override void Start() {
+
+            base.Start();
+
+
             Debug.WriteLine( "Drive or Die starting on " + GameMap.Name );
             Random rand = new Random();
             List<Player> players = Players.ToList();
-
+         
             List<Vector3> spawns = GameMap.SpawnPoints[0].ToList();
             if( spawns.Count == 0 ) {
                 spawns.Add( GameMap.Position );
@@ -43,19 +46,19 @@ namespace Salty_Gamemodes_Server {
             int spawn = rand.Next( 0, spawns.Count );
             Player truck = players[truckID];
             trucker.Add( truck );
-            truck.TriggerEvent( "salty::StartGame", ID, (int)Teams.Trucker, GameMap.Position, GameMap.Size, spawns[spawn], GameMap.GunSpawns );
+            SpawnClient( truck, (int)Teams.Trucker, spawns[spawn] );
             players.RemoveAt( truckID );
-            spawns.RemoveAt( spawn );
+            spawns = GameMap.SpawnPoints[1].ToList();
             // Set innocents
             foreach( var ply in players ) {
                 bikie.Add( ply );
                 if( spawns.Count > 0 ) {
                     spawn = rand.Next( 0, spawns.Count );
-                    ply.TriggerEvent( "salty::StartGame", ID, (int)Teams.Bikie, GameMap.Position, GameMap.Size, spawns[spawn], GameMap.GunSpawns );
+                    SpawnClient( ply, (int)Teams.Bikie, spawns[spawn] );
                     spawns.RemoveAt( spawn );
                 }
                 else {
-                    ply.TriggerEvent( "salty::StartGame", ID, (int)Teams.Bikie, GameMap.Position, GameMap.Size, GameMap.SpawnPoints[rand.Next( 0, GameMap.SpawnPoints.Count )], GameMap.GunSpawns );
+                    SpawnClient( ply, (int)Teams.Bikie, GameMap.SpawnPoints[1][rand.Next( 0, GameMap.SpawnPoints.Count )] );
                 }
 
             }
@@ -65,7 +68,7 @@ namespace Salty_Gamemodes_Server {
         }
 
         public override void End() {
-
+            base.End();
         }
     }
 }

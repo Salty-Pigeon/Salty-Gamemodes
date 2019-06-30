@@ -21,24 +21,32 @@ namespace Salty_Gamemodes_Server
 
 
         public bool inGame = false;
-        BaseGamemode ActiveGame = new BaseGamemode( (int)Gamemodes.None );
+        public static BaseGamemode ActiveGame;
 
         Database SQLConnection;
         MapManager MapManager;
 
         public Init() {
+
+            SQLConnection = new Database();
+            MapManager = new MapManager( SQLConnection.Load() );
+            ActiveGame = new BaseGamemode( MapManager, (int)Gamemodes.None, "___" );
+
+
             EventHandlers[ "salty::netStartGame" ] += new Action( ActiveGame.Start );
-            EventHandlers[ "salty::netEndGame" ] += new Action( ActiveGame.End );
+            EventHandlers[ "salty::netEndGame" ] += new Action( EndGame );
             EventHandlers[ "salty::netSpawnPointGUI" ] += new Action<Player>( SpawnPointGUI );
             EventHandlers[ "salty::netModifyMapPos" ] += new Action<Player, string, string, int, Vector3>( ModifyMapPosition );
             EventHandlers[ "salty::netModifyWeaponPos" ] += new Action<Player, string, string, string, Vector3>( ModifyWeaponPosition );
             EventHandlers[ "salty::netModifyMap" ] += new Action<Player, string, string, int, Vector3, Vector3>( ModifyMap );
 
+            EventHandlers[ "salty::netVoteMap" ] += new Action<Player, string>( MapManager.PlayerVote );
+
+            EventHandlers[ "salty::netJoined" ] += new Action<Player>( PlayerJoined );
+
             EventHandlers["baseevents:onPlayerDied"] += new Action<Player, int, List<dynamic>>( PlayerDied );
             EventHandlers["baseevents:onPlayerKilled"] += new Action<Player, int, ExpandoObject>( PlayerKilled );
 
-            SQLConnection = new Database();
-            MapManager = new MapManager( SQLConnection.Load() );
 
             RegisterCommand( "startTTT", new Action<int, List<object>, string>( ( source, args, raw ) => {
                 StartTTT();
@@ -56,6 +64,10 @@ namespace Salty_Gamemodes_Server
                 EndGame();
             } ), false );
 
+            RegisterCommand( "voteMap", new Action<int, List<object>, string>( ( source, args, raw ) => {
+                MapManager.VoteMapGUI( "ttt" );
+            } ), false );
+
             RegisterCommand( "loadSQL", new Action<int, List<object>, string>( ( source, args, raw ) => {
                 SQLConnection.Load();
             } ), false );
@@ -67,58 +79,52 @@ namespace Salty_Gamemodes_Server
             Tick += Init_Tick;
         }
 
+        public void PlayerJoined( [FromSource]Player ply ) {
+
+            if( ActiveGame.ID != (int)Gamemodes.None ) {
+                ply.TriggerEvent( "salty::UpdateInfo", ActiveGame.ID, ActiveGame.GameTime - GetGameTimer(), ActiveGame.GameMap.Position, ActiveGame.GameMap.Size );
+            }
+            ActiveGame.PlayerJoined( ply );
+        }
+
         private async Task Init_Tick() {
             if( ActiveGame != null )
                 ActiveGame.Update();
+            MapManager.Update();
         }
 
         public void EndGame() {
             ActiveGame.End();
-            ActiveGame = new BaseGamemode( (int)Gamemodes.None );
         }
 
         public void StartMurder() {
-
-            Random rand = new Random();
-            List<Map> maps = MapManager.MapList( "mmm" );
-            Map map = maps[rand.Next( 0, maps.Count )];
-
-            PlayerList players = new PlayerList();
-
-            ActiveGame = new Murder( map, players, (int)Gamemodes.Murder );
+            ActiveGame = new Murder( MapManager, new PlayerList(), (int)Gamemodes.Murder, "mmm" );
+            ActiveGame.CreateGameTimer( 3 * 60 );
             ActiveGame.Start();
-
         }
 
         public void StartDriveOrDie() {
-
-            Random rand = new Random();
-            List<Map> maps = MapManager.MapList( "dod" );
-            Map map = maps[rand.Next( 0, maps.Count )];
-
-            PlayerList players = new PlayerList();
-
-            ActiveGame = new DriveOrDie( map, players, (int)Gamemodes.DriveOrDie );
+            ActiveGame = new DriveOrDie( MapManager, new PlayerList(), (int)Gamemodes.DriveOrDie, "dod" );
             ActiveGame.Start();
-
         }
 
         public void StartTTT() {
-
-            Random rand = new Random();
-            List<Map> maps = MapManager.MapList( "ttt" );
-            Map map = maps[ rand.Next( 0, maps.Count ) ];
-
-            PlayerList players = new PlayerList();
-            
-            ActiveGame = new TTT( map, players, (int)Gamemodes.TTT );
+            ActiveGame = new TTT( MapManager, new PlayerList(), (int)Gamemodes.TTT, "ttt" );
+            ActiveGame.CreateGameTimer( 3 * 60 );
             ActiveGame.Start();
-           
         }
 
         private void PlayerKilled( [FromSource] Player ply, int killerID, ExpandoObject deathData ) {
-            int killerType = (int)deathData.ElementAt( 3 ).Value;
-            List<dynamic> deathCoords = deathData.ElementAt( 2 ).Value as List<dynamic>;
+            int killerType = 0;
+            List<dynamic> deathCoords = new List<dynamic>();
+            foreach( var data in deathData ) {
+                if( data.Key == "killertype" ) {
+                    killerType = (int)data.Value;
+                }
+                if( data.Key == "killerpos" ) {
+                    deathCoords = data.Value as List<dynamic>;
+                }
+            }
             PlayerDied( ply, killerType, deathCoords );
             ActiveGame.PlayerKilled( ply, killerID, deathData );
         }

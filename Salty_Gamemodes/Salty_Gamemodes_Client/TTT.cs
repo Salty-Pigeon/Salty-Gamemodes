@@ -208,7 +208,7 @@ namespace Salty_Gamemodes_Client {
         public override void SetTeam( int team ) {
             switch( team ) {
                 case (0):
-                    TeamText.Caption = "Spectator";
+                    TeamText.Caption = "Spectate";
                     TeamText.Color = System.Drawing.Color.FromArgb( 150, 150, 0 );
                     break;
                 case (1):
@@ -226,6 +226,8 @@ namespace Salty_Gamemodes_Client {
         public override void Update() {
 
             FirstPersonForAlive();
+            SetPlayerMayNotEnterAnyVehicle( PlayerId() );
+            
 
             base.Update();
 

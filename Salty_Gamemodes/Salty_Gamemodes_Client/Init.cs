@@ -14,7 +14,7 @@ namespace Salty_Gamemodes_Client
     public class Init : BaseScript
     {
         BaseGamemode ActiveGame = new BaseGamemode();
-
+        Vector3 spawnPos = Vector3.Zero;
         public Dictionary<string, Map> Maps = new Dictionary<string, Map>();
 
         public Init() {
@@ -22,20 +22,25 @@ namespace Salty_Gamemodes_Client
             EventHandlers[ "playerSpawned" ] += new Action<ExpandoObject>( PlayerSpawn );
             EventHandlers[ "baseevents:onPlayerDied" ] += new Action<int, List<dynamic>>( PlayerDied );
             EventHandlers[ "baseevents:onPlayerKilled" ] += new Action<int, ExpandoObject>( PlayerKilled );
-            EventHandlers[ "salty::StartGame" ] += new Action<int, int, Vector3, Vector3, Vector3, ExpandoObject>( StartGame );
-            EventHandlers[ "salty::EndGame" ] += new Action( ActiveGame.End );
+            EventHandlers[ "salty::StartGame" ] += new Action<int, int, double, Vector3, Vector3, Vector3, ExpandoObject>( StartGame );
+            EventHandlers[ "salty::EndGame" ] += new Action( EndGame );
             EventHandlers[ "salty::CreateMap" ] += new Action( ActiveGame.CreateMap );
             EventHandlers[ "salty::SpawnPointGUI" ] += new Action<ExpandoObject, ExpandoObject>( SpawnGUI );
+            EventHandlers[ "salty::VoteMap" ] += new Action<List<dynamic>>( VoteMap );
             EventHandlers[ "salty::GiveGun" ] += new Action<string, int>( GiveGun );
+            EventHandlers[ "salty::UpdateInfo" ] += new Action<int, double, Vector3, Vector3>( UpdateInfo );
 
             ActiveGame.SetNoClip( false );
             Tick += Update;
-            SetMaxWantedLevel( 0 );       
+            SetMaxWantedLevel( 0 );
+
+
         }
 
-        public void StartGame( int id, int team, Vector3 mapPos, Vector3 mapSize, Vector3 startPos, ExpandoObject gunSpawns ) {
+        public void StartGame( int id, int team, double duration, Vector3 mapPos, Vector3 mapSize, Vector3 startPos, ExpandoObject gunSpawns ) {
             if( ActiveGame.inGame )
                 ActiveGame.End();
+            Debug.WriteLine( duration.ToString() );
             ActiveGame.SetNoClip( false );
             Map map = new Map( mapPos, mapSize, "" );
             map.GunSpawns = ExpandoToDictionary( gunSpawns );
@@ -73,9 +78,37 @@ namespace Salty_Gamemodes_Client
 
                 }
             }
-
+            if( duration > 0 )
+                ActiveGame.CreateGameTimer( duration );
             ActiveGame.Start();
             Game.Player.Character.Position = startPos;
+        }
+
+        public void EndGame() {
+            ActiveGame.End();
+            ActiveGame = new BaseGamemode();
+            ActiveGame.SetNoClip( true );
+        }
+
+        public void UpdateInfo( int id, double duration, Vector3 mapPos, Vector3 mapSize ) {
+
+            Map map = new Map( mapPos, mapSize, "" );
+            if( id == 1 ) { // Trouble in Terrorist Town
+                ActiveGame = new TTT( map, 0 );            
+
+            }
+            if( id == 2 ) { // Drive or die
+                ActiveGame = new DriveOrDie( map, 0 );
+
+            }
+            if( id == 3 ) { // Murder
+                ActiveGame = new Murder( map, 0 );
+            }
+            ActiveGame.inGame = true;
+            if( duration > 0 )
+                ActiveGame.CreateGameTimer( duration );
+            Game.Player.Character.Position = mapPos + new Vector3( 0, 0, 50 );
+            spawnPos = mapPos + new Vector3( 0, 0, 50 );
         }
 
         public Dictionary<string,List<Vector3>> ExpandoToDictionary( ExpandoObject keyValuePairs ) {
@@ -92,6 +125,13 @@ namespace Salty_Gamemodes_Client
             return spawns;
         }
 
+
+        private void VoteMap( List<dynamic> maps ) {
+            List<string> mapsList = maps.OfType<string>().ToList();
+
+            VoteMenu menu = new VoteMenu( this, "Vote Map", "Vote for next map", mapsList );
+
+        }
 
         private void SpawnGUI( ExpandoObject mapObj, ExpandoObject spawnObj ) {
 
@@ -144,8 +184,17 @@ namespace Salty_Gamemodes_Client
         }
 
         private void PlayerKilled( int killerID, ExpandoObject deathData  ) {
-            int killerType = (int)deathData.ElementAt( 3 ).Value;
-            List<dynamic> deathCoords = deathData.ElementAt( 2 ).Value as List<dynamic>;
+
+            int killerType = 0;
+            List<dynamic> deathCoords = new List<dynamic>();
+            foreach( var data in deathData ) {
+                if( data.Key == "killertype" ) {
+                    killerType = (int)data.Value;
+                }
+                if( data.Key == "killerpos" ) {
+                    deathCoords = data.Value as List<dynamic>;
+                }
+            }
             PlayerDied( killerType, deathCoords );
             ActiveGame.PlayerKilled( killerID, deathData );
         }
@@ -156,7 +205,17 @@ namespace Salty_Gamemodes_Client
         }
 
         private void PlayerSpawn( ExpandoObject spawnInfo ) {
-            ActiveGame.PlayerSpawned( spawnInfo );
+
+            if( spawnPos != Vector3.Zero ) {
+                Debug.WriteLine( spawnPos.ToString() );
+                Game.Player.Character.Position = spawnPos;
+                ActiveGame.noclipPos = spawnPos;
+                ActiveGame.SetNoClip( true );
+                spawnPos = Vector3.Zero;
+            } else {
+                ActiveGame.PlayerSpawned( spawnInfo );
+            }
+
         }
 
         public async Task Update() {
@@ -182,6 +241,10 @@ namespace Salty_Gamemodes_Client
 
             ActiveGame.SetNoClip( false );
 
+            TriggerServerEvent( "salty::netJoined" );
+
+
+
             RegisterCommand( "noclip", new Action<int, List<object>, string>( ( source, args, raw ) => {
                 ActiveGame.SetNoClip(!ActiveGame.isNoclip);
             } ), false );
@@ -196,10 +259,6 @@ namespace Salty_Gamemodes_Client
 
             RegisterCommand( "addweaponpoint", new Action<int, List<object>, string>( ( source, args, raw ) => {
                 TriggerServerEvent( "salty::netModifyWeaponPos", "add", "AUTO", args[0], Game.Player.Character.Position );
-            } ), false );
-
-            RegisterCommand( "test", new Action<int, List<object>, string>( ( source, args, raw ) => {
-                TriggerEvent( "salty::GiveGun", "WEAPON_PISTOL", 1 );
             } ), false );
 
             RegisterCommand( "createmap", new Action<int, List<object>, string>( ( source, args, raw ) => {
@@ -239,18 +298,35 @@ namespace Salty_Gamemodes_Client
                 vehicle.CanEngineDegrade = false;
                 vehicle.CanTiresBurst = false;
                 vehicle.CanWheelsBreak = false;
-                //vehicle.EnginePowerMultiplier = 500;
-                SetVehicleEngineCanDegrade( vehicle.NetworkId, false );
-                SetVehicleForwardSpeed( vehicle.NetworkId, 300 );
-                SetVehicleHandlingFloat( vehicle.NetworkId, "CHandlingData", "fCamberStiffnesss", 0.1f );
-                SetVehicleHandlingField( vehicle.NetworkId, "CHandlingData", "fDownForceModifier", 10000 );
-                SetVehicleHandlingField( vehicle.NetworkId, "CHandlingData", "fDriveInertia", 2 );
-                SetVehicleHandlingFloat( vehicle.NetworkId, "CHandlingData", "fDriveBiasFront", 0.5f );
-                SetVehicleHasStrongAxles( vehicle.NetworkId, true );
-                SetVehicleHighGear( vehicle.NetworkId, 12 );
-                SetVehicleStrong( vehicle.NetworkId, true );
-                SetVehicleSteeringScale( vehicle.NetworkId, 2 );
-                // set the player ped into the vehicle and driver seat
+                vehicle.EngineHealth = 999999;
+                vehicle.MaxHealth = 999999;
+                vehicle.Health = 999999;
+                vehicle.EnginePowerMultiplier = 100;
+                vehicle.Gravity = 50;
+                
+
+                SetVehicleHandlingFloat( NetworkGetEntityFromNetworkId(vehicle.NetworkId), "CHandlingData", "fCamberStiffnesss", 0.1f );
+                SetVehicleHandlingFloat( NetworkGetEntityFromNetworkId(vehicle.NetworkId), "CHandlingData", "fInitialDragCoeff ", 10f );
+                SetVehicleHandlingFloat( NetworkGetEntityFromNetworkId(vehicle.NetworkId), "CHandlingData", "fMass", 10000f );
+                SetVehicleHandlingFloat( NetworkGetEntityFromNetworkId(vehicle.NetworkId), "CHandlingData", "fInitialDriveForce", 2f );
+                SetVehicleHandlingFloat( NetworkGetEntityFromNetworkId(vehicle.NetworkId), "CHandlingData", "FTRACTIONSPRINGDELTAMAX", 100f );
+                SetVehicleHandlingFloat( NetworkGetEntityFromNetworkId(vehicle.NetworkId), "CHandlingData", "fSteeringLock", 40f );
+                SetVehicleHandlingFloat( NetworkGetEntityFromNetworkId(vehicle.NetworkId), "CHandlingData", "fDownForceModifier", 100f );
+                SetVehicleHandlingFloat( NetworkGetEntityFromNetworkId(vehicle.NetworkId), "CHandlingData", "fDriveInertia", 1f );
+                SetVehicleHandlingFloat( NetworkGetEntityFromNetworkId(vehicle.NetworkId), "CHandlingData", "fDriveBiasFront", 0.5f );
+                SetVehicleHandlingFloat( NetworkGetEntityFromNetworkId(vehicle.NetworkId), "CHandlingData", "fTractionCurveLateral", 25f );
+                SetVehicleHandlingFloat( NetworkGetEntityFromNetworkId(vehicle.NetworkId), "CHandlingData", "fTractionCurveMax", 5f );
+                SetVehicleHandlingFloat( NetworkGetEntityFromNetworkId(vehicle.NetworkId), "CHandlingData", "fTractionCurveMin", 5f );
+                SetVehicleHandlingFloat( NetworkGetEntityFromNetworkId(vehicle.NetworkId), "CHandlingData", "fTractionBiasFront", 0.5f );
+                SetVehicleHandlingFloat( NetworkGetEntityFromNetworkId(vehicle.NetworkId), "CHandlingData", "fTractionLossMult", 0.1f );
+                SetVehicleHandlingFloat( NetworkGetEntityFromNetworkId(vehicle.NetworkId), "CHandlingData", "fSuspensionReboundDamp", 2f );
+                SetVehicleHandlingFloat( NetworkGetEntityFromNetworkId(vehicle.NetworkId), "CHandlingData", "fSuspensionCompDamp", 2f );
+                SetVehicleHandlingFloat( NetworkGetEntityFromNetworkId(vehicle.NetworkId), "CHandlingData", "fSuspensionForce", 3f );
+                SetVehicleHandlingFloat( NetworkGetEntityFromNetworkId(vehicle.NetworkId), "CHandlingData", "FCOLLISIONDAMAGEMULT", 0f );
+                SetVehicleHasStrongAxles( NetworkGetEntityFromNetworkId( vehicle.NetworkId ), true );
+                SetVehicleHighGear( NetworkGetEntityFromNetworkId( vehicle.NetworkId ), 1 );
+
+
                 Game.PlayerPed.SetIntoVehicle( vehicle, VehicleSeat.Driver );
 
                 // tell the player

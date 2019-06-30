@@ -15,6 +15,10 @@ namespace Salty_Gamemodes_Client {
 
         public Text HealthText;
         public Text AmmoText;
+        public Text GameTimeText;
+
+        public double GameTime = 0;
+        public bool isTimed = false;
 
         public List<Text> WeaponTexts = new List<Text>();
 
@@ -48,6 +52,7 @@ namespace Salty_Gamemodes_Client {
 
         public bool inGame = false;
         public Map GameMap;
+        public string MapTag = "";
 
         public Vector3 noclipPos = Vector3.Zero;
         Vector3 deathPos;
@@ -60,8 +65,10 @@ namespace Salty_Gamemodes_Client {
             HealthText = new Text( "Health: ", new System.Drawing.PointF( Screen.Width * 0.033f, Screen.Height * 0.895f ), 0.5f );
             AmmoText = new Text( "Ammo: ", new System.Drawing.PointF( Screen.Width * 0.033f, Screen.Height * 0.935f ), 0.5f );
 
+            GameTimeText = new Text( "", new System.Drawing.PointF( Screen.Width * 0.1f, Screen.Height * 0.855f ), 0.5f );
+
             BoundText = new Text( "", new System.Drawing.PointF( Screen.Width * 0.2f, Screen.Height * 0.1f), 1.0f );
-            HUDText = new Text( "", new System.Drawing.PointF( Screen.Width * 0.5f, Screen.Height * 0.5f), 1.0f );
+            HUDText = new Text( "", new System.Drawing.PointF( Screen.Width * 0.5f, Screen.Height * 0.5f), 0.5f );
             HUDText.Centered = true;
 
             
@@ -74,7 +81,18 @@ namespace Salty_Gamemodes_Client {
                     GameMap.Weapons.Remove( wep.Key );
                 }
             }
+
             inGame = true;
+        }
+
+
+        public void DrawGameTimer( ) {
+            TimeSpan time = TimeSpan.FromMilliseconds( GameTime - GetGameTimer() );
+
+            GameTimeText.Caption = string.Format( "{0:00}:{1:00}", Math.Ceiling(time.TotalMinutes-1), time.Seconds );
+
+
+            GameTimeText.Draw();
         }
 
         public void DrawBaseHealthHUD() {
@@ -83,15 +101,15 @@ namespace Salty_Gamemodes_Client {
             HealthText.Caption = Game.Player.Character.Health.ToString();
             AmmoText.Caption = Game.PlayerPed.Weapons.Current.AmmoInClip + " / " + Game.PlayerPed.Weapons.Current.Ammo;
 
-            DrawRectangle( 0.025f, 0.9f, 0.1f, 0.03f, 0, 0, 0, 200 );
+            DrawRectangle( 0.025f, 0.9f, 0.12f, 0.03f, 0, 0, 0, 200 );
             float healthPercent = (float)Game.Player.Character.Health / Game.Player.Character.MaxHealth;
             if( healthPercent < 0 )
                 healthPercent = 0;
             if( healthPercent > 1 )
                 healthPercent = 1;
-            DrawRectangle( 0.025f, 0.9f, (healthPercent) * 0.1f, 0.03f, 200, 0, 0, 200 );
+            DrawRectangle( 0.025f, 0.9f, (healthPercent) * 0.12f, 0.03f, 200, 0, 0, 200 );
 
-            DrawRectangle( 0.025f, 0.94f, 0.1f, 0.03f, 200, 200, 0, 200 );
+            DrawRectangle( 0.025f, 0.94f, 0.12f, 0.03f, 200, 200, 0, 200 );
 
             HealthText.Draw();
             AmmoText.Draw();
@@ -164,7 +182,15 @@ namespace Salty_Gamemodes_Client {
 
         public virtual void End() {
             GameMap.ClearWeapons();
+            GameMap.ClearBlip();
             inGame = false;
+           
+        }
+
+
+        public void CreateGameTimer( double length ) {
+            GameTime = GetGameTimer() + length;
+            isTimed = true;
         }
 
         public virtual void PlayerKilled( int killerID, ExpandoObject deathData ) {
@@ -212,7 +238,7 @@ namespace Salty_Gamemodes_Client {
         }
 
         public virtual bool CanPickupWeapon( string weaponModel ) {
-            return true;
+            return !isNoclip;
         }
 
         public bool HasWeapon( string weaponModel ) {
@@ -281,8 +307,12 @@ namespace Salty_Gamemodes_Client {
             RaycastResult result = Raycast( Game.PlayerPed.Position, position, 75, IntersectOptions.Peds1, null );
             if( result.DitHitEntity ) {
                 if( result.HitEntity != Game.PlayerPed ) {
-                    HUDText.Caption = result.HitEntity.Model.Hash.ToString();
-                    lastLooked = GetGameTimer();
+                    int ent = NetworkGetEntityFromNetworkId( result.HitEntity.NetworkId );
+                    if (IsPedAPlayer( ent ) ) {
+                        HUDText.Caption = GetPlayerName( GetPlayerPed( ent ) ).ToString();
+                        lastLooked = GetGameTimer();
+                    }
+
                 }
 
             }
@@ -298,6 +328,8 @@ namespace Salty_Gamemodes_Client {
                 HUDText.Draw();
             }
 
+            if( isTimed )
+                DrawGameTimer();
         }
 
         public void HideReticle() {
@@ -335,6 +367,7 @@ namespace Salty_Gamemodes_Client {
             }
 
             if( isNoclip ) {
+                SetPlayerMayNotEnterAnyVehicle( PlayerId() );
                 NoClipUpdate();
             }
 
@@ -357,6 +390,12 @@ namespace Salty_Gamemodes_Client {
                     BoundText.Caption = "You have " + Math.Round( secondsLeft / 1000 ) + " seconds to return or you will die.";
                     BoundText.Draw();
 
+                }
+            }
+
+            if( isTimed && GameTime != 0 ) {
+                if( GameTime - GetGameTimer() < 0 ) {
+                    isTimed = false;
                 }
             }
 
