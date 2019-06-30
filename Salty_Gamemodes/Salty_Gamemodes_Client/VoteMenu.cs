@@ -10,13 +10,13 @@ namespace Salty_Gamemodes_Client {
 
     class VoteMenu : BaseScript {
 
-        public VoteMenu( Init instance, string name, string subtitle, List<string> Maps ) {
+        public VoteMenu( Init instance, string name, string subtitle, List<string> VoteList ) {
 
             MenuController.MenuAlignment = MenuController.MenuAlignmentOption.Right;
             Menu mapMenu = new Menu( name, subtitle ) { Visible = true };
             MenuController.AddMenu( mapMenu );
 
-            foreach( var map in Maps ) {
+            foreach( var map in VoteList ) {
                 MenuItem mapItem = new MenuItem( map );
                 mapMenu.AddMenuItem( mapItem );
             }
