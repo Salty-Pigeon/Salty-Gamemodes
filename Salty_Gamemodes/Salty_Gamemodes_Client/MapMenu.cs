@@ -23,11 +23,12 @@ namespace Salty_Gamemodes_Client {
             Menu mapMenu = new Menu( name, subtitle ) { Visible = true };
             MenuController.AddMenu( mapMenu );
 
+            Debug.WriteLine( "Hey" );
 
-
-            foreach( var map in Maps ) {
+            foreach( var map in Maps.ToDictionary( x => x.Key, x => x.Value ) ) {
                 Vector3 selectedVector = map.Value.SpawnPoints.ElementAt( 0 ).Value[0];
                 int selectedTeam = map.Value.SpawnPoints.ElementAt( 0 ).Key;
+                Debug.WriteLine( selectedTeam.ToString() );
 
                 Menu mapEditor = AddSubMenu( mapMenu, "Edit " + map.Key );
 
@@ -114,7 +115,7 @@ namespace Salty_Gamemodes_Client {
                     }
                 };
 
-                foreach( var spawns in map.Value.SpawnPoints ) {
+                foreach( var spawns in map.Value.SpawnPoints.ToDictionary( x => x.Key, x => x.Value) ) {
                     foreach( var spawn in spawns.Value ) {
                         MenuItem playerPositionItem = AddMenuItem( playerSpawnMenu, modifyPosMenu, string.Format( "{0} | {1}", spawns.Key.ToString(), spawn.ToString() ), "Modify player spawn point", ">", true );
 

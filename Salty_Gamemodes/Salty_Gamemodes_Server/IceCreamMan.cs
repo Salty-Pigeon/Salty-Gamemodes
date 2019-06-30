@@ -14,8 +14,8 @@ namespace Salty_Gamemodes_Server {
 
         public enum Teams {
             Spectators,
-            Driver,
-            Runner
+            Runner,
+            Driver
         }
 
         public enum GameState {
@@ -43,7 +43,7 @@ namespace Salty_Gamemodes_Server {
             Random rand = new Random();
             List<Player> players = Players.ToList();
 
-            List<Vector3> spawns = GameMap.SpawnPoints[0].ToList();
+            List<Vector3> spawns = GameMap.SpawnPoints[(int)Teams.Driver].ToList();
             if( spawns.Count == 0 ) {
                 spawns.Add( GameMap.Position );
             }
@@ -55,7 +55,7 @@ namespace Salty_Gamemodes_Server {
             drivers.Add( driver );
             SpawnClient( driver, (int)Teams.Driver, spawns[spawn] );
             players.RemoveAt( driverID );
-            spawns = GameMap.SpawnPoints[1].ToList();
+            spawns = GameMap.SpawnPoints[(int)Teams.Runner].ToList();
             // Set innocents
             foreach( var ply in players ) {
                 runners.Add( ply );

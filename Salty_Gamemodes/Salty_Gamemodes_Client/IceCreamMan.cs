@@ -17,6 +17,8 @@ namespace Salty_Gamemodes_Client {
         Vehicle Bike;
         Random rand;
 
+        bool canKill = false;
+
 
         List<string> Bikes = new List<string>() {
             "BMX",
@@ -58,7 +60,18 @@ namespace Salty_Gamemodes_Client {
             streetText = new Text( "", new System.Drawing.PointF( 0.5f, 0.5f ), 1f );
 
             GameWeapons = new Dictionary<string, string>() {
-                { "WEAPON_UNARMED", "Fists" }
+                { "WEAPON_UNARMED", "Fists" },
+                { "WEAPON_RPG", "Bazooka" }
+            };
+
+            WeaponSlots = new Dictionary<string, int>() {
+                { "WEAPON_UNARMED", 0 },
+                { "WEAPON_RPG", 1  },
+            };
+
+            WeaponMaxAmmo = new Dictionary<string, int>() {
+                { "WEAPON_UNARMED", 1  },
+                { "WEAPON_RPG", 100  },
             };
 
 
@@ -67,6 +80,11 @@ namespace Salty_Gamemodes_Client {
             GameMap.CreateBlip();
 
             SetTeam( team );
+        }
+
+        public override void PlayerPickedUpWeapon( string wepName, int count ) {
+            WriteChat( "Picked up " + wepName );
+            base.PlayerPickedUpWeapon( wepName, count );
         }
 
 
@@ -90,18 +108,27 @@ namespace Salty_Gamemodes_Client {
                     TriggerServerEvent( "salty::netAddScore", 1 );
                 }
             }
-            if( Team == 2 ) {
-                if( !Game.PlayerPed.IsInVehicle() ) {
-                    Game.PlayerPed.SetIntoVehicle( Bike, VehicleSeat.Driver );
+            if( Team == 2 && !canKill) {
+                if( !Game.PlayerPed.IsInVehicle()  ) {
+                    //Game.PlayerPed.SetIntoVehicle( Bike, VehicleSeat.Driver );
                 }
                 uint streetName = 0;
                 uint crossingName = 0;
                 GetStreetNameAtCoord( Game.PlayerPed.Position.X, Game.PlayerPed.Position.Y, Game.PlayerPed.Position.Z, ref streetName, ref crossingName );
-
+                if( streetName == 3436239235 || crossingName == 3436239235 ) {
+                    canKill = true;
+                    GiveWeaponToPed( PlayerPedId(), (uint)GetHashKey( "weapon_rpg" ), 100, false, true );
+                    
+                }
             }
-            base.Update();
-        }
 
+            if( canKill ) {
+                //Game.Player.SetRunSpeedMultThisFrame( 20 );
+            }
+
+            base.Update();
+
+        }
 
         public override void End() {
             if( Truck != null )
@@ -132,7 +159,7 @@ namespace Salty_Gamemodes_Client {
             if( Bike != null )
                 Bike.Delete();
             Game.PlayerPed.Position = PlayerSpawn;
-            Bike = await World.CreateVehicle( Bikes[rand.Next(0, Bikes.Count)], Game.PlayerPed.Position, 67.7f );
+            Bike = await World.CreateVehicle( Bikes[rand.Next(0, Bikes.Count)], Game.PlayerPed.Position, 266.6f );
             Bike.MaxSpeed = 15;
             Game.PlayerPed.SetIntoVehicle( Bike, VehicleSeat.Driver );
         }
@@ -190,6 +217,7 @@ namespace Salty_Gamemodes_Client {
             streetText.Draw();
 
             HideHudAndRadarThisFrame();
+            DrawBaseWeaponHUD();
 
             base.HUD();
         }

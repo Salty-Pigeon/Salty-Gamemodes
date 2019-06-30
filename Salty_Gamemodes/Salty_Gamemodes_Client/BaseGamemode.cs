@@ -110,9 +110,13 @@ namespace Salty_Gamemodes_Client {
                 healthPercent = 0;
             if( healthPercent > 1 )
                 healthPercent = 1;
-            DrawRectangle( 0.025f, 0.9f, (healthPercent) * 0.12f, 0.03f, 200, 0, 0, 200 );
+            DrawRectangle( 0.025f, 0.9f, healthPercent * 0.12f, 0.03f, 200, 0, 0, 200 );
 
-            DrawRectangle( 0.025f, 0.94f, 0.12f, 0.03f, 200, 200, 0, 200 );
+            float ammoPercent = (float)Game.PlayerPed.Weapons.Current.AmmoInClip / Game.PlayerPed.Weapons.Current.MaxAmmoInClip;
+
+            DrawRectangle( 0.025f, 0.94f, 0.12f, 0.03f, 0, 0, 0, 200 );
+
+            DrawRectangle( 0.025f, 0.94f, ammoPercent * 0.12f, 0.03f, 200, 200, 0, 200 );
 
             HealthText.Draw();
             AmmoText.Draw();
@@ -179,6 +183,8 @@ namespace Salty_Gamemodes_Client {
         public virtual void ChangeSelectedWeapon( int offset ) {
             lastScroll = GetGameTimer();
             int next = GetNextWeapon( offset );
+            Debug.WriteLine( next.ToString() );
+            Debug.WriteLine( PlayerWeapons[next].ToString() );
             SetCurrentPedWeapon( PlayerPedId(), (uint)GetHashKey( PlayerWeapons[next] ), true );
 
         }
@@ -261,7 +267,7 @@ namespace Salty_Gamemodes_Client {
                 return;
 
             // Weapon change
-            foreach( var weps in GameMap.Weapons ) {
+            foreach( var weps in GameWeapons ) {
                 uint wepHash = (uint)GetHashKey( weps.Key  );
                 //uint wepHash = (uint)GetWeaponHashFromPickup( GetHashKey( weps.Value ) );
                 if( HasPedGotWeapon( PlayerPedId(), wepHash, false) && !PlayerWeapons.ContainsValue(weps.Key) ) {
