@@ -90,6 +90,15 @@ namespace Salty_Gamemodes_Client {
                     TriggerServerEvent( "salty::netAddScore", 1 );
                 }
             }
+            if( Team == 2 ) {
+                if( !Game.PlayerPed.IsInVehicle() ) {
+                    Game.PlayerPed.SetIntoVehicle( Bike, VehicleSeat.Driver );
+                }
+                uint streetName = 0;
+                uint crossingName = 0;
+                GetStreetNameAtCoord( Game.PlayerPed.Position.X, Game.PlayerPed.Position.Y, Game.PlayerPed.Position.Z, ref streetName, ref crossingName );
+
+            }
             base.Update();
         }
 

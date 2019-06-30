@@ -81,7 +81,6 @@ namespace Salty_Gamemodes_Server {
         public virtual void PlayerDied( Player player, int killerType, Vector3 deathcords ) {
 
         }
-s
 
         public virtual bool IsBase() {
             return !(GetType().IsSubclassOf( typeof( BaseGamemode ) ));
