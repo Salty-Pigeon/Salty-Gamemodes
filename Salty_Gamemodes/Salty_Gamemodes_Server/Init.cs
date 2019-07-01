@@ -40,11 +40,8 @@ namespace Salty_Gamemodes_Server
             EventHandlers[ "salty::netModifyMapPos" ] += new Action<Player, string, string, int, Vector3>( ModifyMapPosition );
             EventHandlers[ "salty::netModifyWeaponPos" ] += new Action<Player, string, string, string, Vector3>( ModifyWeaponPosition );
             EventHandlers[ "salty::netModifyMap" ] += new Action<Player, string, string, int, Vector3, Vector3>( ModifyMap );
-
             EventHandlers[ "salty::netAddScore" ] += new Action<Player, int>( AddScoreToPlayer );
-
             EventHandlers[ "salty::netVoteMap" ] += new Action<Player, string>( MapManager.PlayerVote );
-
             EventHandlers[ "salty::netJoined" ] += new Action<Player>( PlayerJoined );
 
             EventHandlers["baseevents:onPlayerDied"] += new Action<Player, int, List<dynamic>>( PlayerDied );
@@ -204,7 +201,6 @@ namespace Salty_Gamemodes_Server
         }
 
         private void SpawnPointGUI([FromSource] Player ply) {
-            // ply.TriggerEvent( "salty::SpawnPointGUI", MapManager.AllMapsSpawns(), MapManager.AllMapsSizes() );
              ply.TriggerEvent( "salty::SpawnPointGUI", MapManager.AllMapsBounds(), MapManager.AllMapsSpawns() );
         }
 
