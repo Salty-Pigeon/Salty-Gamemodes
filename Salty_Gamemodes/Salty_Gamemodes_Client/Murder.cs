@@ -27,12 +27,21 @@ namespace Salty_Gamemodes_Client {
 
             GameWeapons = new Dictionary<string, string>() {
                 { "WEAPON_UNARMED", "Helpless" },
-                { "WEAPON_PISTOL", "Pistol" }
+                { "WEAPON_PISTOL", "Blat blat" },
+                { "WEAPON_KNIFE", "Stabby stabby" }
             };
 
             WeaponMaxAmmo = new Dictionary<string, int>() {
                 { "WEAPON_UNARMED", 0 },
                 { "WEAPON_PISTOL", 1  },
+                { "WEAPON_KNIFE", 1 }
+
+            };
+
+            WeaponSlots = new Dictionary<string, int>() {
+                { "WEAPON_UNARMED", 0 },
+                { "WEAPON_PISTOL", 2  },
+                { "WEAPON_KNIFE", 1 }
             };
 
             GameMap = gameMap;
@@ -43,19 +52,22 @@ namespace Salty_Gamemodes_Client {
         }
 
         public override void Start() {
+
             base.Start();
+
 
             Game.Player.Character.MaxHealth = 100;
             Game.Player.Character.Health = 100;
             if( Team == (int)Teams.Murderer ) {
-                GiveWeaponToPed( PlayerPedId(), (uint)GetHashKey( "WEAPON_UNARMED" ), 1, false, true );
+                GiveWeaponToPed( PlayerPedId(), (uint)GetHashKey( "WEAPON_KNIFE" ), 1, false, true );
                 SetPlayerMeleeWeaponDamageModifier( PlayerId(), 20 );
-                GameWeapons["WEAPON_UNARMED"] = "1 Hit KO";
             } else if( Team == (int)Teams.Civilian ) {
                 RemoveWeaponFromPed( PlayerPedId(), (uint)GetHashKey( "WEAPON_UNARMED" ) );
                 SetPlayerMeleeWeaponDamageModifier( PlayerId(), 0 );
                 SetPlayerWeaponDamageModifier( PlayerId(), 20 );
             }
+
+
 
         }
 
@@ -67,6 +79,7 @@ namespace Salty_Gamemodes_Client {
             HideHudAndRadarThisFrame();
             DrawBaseWeaponHUD();
             DrawGameTimer();
+            FirstPersonForAlive();
 
             base.HUD();
         }
@@ -81,8 +94,12 @@ namespace Salty_Gamemodes_Client {
         }
 
         public override void PlayerDroppedWeapon( string wepName, int count ) {
-            WeaponPickup item = new WeaponPickup( GameMap, "WEAPON_PISTOL", (uint)GetHashKey( "WEAPON_PISTOL" ), GetHashKey( "W_PI_PISTOL"), Game.Player.Character.Position, true, 5000, 1 );
-            item.Throw();
+            Debug.WriteLine( wepName );
+            if( wepName == "WEAPON_PISTOL" ) {
+                WeaponPickup item = new WeaponPickup( GameMap, "WEAPON_PISTOL", (uint)GetHashKey( "WEAPON_PISTOL" ), GetHashKey( "W_PI_PISTOL" ), Game.Player.Character.Position, true, 5000, 1 );
+                item.Throw();
+            }
+            
             base.PlayerDroppedWeapon( wepName, count );
         }
 

@@ -48,6 +48,7 @@ namespace Salty_Gamemodes_Server {
 
         public virtual void End() {
             TriggerClientEvent( "salty::EndGame" );
+            GameMap.ResetSpawns();
             Init.ActiveGame = new BaseGamemode( MapManager, 0, "*" );
         }
 

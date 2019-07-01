@@ -247,7 +247,6 @@ namespace Salty_Gamemodes_Client {
 
             FirstPersonForAlive();
             SetPlayerMayNotEnterAnyVehicle( PlayerId() );
-            
 
             base.Update();
 

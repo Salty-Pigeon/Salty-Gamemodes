@@ -212,7 +212,7 @@ namespace Salty_Gamemodes_Client
 
         public void GiveGun( string weapon, int ammo ) {
             GiveWeaponToPed( PlayerPedId(), (uint)GetHashKey( weapon ), ammo, false, true );
-            SetPedAmmo( PlayerPedId(), (uint)GetHashKey( weapon ), ammo );
+            //SetPedAmmo( PlayerPedId(), (uint)GetHashKey( weapon ), ammo );
         }
 
         private void OnClientResourceStart( string resourceName ) {
@@ -241,6 +241,7 @@ namespace Salty_Gamemodes_Client
             RegisterCommand( "heading", new Action<int, List<object>, string>( ( source, args, raw ) => {
                 Debug.WriteLine( Game.PlayerPed.Heading.ToString() );
             } ), false );
+
 
             RegisterCommand( "spawnPoints", new Action<int, List<object>, string>( ( source, args, raw ) => {
                 TriggerServerEvent( "salty::netSpawnPointGUI" );

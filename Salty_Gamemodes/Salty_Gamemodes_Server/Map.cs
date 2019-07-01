@@ -30,13 +30,14 @@ namespace Salty_Gamemodes_Server {
             return ( pos.X > Position.X - ( Size.X / 2 ) && pos.X < Position.X + ( Size.X / 2 ) && pos.Y > Position.Y - ( Size.Y / 2 ) && pos.Y < Position.Y + ( Size.Y / 2 ) );
         }
 
+        public void ResetSpawns() {
+            usedSpawns = new Dictionary<int, List<Vector3>>();
+        }
 
         public Vector3 GetNextSpawn( int team ) {
-            if (!usedSpawns.ContainsKey(team))
-                return Vector3.Zero;
-            if( usedSpawns[team].Count == 0) {
-                int index = rand.Next(0, SpawnPoints[team].Count);
-                return SpawnPoints[team][index];
+            if( !usedSpawns.ContainsKey( team ) || usedSpawns[team].Count == 0 ) {
+                int index = rand.Next( 0, SpawnPoints[team].Count );
+                return SpawnPoints[team][index]; 
             } else {
                 int index = rand.Next(0, usedSpawns[team].Count);
                 Vector3 spawn = usedSpawns[team][index];

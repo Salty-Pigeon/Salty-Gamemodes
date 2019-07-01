@@ -197,7 +197,11 @@ namespace Salty_Gamemodes_Client {
         public virtual void ChangeSelectedWeapon( int offset ) {
             lastScroll = GetGameTimer();
             int next = GetNextWeapon( offset );
-            SetCurrentPedWeapon( PlayerPedId(), (uint)GetHashKey( PlayerWeapons[next] ), true );
+            try {
+                SetCurrentPedWeapon( PlayerPedId(), (uint)GetHashKey( PlayerWeapons[next] ), true );
+            } catch {
+                Debug.WriteLine( "No weapons" );
+            }
         }
 
         public virtual void End() {
@@ -376,17 +380,17 @@ namespace Salty_Gamemodes_Client {
                 GameMap.Update();
             }
 
-            if( Game.PlayerPed.Weapons.Current.Ammo <= 0 ) {
-                Game.PlayerPed.Weapons.Remove( Game.PlayerPed.Weapons.Current );
-            }
-            
             if( Team == 0 ) {
                 if( GetFollowPedCamViewMode() != 1 ) {
                     SetFollowPedCamViewMode( 1 );
                 }
             }
 
-            if( Game.PlayerPed.Weapons.Current.Hash.ToString() != "Unarmed" )
+            if( Game.PlayerPed.Weapons.Current.Ammo <= 0 && Game.PlayerPed.Weapons.Current.Group.ToString() != "Melee" ) {
+                Game.PlayerPed.Weapons.Remove( Game.PlayerPed.Weapons.Current );
+            }
+
+            if( Game.PlayerPed.Weapons.Current.Hash.ToString() != "Unarmed" && inGame )
                 if( !HashToModel.ContainsKey( Game.PlayerPed.Weapons.Current.Hash.GetHashCode() ) )
                     Game.PlayerPed.Weapons.Remove( Game.PlayerPed.Weapons.Current );
                 
