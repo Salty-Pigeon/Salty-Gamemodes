@@ -9,9 +9,6 @@ using System.Threading.Tasks;
 namespace Salty_Gamemodes_Server {
     class IceCreamMan : BaseGamemode {
 
-        List<Player> drivers = new List<Player>();
-        List<Player> runners = new List<Player>();
-
         public enum Teams {
             Spectators,
             Runner,
