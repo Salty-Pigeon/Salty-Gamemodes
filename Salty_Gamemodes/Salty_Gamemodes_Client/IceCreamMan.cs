@@ -11,7 +11,8 @@ using System.Dynamic;
 namespace Salty_Gamemodes_Client {
     class IceCreamMan : BaseGamemode {
 
-        Text streetText;
+        Text goalText;
+        float goalTextTime = 0;
 
         Vehicle Truck;
         Vehicle Bike;
@@ -56,8 +57,16 @@ namespace Salty_Gamemodes_Client {
         }
 
         public IceCreamMan( Map gameMap, int team ) {
+          
+            goalText = new Text( "", new System.Drawing.PointF( Screen.Width * 0.5f, Screen.Height * 0.3f ), 1f, System.Drawing.Color.FromArgb( 200, 200, 0) );
+            goalText.Centered = true;
 
-            streetText = new Text( "", new System.Drawing.PointF( 0.5f, 0.5f ), 1f );
+            if( team == (int)Teams.Driver ) {
+                goalText.Caption = "You are the Ice Cream Man\nDeliver as much ice cream as you can";
+            } else if( team == (int)Teams.Runner ) {
+                goalText.Caption = "Stop the Ice Cream Man\nBangarang!";
+            }
+            goalTextTime = GetGameTimer() + (5 * 1000);
 
             GameWeapons = new Dictionary<string, string>() {
                 { "WEAPON_UNARMED", "Fists" },
@@ -148,6 +157,11 @@ namespace Salty_Gamemodes_Client {
             }
         }
         
+        public void ShowGoal() {
+            if( goalTextTime > GetGameTimer() ) {
+                goalText.Draw();
+            }
+        }
 
         public override void PlayerSpawned( ExpandoObject spawnInfo ) {
             Respawn();
@@ -207,14 +221,11 @@ namespace Salty_Gamemodes_Client {
         }
 
         public override void HUD() {
-            uint streetName = 0;
-            uint crossingRoad = 0;
-            GetStreetNameAtCoord( Game.PlayerPed.Position.X, Game.PlayerPed.Position.Y, Game.PlayerPed.Position.Z, ref streetName, ref crossingRoad );
-            streetText.Caption = GetStreetNameFromHashKey( streetName );
-            streetText.Draw();
 
             HideHudAndRadarThisFrame();
             DrawBaseWeaponHUD();
+
+            ShowGoal();
 
             base.HUD();
         }
