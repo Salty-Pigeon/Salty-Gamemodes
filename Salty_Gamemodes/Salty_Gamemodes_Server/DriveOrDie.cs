@@ -24,12 +24,28 @@ namespace Salty_Gamemodes_Server {
             PostRound
         }
 
-        public DriveOrDie( MapManager manager, PlayerList players, int ID, string MapTag ) : base( manager, ID, MapTag ) {
-            this.players = players;
+        public DriveOrDie( MapManager manager, int ID, string MapTag ) : base( manager, ID, MapTag ) {
+
         }
 
         public override void Start() {
 
+            Random rand = new Random();
+            List<Player> players = Players.ToList();
+
+            int driverID = rand.Next(0, players.Count);
+            Player driver = players[driverID];
+            SetTeam(driver, (int)Teams.Trucker);
+            SpawnClient(driver, (int)Teams.Trucker);
+            players.RemoveAt(driverID);
+
+
+            foreach (var ply in players) {
+                SetTeam(ply, (int)Teams.Bikie);
+                SpawnClient(ply, (int)Teams.Bikie);
+            }
+
+            /*
             Debug.WriteLine( "Drive or Die starting on " + GameMap.Name );
             Random rand = new Random();
             List<Player> players = Players.ToList();
@@ -59,7 +75,7 @@ namespace Salty_Gamemodes_Server {
                 }
 
             }
-
+            */
             base.Start();
 
         }

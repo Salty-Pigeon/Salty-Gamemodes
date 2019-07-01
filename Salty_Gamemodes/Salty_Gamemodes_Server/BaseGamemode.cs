@@ -18,7 +18,7 @@ namespace Salty_Gamemodes_Server {
         public Dictionary<Player, Dictionary<string, int>> PlayerDetails = new Dictionary<Player, Dictionary<string, int>>();
 
         public Map GameMap;
-        public PlayerList players;
+        public List<Player> InGamePlayers;
         public int ID;
 
         public double GameLength = 0;
@@ -31,6 +31,8 @@ namespace Salty_Gamemodes_Server {
             MapManager = manager;
             this.ID = ID;
             this.MapTag = MapTag;
+
+            InGamePlayers = new PlayerList().ToList();
 
             Random rand = new Random();
             List<Map> maps = MapManager.MapList(MapTag);

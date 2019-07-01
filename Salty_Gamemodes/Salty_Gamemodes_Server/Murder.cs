@@ -25,12 +25,36 @@ namespace Salty_Gamemodes_Server {
             PostRound
         }
 
-        public Murder( MapManager manager, PlayerList players, int ID, string MapTag ) : base( manager, ID, MapTag ) {
-            this.players = players;
+        public Murder( MapManager manager, int ID, string MapTag ) : base( manager, ID, MapTag ) {
+
         }
 
         public override void Start() {
             Debug.WriteLine( "Murder starting on " + GameMap.Name );
+
+            Random rand = new Random();
+            List<Player> players = Players.ToList();
+
+            int driverID = rand.Next(0, players.Count);
+            Player driver = players[driverID];
+            SetTeam(driver, (int)Teams.Murderer);
+            SpawnClient(driver, (int)Teams.Murderer);
+            players.RemoveAt(driverID);
+
+
+            foreach (var ply in players) {
+                SetTeam(ply, (int)Teams.Civilian);
+                SpawnClient(ply, (int)Teams.Civilian);
+            }
+
+            if (players.Count > 0) {
+                Player playerGun = players[rand.Next(0, players.Count)];
+                playerGun.TriggerEvent("salty::GiveGun", "WEAPON_PISTOL", 1);
+            }
+
+
+            /*
+
             Random rand = new Random();
             List<Player> players = Players.ToList();
 
@@ -66,6 +90,7 @@ namespace Salty_Gamemodes_Server {
             if( playerGun != null )
                 playerGun.TriggerEvent( "salty::GiveGun", "WEAPON_PISTOL", 1 );
             // create map
+            */
 
             base.Start();
         }

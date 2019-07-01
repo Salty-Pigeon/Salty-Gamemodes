@@ -22,8 +22,8 @@ namespace Salty_Gamemodes_Server {
             PostRound
         }
 
-        public IceCreamMan( MapManager manager, PlayerList players, int ID, string MapTag ) : base( manager, ID, MapTag ) {
-            this.players = players;
+        public IceCreamMan( MapManager manager, int ID, string MapTag ) : base( manager, ID, MapTag ) {
+
         }
 
         public override void Update() {

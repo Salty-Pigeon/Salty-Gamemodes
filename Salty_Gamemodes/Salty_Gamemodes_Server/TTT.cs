@@ -29,8 +29,8 @@ namespace Salty_Gamemodes_Server {
         public GameState CurrentState = GameState.None;
 
 
-        public TTT( MapManager manager, PlayerList players, int ID, string MapTag ) : base ( manager, ID, MapTag ) {
-            this.players = players;
+        public TTT( MapManager manager, int ID, string MapTag ) : base ( manager, ID, MapTag ) {
+
         }
 
         public override void PlayerJoined( Player ply ) {
@@ -39,9 +39,23 @@ namespace Salty_Gamemodes_Server {
 
         public override void Start() {
             Debug.WriteLine( "TTT starting on " + GameMap.Name );
+
             Random rand = new Random();
             List<Player> players = Players.ToList();
 
+            int driverID = rand.Next(0, players.Count);
+            Player driver = players[driverID];
+            SetTeam(driver, (int)Teams.Traitors);
+            SpawnClient(driver, (int)Teams.Traitors);
+            players.RemoveAt(driverID);
+
+
+            foreach (var ply in players) {
+                SetTeam(ply, (int)Teams.Innocents);
+                SpawnClient(ply, (int)Teams.Innocents);
+            }
+
+            /*
             List<Vector3> spawns = GameMap.SpawnPoints[0].ToList();
             if( spawns.Count == 0 ) {
                 spawns.Add( GameMap.Position );
@@ -69,6 +83,7 @@ namespace Salty_Gamemodes_Server {
                 }
 
             }
+            */
             base.Start();
         }
 

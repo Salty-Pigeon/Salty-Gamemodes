@@ -103,24 +103,24 @@ namespace Salty_Gamemodes_Server
         }
 
         public void StartIceCreamMan() {
-            ActiveGame = new IceCreamMan( MapManager, new PlayerList(), (int)Gamemodes.IceCreamMan, "icm" );
+            ActiveGame = new IceCreamMan( MapManager, (int)Gamemodes.IceCreamMan, "icm" );
             ActiveGame.CreateGameTimer( 3 * 60 );
             ActiveGame.Start();
         }
 
         public void StartMurder() {
-            ActiveGame = new Murder( MapManager, new PlayerList(), (int)Gamemodes.Murder, "mmm" );
+            ActiveGame = new Murder( MapManager, (int)Gamemodes.Murder, "mmm" );
             ActiveGame.CreateGameTimer( 3 * 60 );
             ActiveGame.Start();
         }
 
         public void StartDriveOrDie() {
-            ActiveGame = new DriveOrDie( MapManager, new PlayerList(), (int)Gamemodes.DriveOrDie, "dod" );
+            ActiveGame = new DriveOrDie( MapManager, (int)Gamemodes.DriveOrDie, "dod" );
             ActiveGame.Start();
         }
 
         public void StartTTT() {
-            ActiveGame = new TTT( MapManager, new PlayerList(), (int)Gamemodes.TTT, "ttt" );
+            ActiveGame = new TTT( MapManager, (int)Gamemodes.TTT, "ttt" );
             ActiveGame.CreateGameTimer( 3 * 60 );
             ActiveGame.Start();
         }
