@@ -48,14 +48,16 @@ namespace Salty_Gamemodes_Server {
                 playerGun.TriggerEvent("salty::GiveGun", "WEAPON_PISTOL", 1);
             }
 
-            driver.TriggerEvent( "salty::GiveGun", "WEAPON_PISTOL", 1 );
-
-
             base.Start();
         }
 
 
         public override void PlayerDied( Player player, int killerType, Vector3 deathcords ) {
+
+            if( GetTeam(player) == (int)Teams.Murderer ) {
+                WriteChat( "Murderer dead, civilians win!" );
+                End();
+            }
 
             base.PlayerDied( player, killerType, deathcords );
         }

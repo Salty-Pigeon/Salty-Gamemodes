@@ -39,17 +39,25 @@ namespace Salty_Gamemodes_Server {
         }
 
         public override void PlayerKilled( Player player, int killerID, ExpandoObject deathData ) {
-            if( PlayerDetails[player]["Team"] == (int)Teams.Driver ) {
+            if( GetTeam(player) == (int)Teams.Driver ) {
                 WriteChat( "Ice cream man defeated. Bikers win." );
                 End();
             }
             base.PlayerKilled( player, killerID, deathData );
         }
 
+        public override void PlayerDied( Player player, int killerType, Vector3 deathcords ) {
+            if( GetTeam(player) == (int)Teams.Driver ) {
+                AddScore( player, 3 );
+                Driver.TriggerEvent( "salty::UpdateScore", GetScore(Driver) );
+            }
+
+            base.PlayerDied( player, killerType, deathcords );
+        }
 
         public override void Start() {
 
-            Debug.WriteLine( "Drive or Die starting on " + GameMap.Name );
+            Debug.WriteLine( "Ice cream man starting on " + GameMap.Name );
 
             Random rand = new Random();
             List<Player> players = Players.ToList();

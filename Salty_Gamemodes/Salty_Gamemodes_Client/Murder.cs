@@ -23,6 +23,7 @@ namespace Salty_Gamemodes_Client {
             PostRound
         }
 
+
         public Murder( Map gameMap, int team ) {
 
             GameWeapons = new Dictionary<string, string>() {
@@ -55,22 +56,27 @@ namespace Salty_Gamemodes_Client {
 
             base.Start();
 
+            SetPlayerMeleeWeaponDamageModifier( PlayerId(), 0 );
+            SetPlayerWeaponDamageModifier( PlayerId(), 20 );
 
             Game.Player.Character.MaxHealth = 100;
             Game.Player.Character.Health = 100;
             if( Team == (int)Teams.Murderer ) {
                 GiveWeaponToPed( PlayerPedId(), (uint)GetHashKey( "WEAPON_KNIFE" ), 1, false, true );
-                SetPlayerMeleeWeaponDamageModifier( PlayerId(), 20 );
-            } else if( Team == (int)Teams.Civilian ) {
+            }
+            else if( Team == (int)Teams.Civilian ) {
                 RemoveWeaponFromPed( PlayerPedId(), (uint)GetHashKey( "WEAPON_UNARMED" ) );
-                SetPlayerMeleeWeaponDamageModifier( PlayerId(), 0 );
-                SetPlayerWeaponDamageModifier( PlayerId(), 20 );
             }
 
 
 
         }
 
+        public override void Update() {
+
+            base.Update();
+        }
+        
         public override void End() {
             base.End();
         }
@@ -94,7 +100,6 @@ namespace Salty_Gamemodes_Client {
         }
 
         public override void PlayerDroppedWeapon( string wepName, int count ) {
-            Debug.WriteLine( wepName );
             if( wepName == "WEAPON_PISTOL" ) {
                 WeaponPickup item = new WeaponPickup( GameMap, "WEAPON_PISTOL", (uint)GetHashKey( "WEAPON_PISTOL" ), GetHashKey( "W_PI_PISTOL" ), Game.Player.Character.Position, true, 5000, 1 );
                 item.Throw();

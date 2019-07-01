@@ -171,7 +171,7 @@ namespace Salty_Gamemodes_Client {
             int i = 0;
             foreach(var spawns in SpawnPoints ) {             
                 foreach( var vector in spawns.Value ) {
-                    DrawMarker( 2, vector.X, vector.Y, vector.Z, 0.0f, 0.0f, 0.0f, 0.0f, 180.0f, 0.0f, 2.0f, 2.0f, 2.0f, i/10*6, i, i/3, 200, false, true, 2, false, null, null, false );
+                    DrawMarker( 2, vector.X, vector.Y, vector.Z, 0.0f, 0.0f, 0.0f, 0.0f, 180.0f, 0.0f, 2.0f, 2.0f, 2.0f, i / 10 * 6, i, i / 3, 200, false, true, 2, false, null, null, false ); 
                 }
                 i += 50;
             }

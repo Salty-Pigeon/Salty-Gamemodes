@@ -27,6 +27,7 @@ namespace Salty_Gamemodes_Client
             EventHandlers[ "salty::SpawnPointGUI" ] += new Action<ExpandoObject, ExpandoObject>( SpawnGUI );
             EventHandlers[ "salty::VoteMap" ] += new Action<List<dynamic>>( VoteMap );
             EventHandlers[ "salty::GiveGun" ] += new Action<string, int>( GiveGun );
+            EventHandlers[ "salty::UpdateScore" ] += new Action<int>( ActiveGame.UpdateScore );
             EventHandlers[ "salty::UpdateInfo" ] += new Action<int, double, Vector3, Vector3>( UpdateInfo );
 
             ActiveGame.SetNoClip( false );

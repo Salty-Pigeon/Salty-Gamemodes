@@ -58,7 +58,7 @@ namespace Salty_Gamemodes_Client {
 
         public IceCreamMan( Map gameMap, int team ) {
           
-            goalText = new Text( "", new System.Drawing.PointF( Screen.Width * 0.5f, Screen.Height * 0.3f ), 1f, System.Drawing.Color.FromArgb( 200, 200, 0) );
+            goalText = new Text( "", new System.Drawing.PointF( Screen.Width * 0.5f, Screen.Height * 0.3f ), 1f, System.Drawing.Color.FromArgb( 200, 0, 0) );
             goalText.Centered = true;
 
             if( team == (int)Teams.Driver ) {
@@ -86,7 +86,6 @@ namespace Salty_Gamemodes_Client {
 
             GameMap = gameMap;
             GameMap.Gamemode = this;
-
             SetTeam( team );
         }
 
@@ -112,8 +111,7 @@ namespace Salty_Gamemodes_Client {
                     Truck.Velocity = velocity * 2;
                     Truck.Speed = speed * 1.5f;
                     SetGameplayCamRelativeHeading( 0 );
-                    Score++;
-                    TriggerServerEvent( "salty::netAddScore", 1 );
+                    AddScore( 1 );
                 }
             }
             if( Team == 2 && !canKill) {
@@ -157,7 +155,7 @@ namespace Salty_Gamemodes_Client {
             }
         }
         
-        public void ShowGoal() {
+        public void DrawGoal() {
             if( goalTextTime > GetGameTimer() ) {
                 goalText.Draw();
             }
@@ -225,7 +223,7 @@ namespace Salty_Gamemodes_Client {
             HideHudAndRadarThisFrame();
             DrawBaseWeaponHUD();
 
-            ShowGoal();
+            DrawGoal();
 
             base.HUD();
         }

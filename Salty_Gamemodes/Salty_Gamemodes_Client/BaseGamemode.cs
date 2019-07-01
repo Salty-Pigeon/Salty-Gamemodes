@@ -72,11 +72,10 @@ namespace Salty_Gamemodes_Client {
 
             GameTimeText = new Text( "", new System.Drawing.PointF( Screen.Width * 0.1f, Screen.Height * 0.855f ), 0.5f );
 
-            BoundText = new Text( "", new System.Drawing.PointF( Screen.Width * 0.2f, Screen.Height * 0.1f), 1.0f );
-            HUDText = new Text( "", new System.Drawing.PointF( Screen.Width * 0.5f, Screen.Height * 0.5f), 0.5f );
+            BoundText = new Text( "", new System.Drawing.PointF( Screen.Width * 0.2f, Screen.Height * 0.1f ), 1.0f );
+            HUDText = new Text( "", new System.Drawing.PointF( Screen.Width * 0.5f, Screen.Height * 0.5f ), 0.5f );
             HUDText.Centered = true;
 
-            
         }
 
         public virtual void Start() {
@@ -99,7 +98,6 @@ namespace Salty_Gamemodes_Client {
             TimeSpan time = TimeSpan.FromMilliseconds( GameTime - GetGameTimer() );
 
             GameTimeText.Caption = string.Format( "{0:00}:{1:00}", Math.Ceiling(time.TotalMinutes-1), time.Seconds );
-
 
             GameTimeText.Draw();
         }
@@ -133,9 +131,19 @@ namespace Salty_Gamemodes_Client {
 
         }
 
+        public void UpdateScore( int score ) {
+            WriteChat( "New score " + score );
+            Score += score;
+        }
+
+        public void AddScore(int offset) {
+            UpdateScore( Score + offset );
+            TriggerServerEvent( "salty::netAddScore", offset );
+        }
+
         public void DrawBaseWeaponHUD() {
 
-            if (Team == 0)
+            if( Team == 0)
                 return;
 
             if ( lastScroll + (2 * 1000) > GetGameTimer() ) {
@@ -341,6 +349,7 @@ namespace Salty_Gamemodes_Client {
 
             }
         }
+
 
         public virtual void HUD() {
             if( inGame ) {
