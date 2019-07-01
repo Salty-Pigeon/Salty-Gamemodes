@@ -11,6 +11,7 @@ namespace Salty_Gamemodes_Client {
     class DriveOrDie : BaseGamemode {
 
         float justLeftMap = 0;
+        Vehicle Truck;
 
         public enum Teams {
             Spectators,
@@ -45,6 +46,8 @@ namespace Salty_Gamemodes_Client {
         }
 
         public override void Start() {
+            SpawnTruck();
+            Game.PlayerPed.IsInvincible = true;
             base.Start();
         }
 
@@ -59,10 +62,11 @@ namespace Salty_Gamemodes_Client {
                 justLeftMap = GetGameTimer();
             }
 
-            if( justLeftMap + 500 > GetGameTimer() ) {
+            if( justLeftMap + 1000 > GetGameTimer() ) {
                 if( Game.PlayerPed.IsInVehicle() ) {
+                    // Do random person here
                     Vector3 direction = Game.PlayerPed.CurrentVehicle.Position - GameMap.Position;
-                    direction.Z = rand.Next( 80, 120 );
+                    direction.Z = rand.Next( 300, 500 );
                     direction.Y = -direction.Y;
                     direction.X = -direction.X;
                     Game.PlayerPed.CurrentVehicle.ApplyForce( direction, default, ForceType.MaxForceRot );
@@ -76,7 +80,53 @@ namespace Salty_Gamemodes_Client {
             base.Update();
         }
 
+        public async Task SpawnTruck() {
+            if( Truck != null )
+                Truck.Delete();
+            Game.PlayerPed.Position = PlayerSpawn;
+            Truck = await World.CreateVehicle( "monster", Game.PlayerPed.Position, 67.7f );
+            Truck.CanBeVisiblyDamaged = false;
+            Truck.CanEngineDegrade = false;
+            Truck.CanTiresBurst = false;
+            Truck.CanWheelsBreak = false;
+            Truck.EngineHealth = 999999;
+            Truck.MaxHealth = 999999;
+            Truck.Health = 999999;
+            Truck.EnginePowerMultiplier = 100;
+            Truck.Gravity = 35;
+            Truck.IsInvincible = true;
+            Truck.IsFireProof = true;
+
+            SetVehicleHandlingFloat( NetworkGetEntityFromNetworkId( Truck.NetworkId ), "CHandlingData", "fCamberStiffnesss", 0.1f );
+            SetVehicleHandlingFloat( NetworkGetEntityFromNetworkId( Truck.NetworkId ), "CHandlingData", "fInitialDragCoeff ", 10f );
+            SetVehicleHandlingFloat( NetworkGetEntityFromNetworkId( Truck.NetworkId ), "CHandlingData", "fMass", 10000f );
+            SetVehicleHandlingFloat( NetworkGetEntityFromNetworkId( Truck.NetworkId ), "CHandlingData", "fInitialDriveForce", 2f );
+            SetVehicleHandlingFloat( NetworkGetEntityFromNetworkId( Truck.NetworkId ), "CHandlingData", "FTRACTIONSPRINGDELTAMAX", 100f );
+            SetVehicleHandlingFloat( NetworkGetEntityFromNetworkId( Truck.NetworkId ), "CHandlingData", "fSteeringLock", 40f );
+            SetVehicleHandlingFloat( NetworkGetEntityFromNetworkId( Truck.NetworkId ), "CHandlingData", "fDownForceModifier", 100f );
+            SetVehicleHandlingFloat( NetworkGetEntityFromNetworkId( Truck.NetworkId ), "CHandlingData", "fDriveInertia", 1f );
+            SetVehicleHandlingFloat( NetworkGetEntityFromNetworkId( Truck.NetworkId ), "CHandlingData", "fDriveBiasFront", 0.5f );
+            SetVehicleHandlingFloat( NetworkGetEntityFromNetworkId( Truck.NetworkId ), "CHandlingData", "fTractionCurveLateral", 25f );
+            SetVehicleHandlingFloat( NetworkGetEntityFromNetworkId( Truck.NetworkId ), "CHandlingData", "fTractionCurveMax", 5f );
+            SetVehicleHandlingFloat( NetworkGetEntityFromNetworkId( Truck.NetworkId ), "CHandlingData", "fTractionCurveMin", 5f );
+            SetVehicleHandlingFloat( NetworkGetEntityFromNetworkId( Truck.NetworkId ), "CHandlingData", "fTractionBiasFront", 0.5f );
+            SetVehicleHandlingFloat( NetworkGetEntityFromNetworkId( Truck.NetworkId ), "CHandlingData", "fTractionLossMult", 0.1f );
+            SetVehicleHandlingFloat( NetworkGetEntityFromNetworkId( Truck.NetworkId ), "CHandlingData", "fSuspensionReboundDamp", 2f );
+            SetVehicleHandlingFloat( NetworkGetEntityFromNetworkId( Truck.NetworkId ), "CHandlingData", "fSuspensionCompDamp", 2f );
+            SetVehicleHandlingFloat( NetworkGetEntityFromNetworkId( Truck.NetworkId ), "CHandlingData", "fSuspensionForce", 3f );
+            SetVehicleHandlingFloat( NetworkGetEntityFromNetworkId( Truck.NetworkId ), "CHandlingData", "FCOLLISIONDAMAGEMULT", 0f );
+            SetVehicleHasStrongAxles( NetworkGetEntityFromNetworkId( Truck.NetworkId ), true );
+            SetVehicleHighGear( NetworkGetEntityFromNetworkId( Truck.NetworkId ), 1 );
+
+            Game.PlayerPed.SetIntoVehicle( Truck, VehicleSeat.Driver );
+
+            SetGameplayCamRelativeHeading( 0 );
+
+        }
+
         public override void End() {
+            if( Truck != null )
+                Truck.Delete();
             base.End();
         }
     }
