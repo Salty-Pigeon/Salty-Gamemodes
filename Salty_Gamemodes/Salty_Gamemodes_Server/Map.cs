@@ -16,8 +16,11 @@ namespace Salty_Gamemodes_Server {
         public Dictionary<int, List<Vector3>> SpawnPoints = new Dictionary<int, List<Vector3>>();
         public Dictionary<string, List<Vector3>> GunSpawns = new Dictionary<string, List<Vector3>>();
 
-
+        private Dictionary<int, List<Vector3>> usedSpawns = new Dictionary<int, List<Vector3>>();
+        private Random rand;
         public Map( Vector3 position, Vector3 size, string name ) {
+            rand = new Random(DateTime.Now.Millisecond);
+            usedSpawns = new Dictionary<int, List<Vector3>>();
             Position = position;
             Size = size;
             Name = name;
@@ -27,6 +30,21 @@ namespace Salty_Gamemodes_Server {
             return ( pos.X > Position.X - ( Size.X / 2 ) && pos.X < Position.X + ( Size.X / 2 ) && pos.Y > Position.Y - ( Size.Y / 2 ) && pos.Y < Position.Y + ( Size.Y / 2 ) );
         }
 
+
+        public Vector3 GetNextSpawn( int team ) {
+            if (!usedSpawns.ContainsKey(team))
+                return Vector3.Zero;
+            if( usedSpawns[team].Count == 0) {
+                int index = rand.Next(0, SpawnPoints[team].Count);
+                return SpawnPoints[team][index];
+            } else {
+                int index = rand.Next(0, usedSpawns[team].Count);
+                Vector3 spawn = usedSpawns[team][index];
+                usedSpawns.Remove(index);
+                return spawn;
+            }
+        }
+
         public void AddSpawnPoint( int team, Vector3 spawnPoint ) {
             if( SpawnPoints.ContainsKey( team ) ) {
                 SpawnPoints[team].Add( spawnPoint );
@@ -34,6 +52,9 @@ namespace Salty_Gamemodes_Server {
             else {
                 SpawnPoints.Add( team, new List<Vector3> { spawnPoint } );
             }
+            if (!usedSpawns.ContainsKey(team))
+                usedSpawns.Add(team, new List<Vector3>());
+            usedSpawns[team].Add(spawnPoint);
         }
 
         public void DeleteSpawnPoint( int team, Vector3 spawnPoint ) {

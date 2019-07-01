@@ -99,7 +99,11 @@ namespace Salty_Gamemodes_Client {
         }
 
         public void DrawBaseHealthHUD() {
+
             HideHudAndRadarThisFrame();
+
+            if (Team == 0)
+                return;
 
             HealthText.Caption = Game.Player.Character.Health.ToString();
             AmmoText.Caption = Game.PlayerPed.Weapons.Current.AmmoInClip + " / " + Game.PlayerPed.Weapons.Current.Ammo;
@@ -124,7 +128,11 @@ namespace Salty_Gamemodes_Client {
         }
 
         public void DrawBaseWeaponHUD() {
-            if( lastScroll + (2 * 1000) > GetGameTimer() ) {
+
+            if (Team == 0)
+                return;
+
+            if ( lastScroll + (2 * 1000) > GetGameTimer() ) {
                 int index = 0;
                 var resolution = Screen.Resolution;
                 foreach( var weapon in PlayerWeapons ) {

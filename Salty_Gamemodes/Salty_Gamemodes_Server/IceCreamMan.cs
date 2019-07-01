@@ -35,11 +35,25 @@ namespace Salty_Gamemodes_Server {
 
         public override void Start() {
 
-            base.Start();
-
-
-
             Debug.WriteLine( "Drive or Die starting on " + GameMap.Name );
+
+            Random rand = new Random();
+            List<Player> players = Players.ToList();
+
+            int driverID = rand.Next(0, players.Count);
+            Player driver = players[driverID];
+            SetTeam(driver, (int)Teams.Driver);
+            SpawnClient(driver, (int)Teams.Driver );
+            players.RemoveAt(driverID);
+
+
+            foreach( var ply in players) {
+                SetTeam(ply, (int)Teams.Runner);
+                SpawnClient(ply, (int)Teams.Runner );
+            }
+
+
+            /*
             Random rand = new Random();
             List<Player> players = Players.ToList();
 
@@ -51,7 +65,6 @@ namespace Salty_Gamemodes_Server {
             int driverID = rand.Next( 0, players.Count );
             int spawn = rand.Next( 0, spawns.Count );
             Player driver = players[driverID];
-            PlayerScores.Add( driver, 0 );
             drivers.Add( driver );
             SpawnClient( driver, (int)Teams.Driver, spawns[spawn] );
             players.RemoveAt( driverID );
@@ -59,7 +72,6 @@ namespace Salty_Gamemodes_Server {
             // Set innocents
             foreach( var ply in players ) {
                 runners.Add( ply );
-                PlayerScores.Add( ply, 0 );
                 if( spawns.Count > 0 ) {
                     spawn = rand.Next( 0, spawns.Count );
                     SpawnClient( ply, (int)Teams.Runner, spawns[spawn] );
@@ -70,13 +82,13 @@ namespace Salty_Gamemodes_Server {
                 }
 
             }
+            */
 
-            // create map
-            TriggerClientEvent( "salty::CreateMap", GameMap.Position, GameMap.Size, GameMap.Name );
+            base.Start();
         }
 
         public override void End() {
-            var winner = PlayerScores.OrderBy( x => x.Value ).ElementAt( 0 );
+            var winner = GetScores().OrderBy( x => x.Value ).ElementAt( 0 );
             WriteChat( string.Format( "{0} is winner with score of {1}", winner.Key.Name, winner.Value ) );
             base.End();
         }

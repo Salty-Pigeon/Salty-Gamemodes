@@ -15,7 +15,8 @@ namespace Salty_Gamemodes_Server {
         public enum Teams {
             Spectators,
             Traitors,
-            Innocents
+            Innocents,
+            Detectives
         }
 
         public enum GameState {
@@ -37,9 +38,6 @@ namespace Salty_Gamemodes_Server {
         }
 
         public override void Start() {
-
-            base.Start();
-            
             Debug.WriteLine( "TTT starting on " + GameMap.Name );
             Random rand = new Random();
             List<Player> players = Players.ToList();
@@ -52,30 +50,32 @@ namespace Salty_Gamemodes_Server {
             int traitorID = rand.Next( 0, players.Count );
             int spawn = rand.Next( 0, spawns.Count );
             Player traitor = players[ traitorID ];
-            traitors.Add( traitor );
-            SpawnClient( traitor, (int)Teams.Traitors, spawns[spawn] );
+
+            SetTeam(traitor, (int)Teams.Traitors);
+
+            SpawnClient( traitor, (int)Teams.Traitors );
             players.RemoveAt( traitorID );
             spawns.RemoveAt( spawn );
             // Set innocents
             foreach( var ply in players ) {
-                innocents.Add( ply );
+                SetTeam(ply, (int)Teams.Innocents);
                 if( spawns.Count > 0 ) {
                     spawn = rand.Next( 0, spawns.Count );
-                    SpawnClient( ply, (int)Teams.Traitors, spawns[spawn] );
+                    SpawnClient( ply, (int)Teams.Traitors );
                     spawns.RemoveAt( spawn );
                 } else {
-                    SpawnClient( ply, (int)Teams.Traitors, GameMap.SpawnPoints[0][rand.Next( 0, GameMap.SpawnPoints.Count )] );
+                    SpawnClient( ply, (int)Teams.Traitors );
 
                 }
 
             }
-
-            // create map
-            TriggerClientEvent( "salty::CreateMap", GameMap.Position, GameMap.Size, GameMap.Name );
-           
-
+            base.Start();
         }
 
+        public override void PlayerDied( Player player, int killerType, Vector3 deathcords ) {
+
+            base.PlayerDied(player, killerType, deathcords);
+        }
 
         public override void End() {
             Debug.WriteLine( "Game ending" );

@@ -18,7 +18,8 @@ namespace Salty_Gamemodes_Client {
         public enum Teams {
             Spectators,
             Traitors,
-            Innocents
+            Innocents,
+            Detectives
         }
 
         public enum GameState {
@@ -33,7 +34,7 @@ namespace Salty_Gamemodes_Client {
         public TTT( Map gameMap, int team ) {
 
             GameWeapons = new Dictionary<string, string>() {
-                { "WEAPON_UNARMED", "Unarmed" },
+                { "WEAPON_UNARMED", "Fists" },
                 { "WEAPON_PISTOL", "Pistol"  },
                 { "WEAPON_COMBATPISTOL", "Combat Pistol" },
                 { "WEAPON_SMG", "SMG" },
@@ -155,7 +156,12 @@ namespace Salty_Gamemodes_Client {
             if( Team == (int)Teams.Traitors ) {
                 DrawRectangle( 0.025f, 0.86f, 0.07f, 0.03f, 200, 0, 0, 200 );
             }
-
+            if( Team == (int)Teams.Detectives) {
+                DrawRectangle(0.025f, 0.86f, 0.07f, 0.03f, 0, 0, 200, 200);
+            }
+            if( Team == (int)Teams.Innocents) {
+                DrawRectangle(0.025f, 0.86f, 0.07f, 0.03f, 0, 200, 0, 200);
+            }
 
             TeamText.Draw();
 
@@ -207,16 +213,20 @@ namespace Salty_Gamemodes_Client {
 
         public override void SetTeam( int team ) {
             switch( team ) {
-                case (0):
+                case ((int)Teams.Spectators):
                     TeamText.Caption = "Spectate";
                     TeamText.Color = System.Drawing.Color.FromArgb( 150, 150, 0 );
                     break;
-                case (1):
+                case ((int)Teams.Traitors):
                     TeamText.Caption = "Traitor";
                     TeamText.Color = System.Drawing.Color.FromArgb( 255, 255, 255 );
                     break;
-                case (2):
+                case ((int)Teams.Innocents):
                     TeamText.Caption = "Innocent";
+                    TeamText.Color = System.Drawing.Color.FromArgb( 255, 255, 255 );
+                    break;
+                case ((int)Teams.Detectives):
+                    TeamText.Caption = "Detective";
                     TeamText.Color = System.Drawing.Color.FromArgb( 255, 255, 255 );
                     break;
             }

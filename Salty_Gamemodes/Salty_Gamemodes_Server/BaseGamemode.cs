@@ -15,8 +15,7 @@ namespace Salty_Gamemodes_Server {
 
         public MapManager MapManager;
 
-        public Dictionary<Player, int> PlayerScores = new Dictionary<Player, int>();
-
+        public Dictionary<Player, Dictionary<string, int>> PlayerDetails = new Dictionary<Player, Dictionary<string, int>>();
 
         public Map GameMap;
         public PlayerList players;
@@ -32,23 +31,23 @@ namespace Salty_Gamemodes_Server {
             MapManager = manager;
             this.ID = ID;
             this.MapTag = MapTag;
+
+            Random rand = new Random();
+            List<Map> maps = MapManager.MapList(MapTag);
+            Map map = maps[rand.Next(0, maps.Count)];
+
+            GameMap = map;
         }
 
         public virtual void Start() {
-
-            Random rand = new Random();
-            List<Map> maps = MapManager.MapList( MapTag );
-            Map map = maps[rand.Next( 0, maps.Count )];
-
-            GameMap = map;
-
-            if( isTimed )
+            TriggerClientEvent("salty::CreateMap", GameMap.Position, GameMap.Size, GameMap.Name);
+            if ( isTimed )
                 GameTime = GetGameTimer() + GameLength;
         }
 
         public virtual void End() {
             TriggerClientEvent( "salty::EndGame" );
-            Init.ActiveGame = new BaseGamemode( MapManager, 0, "*" );
+            Init.ActiveGame = new BaseGamemode( MapManager, 0, "___" );
         }
 
         public virtual void Update() {
@@ -64,9 +63,8 @@ namespace Salty_Gamemodes_Server {
 
         }
 
-        public void SpawnClient( Player ply, int team, Vector3 spawn ) {
-            ply.TriggerEvent( "salty::StartGame", ID, team, GameTime - GetGameTimer(), GameMap.Position, GameMap.Size, spawn, GameMap.GunSpawns );
-
+        public void SpawnClient( Player ply, int team ) {
+            ply.TriggerEvent( "salty::StartGame", ID, team, GameTime - GetGameTimer(), GameMap.Position, GameMap.Size, GameMap.GetNextSpawn(team), GameMap.GunSpawns );
         }
 
         public void CreateGameTimer( double length ) {
@@ -86,6 +84,45 @@ namespace Salty_Gamemodes_Server {
             return !(GetType().IsSubclassOf( typeof( BaseGamemode ) ));
         }
 
+        public void SetTeam( Player ply, int team ) {
+            if (!PlayerDetails.ContainsKey(ply))
+                PlayerDetails.Add(ply, new Dictionary<string, int>() { { "Team", 0 }, { "Score", 0 } });
+            PlayerDetails[ply]["Team"] = team;
+        }
+
+        public int GetTeam( Player ply ) {
+            if (PlayerDetails.ContainsKey(ply)) {
+                return PlayerDetails[ply]["Team"];
+            }
+            return 0;
+        }
+
+        public Dictionary<Player, int> GetScores() {
+            Dictionary<Player, int> PlayerScores = new Dictionary<Player, int>();
+            foreach( var ply in PlayerDetails) {
+                PlayerScores.Add(ply.Key, ply.Value["Score"]);
+            }
+            return PlayerScores;
+        } 
+
+        public int GetScore( Player ply ) {
+            if( PlayerDetails.ContainsKey(ply)) {
+                return PlayerDetails[ply]["Score"];
+            }
+            return 0;
+        }
+
+        public void AddScore( Player ply, int amount ) {
+            if (!PlayerDetails.ContainsKey(ply)) {
+                PlayerDetails.Add(ply, new Dictionary<string, int>() { { "Team", 0 }, { "Score", 0 } });
+            }
+            else {
+                PlayerDetails[ply]["Score"] += amount;
+            }
+            Debug.WriteLine(ply.Name + " has score: " + PlayerDetails[ply]["Score"]);
+        }
+
+        /*
         public void AddScore( Player ply, int amount ) {
             if( PlayerScores.ContainsKey(ply) ) {
                 PlayerScores[ply] += amount;
@@ -94,7 +131,7 @@ namespace Salty_Gamemodes_Server {
                 PlayerScores.Add( ply, amount );
             }
             Debug.WriteLine( ply.Name + " has score: " + PlayerScores[ply] );
-        }
+        }*/
 
         public void WriteChat( string str ) {
             TriggerClientEvent( "chat:addMessage", new {

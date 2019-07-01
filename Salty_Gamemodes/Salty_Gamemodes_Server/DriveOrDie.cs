@@ -30,9 +30,6 @@ namespace Salty_Gamemodes_Server {
 
         public override void Start() {
 
-            base.Start();
-
-
             Debug.WriteLine( "Drive or Die starting on " + GameMap.Name );
             Random rand = new Random();
             List<Player> players = Players.ToList();
@@ -46,7 +43,7 @@ namespace Salty_Gamemodes_Server {
             int spawn = rand.Next( 0, spawns.Count );
             Player truck = players[truckID];
             trucker.Add( truck );
-            SpawnClient( truck, (int)Teams.Trucker, spawns[spawn] );
+            SpawnClient( truck, (int)Teams.Trucker );
             players.RemoveAt( truckID );
             spawns = GameMap.SpawnPoints[1].ToList();
             // Set innocents
@@ -54,17 +51,17 @@ namespace Salty_Gamemodes_Server {
                 bikie.Add( ply );
                 if( spawns.Count > 0 ) {
                     spawn = rand.Next( 0, spawns.Count );
-                    SpawnClient( ply, (int)Teams.Bikie, spawns[spawn] );
+                    SpawnClient( ply, (int)Teams.Bikie );
                     spawns.RemoveAt( spawn );
                 }
                 else {
-                    SpawnClient( ply, (int)Teams.Bikie, GameMap.SpawnPoints[1][rand.Next( 0, GameMap.SpawnPoints.Count )] );
+                    SpawnClient( ply, (int)Teams.Bikie );
                 }
 
             }
-         
-            // create map
-            TriggerClientEvent( "salty::CreateMap", GameMap.Position, GameMap.Size, GameMap.Name );
+
+            base.Start();
+
         }
 
         public override void End() {

@@ -77,7 +77,6 @@ namespace Salty_Gamemodes_Client {
 
             GameMap = gameMap;
             GameMap.Gamemode = this;
-            GameMap.CreateBlip();
 
             SetTeam( team );
         }
@@ -180,7 +179,6 @@ namespace Salty_Gamemodes_Client {
             Truck.Gravity = 50;
             Truck.IsInvincible = true;
             Truck.IsFireProof = true;
-
 
             SetVehicleHandlingFloat( NetworkGetEntityFromNetworkId( Truck.NetworkId ), "CHandlingData", "fCamberStiffnesss", 0.1f );
             SetVehicleHandlingFloat( NetworkGetEntityFromNetworkId( Truck.NetworkId ), "CHandlingData", "fInitialDragCoeff ", 10f );
