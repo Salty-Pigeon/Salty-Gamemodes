@@ -45,37 +45,6 @@ namespace Salty_Gamemodes_Server {
                 SpawnClient(ply, (int)Teams.Bikie);
             }
 
-            /*
-            Debug.WriteLine( "Drive or Die starting on " + GameMap.Name );
-            Random rand = new Random();
-            List<Player> players = Players.ToList();
-         
-            List<Vector3> spawns = GameMap.SpawnPoints[0].ToList();
-            if( spawns.Count == 0 ) {
-                spawns.Add( GameMap.Position );
-            }
-            // Set traitor
-            int truckID = rand.Next( 0, players.Count );
-            int spawn = rand.Next( 0, spawns.Count );
-            Player truck = players[truckID];
-            trucker.Add( truck );
-            SpawnClient( truck, (int)Teams.Trucker );
-            players.RemoveAt( truckID );
-            spawns = GameMap.SpawnPoints[1].ToList();
-            // Set innocents
-            foreach( var ply in players ) {
-                bikie.Add( ply );
-                if( spawns.Count > 0 ) {
-                    spawn = rand.Next( 0, spawns.Count );
-                    SpawnClient( ply, (int)Teams.Bikie );
-                    spawns.RemoveAt( spawn );
-                }
-                else {
-                    SpawnClient( ply, (int)Teams.Bikie );
-                }
-
-            }
-            */
             base.Start();
 
         }

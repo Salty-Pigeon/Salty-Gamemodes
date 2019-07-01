@@ -33,6 +33,21 @@ namespace Salty_Gamemodes_Client {
 
         public TTT( Map gameMap, int team ) {
 
+            GameMap = gameMap;
+            GameMap.Gamemode = this;
+
+            GameMap.WeaponWeights = new Dictionary<string, int>() {
+                { "WEAPON_PISTOL", 8 },
+                { "WEAPON_COMBATPISTOL", 7  },
+                { "WEAPON_SMG", 6  },
+                { "WEAPON_CARBINERIFLE", 5  },
+                { "WEAPON_ASSAULTRIFLE", 4  },
+                //{ "WEAPON_SNIPERRIFLE", 2 },
+                { "WEAPON_PUMPSHOTGUN", 4  },
+                { "WEAPON_MICROSMG", 6 },
+                { "WEAPON_COMBATMG", 3 }
+            };
+
             GameWeapons = new Dictionary<string, string>() {
                 { "WEAPON_UNARMED", "Fists" },
                 { "WEAPON_PISTOL", "Pistol"  },
@@ -72,14 +87,8 @@ namespace Salty_Gamemodes_Client {
                 { "WEAPON_COMBATMG", 300 },
             };
 
-
             TeamText = new Text( "Spectator", new System.Drawing.PointF( Screen.Width * 0.033f, Screen.Height * 0.855f ), 0.5f );
 
-
-
-            GameMap = gameMap;
-            GameMap.Gamemode = this;
-            GameMap.CreateBlip();
             SetTeam( team );
         }
 
@@ -89,6 +98,7 @@ namespace Salty_Gamemodes_Client {
             GameMap.SpawnWeapons();
             SetPlayerMayNotEnterAnyVehicle( PlayerId() );
             WriteChat( "Game starting" );
+            GameMap.CreateBlip();
             base.Start();
         }
 

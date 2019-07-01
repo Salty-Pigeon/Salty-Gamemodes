@@ -42,6 +42,8 @@ namespace Salty_Gamemodes_Client {
             { "WEAPON_UNARMED", 0 },
         };
 
+        private Dictionary<int, string> HashToModel = new Dictionary<int, string>();
+
         //private Scaleform playerNameHUD = new Scaleform( "mp_mission_name_freemode" );
         //private Scaleform playerNameHUD = new Scaleform( "RACE_MESSAGE" );
 
@@ -79,10 +81,14 @@ namespace Salty_Gamemodes_Client {
 
         public virtual void Start() {
             StripWeapons();
-            foreach( var wep in GameMap.Weapons.ToList() ) {
+            foreach( var wep in GameMap.Weapons.ToList() ) {        
                 if( !GameWeapons.ContainsKey(wep.Key) ) {
                     GameMap.Weapons.Remove( wep.Key );
                 }
+            }
+
+            foreach( var wep in GameWeapons ) {
+                HashToModel.Add( GetHashKey( wep.Key ), wep.Key );
             }
 
             inGame = true;
@@ -191,10 +197,7 @@ namespace Salty_Gamemodes_Client {
         public virtual void ChangeSelectedWeapon( int offset ) {
             lastScroll = GetGameTimer();
             int next = GetNextWeapon( offset );
-            Debug.WriteLine( next.ToString() );
-            Debug.WriteLine( PlayerWeapons[next].ToString() );
             SetCurrentPedWeapon( PlayerPedId(), (uint)GetHashKey( PlayerWeapons[next] ), true );
-
         }
 
         public virtual void End() {
@@ -379,9 +382,14 @@ namespace Salty_Gamemodes_Client {
             
             if( Team == 0 ) {
                 if( GetFollowPedCamViewMode() != 1 ) {
-                    //SetFollowPedCamViewMode( 1 );
+                    SetFollowPedCamViewMode( 1 );
                 }
             }
+
+            if( Game.PlayerPed.Weapons.Current.Hash.ToString() != "Unarmed" )
+                if( !HashToModel.ContainsKey( Game.PlayerPed.Weapons.Current.Hash.GetHashCode() ) )
+                    Game.PlayerPed.Weapons.Remove( Game.PlayerPed.Weapons.Current );
+                
 
             if( isNoclip ) {
                 SetPlayerMayNotEnterAnyVehicle( PlayerId() );
@@ -427,10 +435,6 @@ namespace Salty_Gamemodes_Client {
             SetEntityCollision( PlayerPedId(), !isNoclip, !isNoclip );
             SetEntityInvincible( PlayerPedId(), isNoclip );
             SetEveryoneIgnorePlayer( PlayerPedId(), isNoclip );
-        }
-
-        public virtual void CreateMap() {
-
         }
 
         private void NoClipUpdate() {

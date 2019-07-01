@@ -52,46 +52,6 @@ namespace Salty_Gamemodes_Server {
                 playerGun.TriggerEvent("salty::GiveGun", "WEAPON_PISTOL", 1);
             }
 
-
-            /*
-
-            Random rand = new Random();
-            List<Player> players = Players.ToList();
-
-            List<Vector3> spawns = GameMap.SpawnPoints[0].ToList();
-            if( spawns.Count == 0 ) {
-                spawns.Add( GameMap.Position );
-            }
-            // Set traitor
-            int murdererID = rand.Next( 0, players.Count );
-            int spawn = rand.Next( 0, spawns.Count );
-            Player murder = players[murdererID];
-            murderer.Add( murder );
-            SpawnClient( murder, (int)Teams.Murderer );
-            players.RemoveAt( murdererID );
-            spawns.RemoveAt( spawn );
-            Player playerGun = null;
-            if( players.Count > 0 ) {
-                playerGun = players[rand.Next( 0, players.Count )];
-            }
-            // Set innocents
-            foreach( var ply in players ) {
-                civilians.Add( ply );
-                if( spawns.Count > 0 ) {
-                    spawn = rand.Next( 0, spawns.Count );
-                    SpawnClient( ply, (int)Teams.Civilian );
-                    spawns.RemoveAt( spawn );
-                }
-                else {
-                    SpawnClient( ply, (int)Teams.Civilian );
-                }
-
-            }
-            if( playerGun != null )
-                playerGun.TriggerEvent( "salty::GiveGun", "WEAPON_PISTOL", 1 );
-            // create map
-            */
-
             base.Start();
         }
 

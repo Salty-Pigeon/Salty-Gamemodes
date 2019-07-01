@@ -5,14 +5,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Dynamic;
 
 namespace Salty_Gamemodes_Server {
     class IceCreamMan : BaseGamemode {
 
+        Player Driver;
+
         public enum Teams {
             Spectators,
-            Runner,
-            Driver
+            Driver,
+            Runner
         }
 
         public enum GameState {
@@ -30,6 +33,20 @@ namespace Salty_Gamemodes_Server {
             base.Update();
         }
 
+        public override void OnTimerEnd() {
+            WriteChat( "Ice cream man delivered ice cream safely" );
+            base.OnTimerEnd();
+        }
+
+        public override void PlayerKilled( Player player, int killerID, ExpandoObject deathData ) {
+            if( PlayerDetails[player]["Team"] == (int)Teams.Driver ) {
+                WriteChat( "Ice cream man defeated. Bikers win." );
+                End();
+            }
+            base.PlayerKilled( player, killerID, deathData );
+        }
+
+
         public override void Start() {
 
             Debug.WriteLine( "Drive or Die starting on " + GameMap.Name );
@@ -38,9 +55,10 @@ namespace Salty_Gamemodes_Server {
             List<Player> players = Players.ToList();
 
             int driverID = rand.Next(0, players.Count);
-            Player driver = players[driverID];
-            SetTeam(driver, (int)Teams.Driver);
-            SpawnClient(driver, (int)Teams.Driver );
+            Driver = players[driverID];
+             
+            SetTeam( Driver, (int)Teams.Driver);
+            SpawnClient( Driver, (int)Teams.Driver );
             players.RemoveAt(driverID);
 
 
@@ -49,44 +67,14 @@ namespace Salty_Gamemodes_Server {
                 SpawnClient(ply, (int)Teams.Runner );
             }
 
-
-            /*
-            Random rand = new Random();
-            List<Player> players = Players.ToList();
-
-            List<Vector3> spawns = GameMap.SpawnPoints[(int)Teams.Driver].ToList();
-            if( spawns.Count == 0 ) {
-                spawns.Add( GameMap.Position );
-            }
-            // Set traitor
-            int driverID = rand.Next( 0, players.Count );
-            int spawn = rand.Next( 0, spawns.Count );
-            Player driver = players[driverID];
-            drivers.Add( driver );
-            SpawnClient( driver, (int)Teams.Driver, spawns[spawn] );
-            players.RemoveAt( driverID );
-            spawns = GameMap.SpawnPoints[(int)Teams.Runner].ToList();
-            // Set innocents
-            foreach( var ply in players ) {
-                runners.Add( ply );
-                if( spawns.Count > 0 ) {
-                    spawn = rand.Next( 0, spawns.Count );
-                    SpawnClient( ply, (int)Teams.Runner, spawns[spawn] );
-                    spawns.RemoveAt( spawn );
-                }
-                else {
-                    SpawnClient( ply, (int)Teams.Runner, GameMap.SpawnPoints[1][rand.Next( 0, GameMap.SpawnPoints.Count )] );
-                }
-
-            }
-            */
-
             base.Start();
         }
 
         public override void End() {
             var winner = GetScores().OrderBy( x => x.Value ).ElementAt( 0 );
-            WriteChat( string.Format( "{0} is winner with score of {1}", winner.Key.Name, winner.Value ) );
+
+            WriteChat( string.Format( "{0} got a score of {1}", Driver.Name, PlayerDetails[Driver]["Score"] ) );
+
             base.End();
         }
 

@@ -31,7 +31,7 @@ namespace Salty_Gamemodes_Server
 
             SQLConnection = new Database();
             MapManager = new MapManager( SQLConnection.Load() );
-            ActiveGame = new BaseGamemode( MapManager, (int)Gamemodes.None, "___" );
+            ActiveGame = new BaseGamemode( MapManager, (int)Gamemodes.None, "*" );
 
 
             EventHandlers[ "salty::netStartGame" ] += new Action( ActiveGame.Start );

@@ -24,17 +24,7 @@ namespace Salty_Gamemodes_Client {
             { "WEAPON_COMBATMG", "W_MG_COMBATMG" }
         };
 
-        Dictionary<string, int> weaponWeights = new Dictionary<string, int>() {
-            { "WEAPON_PISTOL", 10 },
-            { "WEAPON_COMBATPISTOL", 10  },
-            { "WEAPON_SMG", 6  },
-            { "WEAPON_CARBINERIFLE", 4  },
-            { "WEAPON_ASSAULTRIFLE", 6  },
-            { "WEAPON_SNIPERRIFLE", 2 },
-            { "WEAPON_PUMPSHOTGUN", 4  },
-            { "WEAPON_MICROSMG", 8 },
-            { "WEAPON_COMBATMG", 2 }
-        };
+        public Dictionary<string, int> WeaponWeights = new Dictionary<string, int>();
 
         public Dictionary<string, WeaponPickup> CreatedWeapons = new Dictionary<string, WeaponPickup>();
 
@@ -61,7 +51,7 @@ namespace Salty_Gamemodes_Client {
             Position = position;
             Size = size;
             Name = name;       
-
+   
         }
 
         public void CreateBlip() {
@@ -116,10 +106,9 @@ namespace Salty_Gamemodes_Client {
             foreach( var wep in Gamemode.GameWeapons ) {
                 if( wep.Key == "WEAPON_UNARMED" )
                     continue;
-                i += weaponWeights[wep.Key];
+                i += WeaponWeights[wep.Key];
                 weaponIntervals.Add( i, wep.Key );
             }
-            
 
             foreach( var gunTypes in GunSpawns ) {
                 foreach( var gunPos in gunTypes.Value ) {
@@ -127,14 +116,26 @@ namespace Salty_Gamemodes_Client {
 
                         int index = rand.Next( 0, i );
                         string prevItem = Weapons.ElementAt( 0 ).Key;
-                        string wepModel = Weapons.ElementAt( 0 ).Key, worldModel = Weapons.ElementAt( 0 ).Value ;
-                        foreach( var x in weaponIntervals ) {
-                            if( index < x.Key ) {
+                        string wepModel = Weapons.ElementAt( Weapons.Count-1 ).Key, worldModel = Weapons.ElementAt( Weapons.Count-1 ).Value ;
+                        int prevKey = 0;
+                        foreach( var x in weaponIntervals ) {      
+                            
+                            if( index > prevKey && index <= x.Key ) {
+                                Debug.WriteLine( string.Format( "{0} {1} {2} {3}", index, x.Value, x.Key, weaponIntervals.ElementAt( weaponIntervals.Count - 1 ).Key ) );
+                                wepModel = x.Value;
+                                worldModel = Weapons[x.Value];
+                                break;
+                            }
+                            /*
+                            if( index <= x.Key ) {
+                                Debug.WriteLine( string.Format( "{0} {1} {2} {3}", index, x.Value, x.Key, weaponIntervals.ElementAt( weaponIntervals.Count-1 ).Key ) );
                                 wepModel = prevItem;
                                 worldModel = Weapons[prevItem];
                                 break;
                             }
+                            */
                             prevItem = x.Value;
+                            prevKey = x.Key;
                         }
                         uint pickupHash = (uint)GetHashKey( wepModel );
                         int worldHash = GetHashKey( worldModel );
@@ -143,7 +144,6 @@ namespace Salty_Gamemodes_Client {
                             CreatedWeapons.Add( wepModel, item );
                     }
                     else {
-
                         WeaponPickup item = new WeaponPickup( this, gunTypes.Key, ( uint)GetHashKey( gunTypes.Key ), GetHashKey( Weapons[gunTypes.Key] ), gunPos, false, 0, Gamemode.WeaponMaxAmmo[gunTypes.Key] / 3 );
                         if( !CreatedWeapons.ContainsKey( gunTypes.Key ) )
                             CreatedWeapons.Add( gunTypes.Key, item );

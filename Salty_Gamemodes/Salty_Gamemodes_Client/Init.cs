@@ -24,7 +24,6 @@ namespace Salty_Gamemodes_Client
             EventHandlers[ "baseevents:onPlayerKilled" ] += new Action<int, ExpandoObject>( PlayerKilled );
             EventHandlers[ "salty::StartGame" ] += new Action<int, int, double, Vector3, Vector3, Vector3, ExpandoObject>( StartGame );
             EventHandlers[ "salty::EndGame" ] += new Action( EndGame );
-            EventHandlers[ "salty::CreateMap" ] += new Action( ActiveGame.CreateMap );
             EventHandlers[ "salty::SpawnPointGUI" ] += new Action<ExpandoObject, ExpandoObject>( SpawnGUI );
             EventHandlers[ "salty::VoteMap" ] += new Action<List<dynamic>>( VoteMap );
             EventHandlers[ "salty::GiveGun" ] += new Action<string, int>( GiveGun );
@@ -40,7 +39,6 @@ namespace Salty_Gamemodes_Client
         public void StartGame( int id, int team, double duration, Vector3 mapPos, Vector3 mapSize, Vector3 startPos, ExpandoObject gunSpawns ) {
             if( ActiveGame.inGame )
                 ActiveGame.End();
-            Debug.WriteLine( duration.ToString() );
             ActiveGame.SetNoClip( false );
             Map map = new Map( mapPos, mapSize, "" );
             map.GunSpawns = ExpandoToDictionary( gunSpawns );
@@ -189,7 +187,6 @@ namespace Salty_Gamemodes_Client
         private void PlayerSpawn( ExpandoObject spawnInfo ) {
 
             if( spawnPos != Vector3.Zero ) {
-                Debug.WriteLine( spawnPos.ToString() );
                 Game.Player.Character.Position = spawnPos;
                 ActiveGame.noclipPos = spawnPos;
                 ActiveGame.SetNoClip( true );
@@ -255,6 +252,10 @@ namespace Salty_Gamemodes_Client
 
             RegisterCommand( "addweaponpoint", new Action<int, List<object>, string>( ( source, args, raw ) => {
                 TriggerServerEvent( "salty::netModifyWeaponPos", "add", "AUTO", args[0], Game.Player.Character.Position );
+            } ), false );
+
+            RegisterCommand( "kill", new Action<int, List<object>, string>( ( source, args, raw ) => {
+                Game.PlayerPed.Kill();
             } ), false );
 
             RegisterCommand( "createmap", new Action<int, List<object>, string>( ( source, args, raw ) => {

@@ -42,20 +42,20 @@ namespace Salty_Gamemodes_Server {
         }
 
         public virtual void Start() {
-            TriggerClientEvent("salty::CreateMap", GameMap.Position, GameMap.Size, GameMap.Name);
             if ( isTimed )
                 GameTime = GetGameTimer() + GameLength;
         }
 
         public virtual void End() {
             TriggerClientEvent( "salty::EndGame" );
-            Init.ActiveGame = new BaseGamemode( MapManager, 0, "___" );
+            Init.ActiveGame = new BaseGamemode( MapManager, 0, "*" );
         }
 
         public virtual void Update() {
             if( isTimed && GameTime != 0 ) {
                 if( GameTime - GetGameTimer() < 0 ) {
                     isTimed = false;
+                    OnTimerEnd();
                     End();
                 }
             }
@@ -66,7 +66,7 @@ namespace Salty_Gamemodes_Server {
         }
 
         public void SpawnClient( Player ply, int team ) {
-            ply.TriggerEvent( "salty::StartGame", ID, team, GameTime - GetGameTimer(), GameMap.Position, GameMap.Size, GameMap.GetNextSpawn(team), GameMap.GunSpawns );
+            ply.TriggerEvent( "salty::StartGame", ID, team, GameLength, GameMap.Position, GameMap.Size, GameMap.GetNextSpawn(team), GameMap.GunSpawns );
         }
 
         public void CreateGameTimer( double length ) {
@@ -79,6 +79,10 @@ namespace Salty_Gamemodes_Server {
         }
 
         public virtual void PlayerDied( Player player, int killerType, Vector3 deathcords ) {
+
+        }
+
+        public virtual void OnTimerEnd() {
 
         }
 
@@ -123,17 +127,6 @@ namespace Salty_Gamemodes_Server {
             }
             Debug.WriteLine(ply.Name + " has score: " + PlayerDetails[ply]["Score"]);
         }
-
-        /*
-        public void AddScore( Player ply, int amount ) {
-            if( PlayerScores.ContainsKey(ply) ) {
-                PlayerScores[ply] += amount;
-            }
-            else {
-                PlayerScores.Add( ply, amount );
-            }
-            Debug.WriteLine( ply.Name + " has score: " + PlayerScores[ply] );
-        }*/
 
         public void WriteChat( string str ) {
             TriggerClientEvent( "chat:addMessage", new {
