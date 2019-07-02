@@ -1,0 +1,34 @@
+trucks going super quick drive or die, everyone on motorbikes, main truck invincible everyone else blows up, get pushed back inside barrier
+
+smeer the queer
+duck hunt
+
+ice cream man
+
+tank
+
+TTT - Tab to show detective and traitor menu
+
+kill as many civs as possible in city with supped up bikes 
+gun game
+
+
+ToDo:
+
+Finish TTT playable.
+Make Ice cream man with score, bikers get to other side and get RPG's to kill truck driver, truck driver gets to end as much as possible for score. infinite lives time limit 8min
+
+Can vote gamemode anytime
+
+Leaderboard for ice cream man on MYSQL.
+Points for hitting civs, people, explosions etc
+
+
+https://runtime.fivem.net/doc/natives/#_0xAA0008F3BBB8F416
+GRAPHICS::CLEAR_DRAW_ORIGIN().  
+SetDrawOrigin
+Radar TTT
+Murder foot prints
+
+
+TTT menu with OpenIV
