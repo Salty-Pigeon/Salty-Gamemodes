@@ -222,7 +222,7 @@ namespace Salty_Gamemodes_Client {
 
             HideHudAndRadarThisFrame();
             DrawBaseWeaponHUD();
-
+            DrawScore();
             DrawGoal();
 
             base.HUD();

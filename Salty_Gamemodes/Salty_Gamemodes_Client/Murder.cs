@@ -90,10 +90,6 @@ namespace Salty_Gamemodes_Client {
             base.HUD();
         }
 
-        public override void PlayerDied( int killerType, Vector3 deathcords ) {
-            SetTeam((int)Teams.Spectators);
-            base.PlayerDied(killerType, deathcords);
-        }
 
         public override bool CanPickupWeapon( string weaponModel ) {
             return base.CanPickupWeapon( weaponModel );
@@ -114,8 +110,7 @@ namespace Salty_Gamemodes_Client {
         }
 
         public override void PlayerSpawned( ExpandoObject spawnInfo ) {
-            Game.Player.Character.MaxHealth = 100;
-            Game.Player.Character.Health = 100;
+            SetTeam( (int)Teams.Spectators );
             base.PlayerSpawned( spawnInfo );
         }
 

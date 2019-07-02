@@ -17,6 +17,7 @@ namespace Salty_Gamemodes_Client {
         public Text HealthText;
         public Text AmmoText;
         public Text GameTimeText;
+        public Text ScoreText;
 
         public int Score;
 
@@ -71,6 +72,8 @@ namespace Salty_Gamemodes_Client {
             AmmoText = new Text( "Ammo: ", new System.Drawing.PointF( Screen.Width * 0.033f, Screen.Height * 0.935f ), 0.5f );
 
             GameTimeText = new Text( "", new System.Drawing.PointF( Screen.Width * 0.1f, Screen.Height * 0.855f ), 0.5f );
+            ScoreText = new Text( "Score: 0", new System.Drawing.PointF( Screen.Width * 0.5f, Screen.Height * 0.01f ), 0.7f, System.Drawing.Color.FromArgb(255,255,255) );
+            ScoreText.Centered = true;
 
             BoundText = new Text( "", new System.Drawing.PointF( Screen.Width * 0.2f, Screen.Height * 0.1f ), 1.0f );
             HUDText = new Text( "", new System.Drawing.PointF( Screen.Width * 0.5f, Screen.Height * 0.5f ), 0.5f );
@@ -131,9 +134,14 @@ namespace Salty_Gamemodes_Client {
 
         }
 
+        public void DrawScore() {
+            ScoreText.Draw();
+        }
+
         public void UpdateScore( int score ) {
             WriteChat( "New score " + score );
             Score += score;
+            ScoreText.Caption = "Score: " + score;
         }
 
         public void AddScore(int offset) {
@@ -213,10 +221,9 @@ namespace Salty_Gamemodes_Client {
         }
 
         public virtual void End() {
-            GameMap.ClearWeapons();
             GameMap.ClearBlip();
             inGame = false;
-           
+
         }
 
 

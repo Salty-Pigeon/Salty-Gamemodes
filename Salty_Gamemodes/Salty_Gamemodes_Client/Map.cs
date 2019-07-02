@@ -178,8 +178,11 @@ namespace Salty_Gamemodes_Client {
         }
 
         public void ClearBlip() {
-            RemoveBlip( ref Blip );
-            isVisible = false;
+            if( isVisible ) {
+                Debug.WriteLine( Blip.ToString() );
+                RemoveBlip( ref Blip );
+                isVisible = false;
+            }
         }
 
         public bool IsInZone( Vector3 pos ) {
