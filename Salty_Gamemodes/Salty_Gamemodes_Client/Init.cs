@@ -17,6 +17,8 @@ namespace Salty_Gamemodes_Client
         Vector3 spawnPos = Vector3.Zero;
         public Dictionary<string, Map> Maps = new Dictionary<string, Map>();
 
+        SaltyMenu testMenu;
+
         public Init() {
             EventHandlers[ "onClientResourceStart" ] += new Action<string>( OnClientResourceStart );
             EventHandlers[ "playerSpawned" ] += new Action<ExpandoObject>( PlayerSpawn );
@@ -211,6 +213,9 @@ namespace Salty_Gamemodes_Client
                 }
             }
 
+            if (testMenu != null)
+                testMenu.Draw();
+
         }
 
 
@@ -231,6 +236,10 @@ namespace Salty_Gamemodes_Client
             RegisterCommand( "noclip", new Action<int, List<object>, string>( ( source, args, raw ) => {
                 ActiveGame.SetNoClip(!ActiveGame.isNoclip);
             } ), false );
+
+            RegisterCommand("menu", new Action<int, List<object>, string>(( source, args, raw ) => {
+                testMenu = new TTT_Menu(0.5f, 0.5f, 0.2f, 0.2f, System.Drawing.Color.FromArgb(0, 0, 0));
+            }), false);
 
             RegisterCommand( "score", new Action<int, List<object>, string>( ( source, args, raw ) => {
                 ActiveGame.AddScore( 1 );

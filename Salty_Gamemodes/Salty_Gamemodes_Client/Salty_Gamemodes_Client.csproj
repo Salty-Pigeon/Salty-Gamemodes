@@ -58,7 +58,10 @@
     <Compile Include="MapMenu.cs" />
     <Compile Include="Murder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SaltyButton.cs" />
+    <Compile Include="SaltyMenu.cs" />
     <Compile Include="TTT.cs" />
+    <Compile Include="TTT_Menu.cs" />
     <Compile Include="VoteMenu.cs" />
     <Compile Include="WeaponPickup.cs" />
   </ItemGroup>
