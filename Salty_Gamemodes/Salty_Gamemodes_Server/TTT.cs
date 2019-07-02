@@ -56,7 +56,7 @@ namespace Salty_Gamemodes_Server {
         }
 
         public override void PlayerDied( Player player, int killerType, Vector3 deathcords ) {
-
+            SetTeam(player, (int)Teams.Spectators);
             base.PlayerDied(player, killerType, deathcords);
         }
 

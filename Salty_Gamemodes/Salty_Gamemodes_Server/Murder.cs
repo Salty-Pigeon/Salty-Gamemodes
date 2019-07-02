@@ -59,6 +59,13 @@ namespace Salty_Gamemodes_Server {
                 End();
             }
 
+            SetTeam(player, (int)Teams.Spectators);
+
+            if (PlayerTeams[(int)Teams.Civilian].Count == 0) {
+                WriteChat("Civilians dead, murderer wins!");
+                End();
+            }
+
             base.PlayerDied( player, killerType, deathcords );
         }
 

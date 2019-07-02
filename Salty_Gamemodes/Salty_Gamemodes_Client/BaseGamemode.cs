@@ -75,11 +75,11 @@ namespace Salty_Gamemodes_Client {
             BoundText = new Text( "", new System.Drawing.PointF( Screen.Width * 0.2f, Screen.Height * 0.1f ), 1.0f );
             HUDText = new Text( "", new System.Drawing.PointF( Screen.Width * 0.5f, Screen.Height * 0.5f ), 0.5f );
             HUDText.Centered = true;
+            StripWeapons();
 
         }
 
         public virtual void Start() {
-            StripWeapons();
             foreach( var wep in GameMap.Weapons.ToList() ) {        
                 if( !GameWeapons.ContainsKey(wep.Key) ) {
                     GameMap.Weapons.Remove( wep.Key );

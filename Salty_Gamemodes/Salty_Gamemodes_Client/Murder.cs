@@ -54,7 +54,6 @@ namespace Salty_Gamemodes_Client {
 
         public override void Start() {
 
-            base.Start();
 
             SetPlayerMeleeWeaponDamageModifier( PlayerId(), 0 );
             SetPlayerWeaponDamageModifier( PlayerId(), 20 );
@@ -68,6 +67,7 @@ namespace Salty_Gamemodes_Client {
                 RemoveWeaponFromPed( PlayerPedId(), (uint)GetHashKey( "WEAPON_UNARMED" ) );
             }
 
+            base.Start();
 
 
         }
@@ -88,6 +88,11 @@ namespace Salty_Gamemodes_Client {
             FirstPersonForAlive();
 
             base.HUD();
+        }
+
+        public override void PlayerDied( int killerType, Vector3 deathcords ) {
+            SetTeam((int)Teams.Spectators);
+            base.PlayerDied(killerType, deathcords);
         }
 
         public override bool CanPickupWeapon( string weaponModel ) {

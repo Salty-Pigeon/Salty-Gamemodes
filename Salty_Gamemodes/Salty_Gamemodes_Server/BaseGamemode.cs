@@ -16,6 +16,7 @@ namespace Salty_Gamemodes_Server {
         public MapManager MapManager;
 
         public Dictionary<Player, Dictionary<string, int>> PlayerDetails = new Dictionary<Player, Dictionary<string, int>>();
+        public Dictionary<int, List<Player>> PlayerTeams = new Dictionary<int, List<Player>>();
 
         public Map GameMap;
         public List<Player> InGamePlayers;
@@ -94,7 +95,17 @@ namespace Salty_Gamemodes_Server {
         public void SetTeam( Player ply, int team ) {
             if (!PlayerDetails.ContainsKey(ply))
                 PlayerDetails.Add(ply, new Dictionary<string, int>() { { "Team", 0 }, { "Score", 0 } });
+            int plyOldTeam = PlayerDetails[ply]["Team"];
+            if( PlayerTeams.ContainsKey(plyOldTeam)) {
+                if (PlayerTeams[plyOldTeam].Contains(ply))
+                    PlayerTeams[plyOldTeam].Remove(ply);
+            }
             PlayerDetails[ply]["Team"] = team;
+            if( !PlayerTeams.ContainsKey(team)) {
+                PlayerTeams.Add(team, new List<Player>() { ply });
+            } else {
+                PlayerTeams[team].Add(ply);
+            }
         }
 
         public int GetTeam( Player ply ) {
