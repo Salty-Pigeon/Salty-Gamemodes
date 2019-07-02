@@ -130,6 +130,11 @@ namespace Salty_Gamemodes_Server {
             return 0;
         }
 
+        public void PlayerDropped( [FromSource] Player ply, string reason ) {
+            PlayerTeams[GetTeam(ply)].Remove(ply);
+            PlayerDetails.Remove(ply);
+        }
+
         public void AddScore( Player ply, int amount ) {
             if (!PlayerDetails.ContainsKey(ply)) {
                 PlayerDetails.Add(ply, new Dictionary<string, int>() { { "Team", 0 }, { "Score", 0 } });

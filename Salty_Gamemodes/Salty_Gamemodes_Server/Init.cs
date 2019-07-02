@@ -34,6 +34,11 @@ namespace Salty_Gamemodes_Server
             ActiveGame = new BaseGamemode( MapManager, (int)Gamemodes.None, "*" );
 
 
+            EventHandlers["playerDropped"] += new Action<Player, string>(ActiveGame.PlayerDropped);
+
+            EventHandlers["baseevents:onPlayerDied"] += new Action<Player, int, List<dynamic>>(PlayerDied);
+            EventHandlers["baseevents:onPlayerKilled"] += new Action<Player, int, ExpandoObject>(PlayerKilled);
+
             EventHandlers[ "salty::netStartGame" ] += new Action( ActiveGame.Start );
             EventHandlers[ "salty::netEndGame" ] += new Action( EndGame );
             EventHandlers[ "salty::netSpawnPointGUI" ] += new Action<Player>( SpawnPointGUI );
@@ -43,9 +48,6 @@ namespace Salty_Gamemodes_Server
             EventHandlers[ "salty::netAddScore" ] += new Action<Player, int>( AddScoreToPlayer );
             EventHandlers[ "salty::netVoteMap" ] += new Action<Player, string>( MapManager.PlayerVote );
             EventHandlers[ "salty::netJoined" ] += new Action<Player>( PlayerJoined );
-
-            EventHandlers["baseevents:onPlayerDied"] += new Action<Player, int, List<dynamic>>( PlayerDied );
-            EventHandlers["baseevents:onPlayerKilled"] += new Action<Player, int, ExpandoObject>( PlayerKilled );
 
 
             RegisterCommand( "startTTT", new Action<int, List<object>, string>( ( source, args, raw ) => {
