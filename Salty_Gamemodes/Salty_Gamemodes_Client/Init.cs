@@ -20,6 +20,9 @@ namespace Salty_Gamemodes_Client
         SaltyMenu testMenu;
 
         public Init() {
+
+            RequestStreamedTextureDict("saltyTextures", true);
+
             EventHandlers[ "onClientResourceStart" ] += new Action<string>( OnClientResourceStart );
             EventHandlers[ "playerSpawned" ] += new Action<ExpandoObject>( PlayerSpawn );
             EventHandlers[ "baseevents:onPlayerDied" ] += new Action<int, List<dynamic>>( PlayerDied );

@@ -48,7 +48,8 @@ namespace Salty_Gamemodes_Client {
                 ButtonText.Draw();
                 
             } else {
-                DrawSprite("logo", Texture, Position.X, Position.Y, Size.X, Size.Y, Rotation, Colour.R, Colour.G, Colour.B, Colour.A);
+                if( HasStreamedTextureDictLoaded("saltyTextures") )
+                    DrawSprite("saltyTextures", Texture, Position.X, Position.Y, Size.X, Size.Y, Rotation, Colour.R, Colour.G, Colour.B, Colour.A);
             }
         }
 
