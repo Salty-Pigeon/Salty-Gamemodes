@@ -28,6 +28,18 @@ namespace Salty_Gamemodes_Server {
 
         }
 
+        public override void PlayerDied( Player player, int killerType, Vector3 deathcords ) {
+            int team = GetTeam( player );
+            if( team == (int)Teams.Bikie ) {
+                SetTeam( player, (int)Teams.Trucker );
+            }
+            if( TeamCount((int)Teams.Bikie) == 0 ) {
+                WriteChat( "All bikers defeated" );
+                //End();
+            }
+            base.PlayerDied( player, killerType, deathcords );
+        }
+
         public override void Start() {
 
             Random rand = new Random();
@@ -50,6 +62,7 @@ namespace Salty_Gamemodes_Server {
         }
 
         public override void End() {
+           
             base.End();
         }
     }

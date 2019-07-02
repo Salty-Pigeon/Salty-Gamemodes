@@ -108,6 +108,10 @@ namespace Salty_Gamemodes_Server {
             }
         }
 
+        public int TeamCount( int team ) {
+            return PlayerTeams.ContainsKey( team ) ? PlayerTeams[team].Count : 0;
+        }
+
         public int GetTeam( Player ply ) {
             if (PlayerDetails.ContainsKey(ply)) {
                 return PlayerDetails[ply]["Team"];
@@ -131,8 +135,11 @@ namespace Salty_Gamemodes_Server {
         }
 
         public void PlayerDropped( [FromSource] Player ply, string reason ) {
-            PlayerTeams[GetTeam(ply)].Remove(ply);
-            PlayerDetails.Remove(ply);
+            int team = GetTeam( ply );
+            if( PlayerTeams.ContainsKey( team ) ) {
+                PlayerTeams[GetTeam( ply )].Remove( ply );
+                PlayerDetails.Remove( ply );
+            }
         }
 
         public void AddScore( Player ply, int amount ) {

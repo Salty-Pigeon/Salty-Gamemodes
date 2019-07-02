@@ -30,10 +30,10 @@ namespace Salty_Gamemodes_Client
             EventHandlers[ "salty::UpdateScore" ] += new Action<int>( UpdateScore );
             EventHandlers[ "salty::UpdateInfo" ] += new Action<int, double, Vector3, Vector3>( UpdateInfo );
 
-            ActiveGame.SetNoClip( false );
+            ActiveGame.SetTeam( 0 );
+            ActiveGame.SetNoClip( true );
             Tick += Update;
             SetMaxWantedLevel( 0 );
-
 
         }
 
@@ -230,6 +230,10 @@ namespace Salty_Gamemodes_Client
 
             RegisterCommand( "noclip", new Action<int, List<object>, string>( ( source, args, raw ) => {
                 ActiveGame.SetNoClip(!ActiveGame.isNoclip);
+            } ), false );
+
+            RegisterCommand( "score", new Action<int, List<object>, string>( ( source, args, raw ) => {
+                ActiveGame.AddScore( 1 );
             } ), false );
 
             RegisterCommand( "mouse", new Action<int, List<object>, string>( ( source, args, raw ) => {

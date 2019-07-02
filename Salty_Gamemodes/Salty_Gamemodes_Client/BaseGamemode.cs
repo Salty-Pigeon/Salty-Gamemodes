@@ -18,8 +18,14 @@ namespace Salty_Gamemodes_Client {
         public Text AmmoText;
         public Text GameTimeText;
         public Text ScoreText;
+        public Text AddScoreText;
+
+        public Text GoalText;
+        public float GoalTextTime = 0;
 
         public int Score;
+        private float showScoreTimer = 0;
+        private float showScoreLength = 500;
 
         public double GameTime = 0;
         public bool isTimed = false;
@@ -73,16 +79,21 @@ namespace Salty_Gamemodes_Client {
 
             GameTimeText = new Text( "", new System.Drawing.PointF( Screen.Width * 0.1f, Screen.Height * 0.855f ), 0.5f );
             ScoreText = new Text( "Score: 0", new System.Drawing.PointF( Screen.Width * 0.5f, Screen.Height * 0.01f ), 0.7f, System.Drawing.Color.FromArgb(255,255,255) );
+            AddScoreText = new Text( "", new System.Drawing.PointF( Screen.Width * 0.5f + (ScoreText.Width/2), Screen.Height * 0.025f ), 0.3f, System.Drawing.Color.FromArgb(255,255,255) );
             ScoreText.Centered = true;
-
             BoundText = new Text( "", new System.Drawing.PointF( Screen.Width * 0.2f, Screen.Height * 0.1f ), 1.0f );
             HUDText = new Text( "", new System.Drawing.PointF( Screen.Width * 0.5f, Screen.Height * 0.5f ), 0.5f );
             HUDText.Centered = true;
+
+            GoalText = new Text( "", new System.Drawing.PointF( Screen.Width * 0.5f, Screen.Height * 0.1f ), 1f, System.Drawing.Color.FromArgb( 0, 200, 0 ) );
+            GoalText.Centered = true;
+
             StripWeapons();
 
         }
 
-        public virtual void Start() {
+        public virtual void Start() {           
+
             foreach( var wep in GameMap.Weapons.ToList() ) {        
                 if( !GameWeapons.ContainsKey(wep.Key) ) {
                     GameMap.Weapons.Remove( wep.Key );
@@ -136,12 +147,25 @@ namespace Salty_Gamemodes_Client {
 
         public void DrawScore() {
             ScoreText.Draw();
+            float time = showScoreTimer - GetGameTimer();
+            if( time >= 0 ) {
+                if( time <= (showScoreLength/2) ) {
+                    float percent = time / (showScoreLength/2);
+                    AddScoreText.Scale = percent * 0.3f;
+                } else {
+                    float percent = (time-(showScoreLength/2)) / (showScoreLength/2);
+                    AddScoreText.Scale = 0.3f - (percent * 0.3f);
+                }
+                AddScoreText.Draw();
+            }
         }
 
         public void UpdateScore( int score ) {
-            WriteChat( "New score " + score );
-            Score += score;
+            AddScoreText.Caption = "+" + (score - Score);
+            Score = score;
+            showScoreTimer = GetGameTimer() + showScoreLength;
             ScoreText.Caption = "Score: " + score;
+            AddScoreText.Position = new System.Drawing.PointF( Screen.Width * 0.5f + (ScoreText.Width / 2), Screen.Height * 0.025f );
         }
 
         public void AddScore(int offset) {
@@ -241,16 +265,8 @@ namespace Salty_Gamemodes_Client {
         }
 
         public virtual void PlayerSpawned( ExpandoObject spawnInfo ) {
-
             if( Team == 0 ) {
                 SetNoClip( true );
-            }
-            
-            if( inGame ) {
-                SetTeam( 0 );
-                SetNoClip( true );
-                Game.Player.Character.Position = deathPos;
-                noclipPos = deathPos;
             }
         }
 
@@ -288,6 +304,16 @@ namespace Salty_Gamemodes_Client {
             foreach( var i in PlayerWeapons.Keys.ToList() )  {
                 if( PlayerWeapons[i] == weaponName )
                     PlayerWeapons.Remove( i );
+            }
+        }
+
+        public void SetGoalTimer( float time ) {
+            GoalTextTime = GetGameTimer() + (time * 1000);
+        }
+
+        public void DrawGoal() {
+            if( GoalTextTime > GetGameTimer() ) {
+                GoalText.Draw();
             }
         }
 
@@ -363,7 +389,8 @@ namespace Salty_Gamemodes_Client {
                 GameMap.DrawBoundarys();
             }
 
-           
+            DrawGoal();
+
             if( lastLooked + 300 > GetGameTimer() ) {
                 HUDText.Draw();
             }

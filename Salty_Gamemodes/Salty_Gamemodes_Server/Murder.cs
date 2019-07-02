@@ -61,7 +61,7 @@ namespace Salty_Gamemodes_Server {
 
             SetTeam( player, (int)Teams.Spectators );
 
-            if( PlayerTeams.ContainsKey( (int)Teams.Civilian ) ? PlayerTeams[(int)Teams.Civilian].Count == 0 : false ) {
+            if( TeamCount((int)Teams.Murderer) == 0 ) {
                 WriteChat( "Civilians dead, murderer wins!" );
                 End();
             }

@@ -11,8 +11,7 @@ using System.Dynamic;
 namespace Salty_Gamemodes_Client {
     class IceCreamMan : BaseGamemode {
 
-        Text goalText;
-        float goalTextTime = 0;
+
 
         Vehicle Truck;
         Vehicle Bike;
@@ -43,30 +42,31 @@ namespace Salty_Gamemodes_Client {
         }
 
         public override void Start() {
+            Game.PlayerPed.IsInvincible = false;
             rand = new Random( GetGameTimer() );
             Game.Player.Character.MaxHealth = 100;
             Game.Player.Character.Health = 100;
-            if( Team == 1 ) {
+            GameTimeText.Position = new System.Drawing.PointF( 0, 0 );
+            if( Team == (int)Teams.Driver ) {
                 SpawnTruck();
+                GoalText.Color = System.Drawing.Color.FromArgb( 200, 0, 0 );
             }
-            if( Team == 2 ) {
+            if( Team == (int)Teams.Runner ) {
                 SpawnBike();
+                GoalText.Color = System.Drawing.Color.FromArgb( 0, 200, 0 );
             }
             WriteChat( "Game starting" );
             base.Start();
         }
 
         public IceCreamMan( Map gameMap, int team ) {
-          
-            goalText = new Text( "", new System.Drawing.PointF( Screen.Width * 0.5f, Screen.Height * 0.3f ), 1f, System.Drawing.Color.FromArgb( 200, 0, 0) );
-            goalText.Centered = true;
 
             if( team == (int)Teams.Driver ) {
-                goalText.Caption = "You are the Ice Cream Man\nDeliver as much ice cream as you can";
+                GoalText.Caption = "You are the Ice Cream Man\nDeliver as much ice cream as you can";
             } else if( team == (int)Teams.Runner ) {
-                goalText.Caption = "Stop the Ice Cream Man\nBangarang!";
+                GoalText.Caption = "Stop the Ice Cream Man\nBangarang!";
             }
-            goalTextTime = GetGameTimer() + (5 * 1000);
+            SetGoalTimer( 5 );
 
             GameWeapons = new Dictionary<string, string>() {
                 { "WEAPON_UNARMED", "Fists" },
@@ -115,6 +115,7 @@ namespace Salty_Gamemodes_Client {
                 }
             }
             if( Team == 2 && !canKill) {
+                Game.PlayerPed.CanBeKnockedOffBike = false;
                 if( !Game.PlayerPed.IsInVehicle()  ) {
                     //Game.PlayerPed.SetIntoVehicle( Bike, VehicleSeat.Driver );
                 }
@@ -124,12 +125,14 @@ namespace Salty_Gamemodes_Client {
                 if( streetName == 3436239235 || crossingName == 3436239235 ) {
                     canKill = true;
                     GiveWeaponToPed( PlayerPedId(), (uint)GetHashKey( "weapon_rpg" ), 100, false, true );
-                    
                 }
             }
 
             if( canKill ) {
-                //Game.Player.SetRunSpeedMultThisFrame( 20 );
+                SetPedMoveRateOverride( PlayerPedId(), 4f );
+                Game.PlayerPed.IsInvincible = true;
+                Game.PlayerPed.Weapons.Current.InfiniteAmmo = true;
+                Game.PlayerPed.Weapons.Current.InfiniteAmmoClip = true;
             }
 
             base.Update();
@@ -154,12 +157,7 @@ namespace Salty_Gamemodes_Client {
                 SpawnBike();
             }
         }
-        
-        public void DrawGoal() {
-            if( goalTextTime > GetGameTimer() ) {
-                goalText.Draw();
-            }
-        }
+
 
         public override void PlayerSpawned( ExpandoObject spawnInfo ) {
             Respawn();
@@ -170,8 +168,9 @@ namespace Salty_Gamemodes_Client {
                 Bike.Delete();
             Game.PlayerPed.Position = PlayerSpawn;
             Bike = await World.CreateVehicle( Bikes[rand.Next(0, Bikes.Count)], Game.PlayerPed.Position, 266.6f );
-            Bike.MaxSpeed = 15;
+            Bike.MaxSpeed = 12;
             Game.PlayerPed.SetIntoVehicle( Bike, VehicleSeat.Driver );
+            SetGameplayCamRelativeHeading( 0 );
         }
 
         public async Task SpawnTruck() {
@@ -219,11 +218,12 @@ namespace Salty_Gamemodes_Client {
         }
 
         public override void HUD() {
-
+            
             HideHudAndRadarThisFrame();
             DrawBaseWeaponHUD();
-            DrawScore();
-            DrawGoal();
+            if( Team == (int)Teams.Driver)
+                DrawScore();
+
 
             base.HUD();
         }
