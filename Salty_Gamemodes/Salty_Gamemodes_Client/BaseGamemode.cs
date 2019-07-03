@@ -318,7 +318,7 @@ namespace Salty_Gamemodes_Client {
         }
 
         public virtual void Events() {
-
+        
             if( GameMap == null )
                 return;
 

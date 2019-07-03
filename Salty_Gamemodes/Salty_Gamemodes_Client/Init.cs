@@ -17,7 +17,7 @@ namespace Salty_Gamemodes_Client
         Vector3 spawnPos = Vector3.Zero;
         public Dictionary<string, Map> Maps = new Dictionary<string, Map>();
 
-        SaltyMenu testMenu;
+        public static SaltyMenu testMenu;
 
         public Init() {
 

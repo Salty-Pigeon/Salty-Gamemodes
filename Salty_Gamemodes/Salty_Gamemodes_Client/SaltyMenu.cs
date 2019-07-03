@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Salty_Gamemodes_Client {
-    class SaltyMenu : BaseScript {
+    public class SaltyMenu : BaseScript {
 
         Vector2 Position;
         Vector2 Size;
@@ -44,6 +44,10 @@ namespace Salty_Gamemodes_Client {
                 MouseClick();
             }
 
+        }
+
+        public void Close() {
+            Init.testMenu = null;
         }
 
         public void MouseClick() {

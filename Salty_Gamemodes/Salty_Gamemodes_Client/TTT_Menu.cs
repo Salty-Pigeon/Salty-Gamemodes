@@ -21,6 +21,7 @@ namespace Salty_Gamemodes_Client {
         }
         public void Test_Click() {
             Debug.WriteLine("Test was clicked");
+            Close();
         }
 
     }
