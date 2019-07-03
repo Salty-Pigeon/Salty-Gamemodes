@@ -33,6 +33,8 @@ namespace Salty_Gamemodes_Client {
 
         public List<SaltyText> WeaponTexts = new List<SaltyText>();
 
+        public Dictionary<int, Dictionary<string, int>> OtherPlayerInfo = new Dictionary<int, Dictionary<string, int>>();
+
         public bool isNoclip = false;
 
         public float lastScroll = 0;
@@ -366,7 +368,7 @@ namespace Salty_Gamemodes_Client {
 
         }
 
-        public void ShowNames() {
+        public virtual void ShowNames() {
             Vector3 position = Game.PlayerPed.ForwardVector;
 
             RaycastResult result = Raycast( Game.PlayerPed.Position, position, 75, IntersectOptions.Peds1, null );
@@ -383,6 +385,27 @@ namespace Salty_Gamemodes_Client {
             }
         }
 
+        public virtual void UpdatePlayerInfo( int entID, string key, int value  ) {
+            if (OtherPlayerInfo.ContainsKey(entID)) {
+                if (OtherPlayerInfo[entID].ContainsKey(key)) {
+                    OtherPlayerInfo[entID][key] = value;
+                }
+                else {
+                    OtherPlayerInfo[entID].Add(key, value);
+                }
+            }
+            else {
+                OtherPlayerInfo.Add(entID, new Dictionary<string, int>() { { key, value } });
+            }
+        }
+
+        public bool GetPlayerBool( int entID, string key ) {
+            if( OtherPlayerInfo.ContainsKey(entID)) {
+                if (OtherPlayerInfo[entID].ContainsKey(key))
+                    return OtherPlayerInfo[entID][key] != 0;
+            }
+            return false;
+        }
 
         public virtual void HUD() {
             if( inGame ) {

@@ -20,7 +20,6 @@ namespace Salty_Gamemodes_Server
         }
 
 
-
         public bool inGame = false;
         public static BaseGamemode ActiveGame;
 
@@ -48,6 +47,7 @@ namespace Salty_Gamemodes_Server
             EventHandlers[ "salty::netAddScore" ] += new Action<Player, int>( AddScoreToPlayer );
             EventHandlers[ "salty::netVoteMap" ] += new Action<Player, string>( MapManager.PlayerVote );
             EventHandlers[ "salty::netJoined" ] += new Action<Player>( PlayerJoined );
+            EventHandlers[ "salty::netUpdatePlayerBool" ] += new Action<Player, string>( UpdatePlayerBool );
 
 
             RegisterCommand( "startTTT", new Action<int, List<object>, string>( ( source, args, raw ) => {
@@ -92,6 +92,10 @@ namespace Salty_Gamemodes_Server
                 ply.TriggerEvent( "salty::UpdateInfo", ActiveGame.ID, ActiveGame.GameTime - GetGameTimer(), ActiveGame.GameMap.Position, ActiveGame.GameMap.Size );
             }
             ActiveGame.PlayerJoined( ply );
+        }
+
+        public void UpdatePlayerBool( [FromSource]Player ply, string key ) {
+            ActiveGame.UpdatePlayerBoolean(ply, key);
         }
 
         private async Task Init_Tick() {

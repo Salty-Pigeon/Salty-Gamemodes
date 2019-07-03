@@ -37,6 +37,7 @@ namespace Salty_Gamemodes_Client
             EventHandlers[ "salty::GiveGun" ] += new Action<string, int>( GiveGun );
             EventHandlers[ "salty::UpdateScore" ] += new Action<int>( UpdateScore );
             EventHandlers[ "salty::UpdateInfo" ] += new Action<int, double, Vector3, Vector3>( UpdateInfo );
+            EventHandlers[ "salty::GMPlayerUpdate" ] += new Action<int, string, int>(UpdatePlayerInfo);
 
             ActiveGame.SetTeam( 0 );
             ActiveGame.SetNoClip( true );
@@ -73,6 +74,10 @@ namespace Salty_Gamemodes_Client
 
         public void UpdateScore( int amount ) {
             ActiveGame.UpdateScore(amount);
+        }
+
+        public void UpdatePlayerInfo(int entID, string key, int value) {
+            ActiveGame.UpdatePlayerInfo(entID, key, value);
         }
 
         public void EndGame() {

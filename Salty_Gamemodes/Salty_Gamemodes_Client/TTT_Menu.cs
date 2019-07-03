@@ -20,6 +20,7 @@ namespace Salty_Gamemodes_Client {
 
         public void Disguise_Click() {
             Debug.WriteLine( "Disguise!" );
+            TriggerServerEvent("salty::netUpdatePlayerBool", "disguised");
             Close();
         }
 

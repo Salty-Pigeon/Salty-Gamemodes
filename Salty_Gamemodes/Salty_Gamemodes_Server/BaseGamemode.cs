@@ -67,6 +67,33 @@ namespace Salty_Gamemodes_Server {
 
         }
 
+        public bool GetPlayerBoolean( Player ply, string key ) {
+            if(PlayerDetails.ContainsKey(ply)) {
+                if (PlayerDetails[ply].ContainsKey(key))
+                    return PlayerDetails[ply][key] != 0;
+            }
+            return false;
+        }
+
+
+        public void UpdatePlayerBoolean( Player ply, string key ) {
+            if (PlayerDetails.ContainsKey(ply)) {
+                if(PlayerDetails[ply].ContainsKey(key)) {
+                    if (PlayerDetails[ply][key] == 1)
+                        PlayerDetails[ply][key] = 0;
+                    else
+                        PlayerDetails[ply][key] = 1;
+                }
+                else {
+                    PlayerDetails[ply].Add(key, 1);
+                }
+            } else {
+                PlayerDetails.Add(ply, new Dictionary<string, int> { { key, 1 } });
+            }
+            TriggerClientEvent("salty::GMPlayerUpdate", ply.Character.NetworkId, key, PlayerDetails[ply][key]);
+            
+        }
+
         public void SpawnClient( Player ply, int team ) {
             ply.TriggerEvent( "salty::StartGame", ID, team, GameLength, GameMap.Position, GameMap.Size, GameMap.GetNextSpawn(team), GameMap.GunSpawns );
         }

@@ -13,7 +13,6 @@ namespace Salty_Gamemodes_Client {
 
 
         public SaltyText TeamText;
-        
 
         public enum Teams {
             Spectators,
@@ -155,6 +154,24 @@ namespace Salty_Gamemodes_Client {
             base.PlayerSpawned( spawnInfo );
         }
 
+        public override void ShowNames() {
+            Vector3 position = Game.PlayerPed.ForwardVector;
+
+            RaycastResult result = Raycast(Game.PlayerPed.Position, position, 75, IntersectOptions.Peds1, null);
+            if (result.DitHitEntity) {
+                if (result.HitEntity != Game.PlayerPed) {
+                    int ent = NetworkGetEntityFromNetworkId(result.HitEntity.NetworkId);
+                    if (GetPlayerBool(ent, "disguised"))
+                        return;
+                    if (IsPedAPlayer(ent)) {
+                        HUDText.Caption = GetPlayerName(GetPlayerPed(ent)).ToString();
+                        lastLooked = GetGameTimer();
+                    }
+                }
+
+            }
+        }
+
         public override void HUD() {
 
             HideReticle();
@@ -178,6 +195,8 @@ namespace Salty_Gamemodes_Client {
 
             base.HUD();
         }
+
+
 
         
         public void DrawWeaponHUD() {
