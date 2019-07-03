@@ -12,7 +12,7 @@ namespace Salty_Gamemodes_Client {
     class TTT : BaseGamemode {
 
 
-        public Text TeamText;
+        public SaltyText TeamText;
         
 
         public enum Teams {
@@ -58,7 +58,8 @@ namespace Salty_Gamemodes_Client {
                 //{ "WEAPON_SNIPERRIFLE", "Sniper" },
                 { "WEAPON_PUMPSHOTGUN", "Pump Shotgun"  },
                 { "WEAPON_MICROSMG", "Micro-SMG" },
-                { "WEAPON_COMBATMG", "Light Machine Gun" }
+                { "WEAPON_COMBATMG", "Light Machine Gun" },
+                { "WEAPON_KINFE", "Knife" }
             };
 
             WeaponSlots = new Dictionary<string, int>() {
@@ -72,6 +73,7 @@ namespace Salty_Gamemodes_Client {
                 //{ "WEAPON_SNIPERRIFLE", 1 },
                 { "WEAPON_PUMPSHOTGUN", 2  },
                 { "WEAPON_COMBATMG", 2 },
+                { "WEAPON_KNIFE", 3 },
             };
 
             WeaponMaxAmmo = new Dictionary<string, int>() {
@@ -85,9 +87,10 @@ namespace Salty_Gamemodes_Client {
                 //{ "WEAPON_SNIPERRIFLE", 1 },
                 { "WEAPON_PUMPSHOTGUN", 24  },
                 { "WEAPON_COMBATMG", 300 },
+                { "WEAPON_KNIFE", 1 },
             };
 
-            TeamText = new Text( "Spectator", new System.Drawing.PointF( Screen.Width * 0.033f, Screen.Height * 0.855f ), 0.5f );
+            TeamText = new SaltyText( 0.033f, 0.855f, 0, 0, 0.5f, "Spectator", 255, 255, 255, 255, false, false, 0, true );
 
             SetTeam( team );
         }
@@ -131,27 +134,31 @@ namespace Salty_Gamemodes_Client {
         }
 
         public override bool CanPickupWeapon( string weaponModel ) {
-            bool canPickup = true;
             if( PlayerWeapons.ContainsKey( WeaponSlots[weaponModel] ) )
-                canPickup = false;
-           
-            return canPickup;
+                return false;
+            return base.CanPickupWeapon( weaponModel );
         }
 
         public override void PlayerPickedUpWeapon( string wepName, int count ) {
             lastScroll = GetGameTimer();
-            PlayerWeapons[WeaponSlots[wepName]] = wepName;
             base.PlayerPickedUpWeapon( wepName, count );
-        }
-
-        public override void PlayerDroppedWeapon( string wepName, int count ) {
-            PlayerWeapons.Remove( WeaponSlots[wepName] );
-            base.PlayerDroppedWeapon( wepName, count );
         }
 
         public override void PlayerDied( int killerType, Vector3 deathcords ) {
             SetTeam( (int)Teams.Spectators );
             base.PlayerDied( killerType, deathcords );
+        }
+
+        public override void RemoveWeaponCheck() {
+            if( Game.PlayerPed.Weapons.Current.Model.ToString() == "Knife" && Team == (int)Teams.Traitors ) 
+                return;
+            
+            if( Game.PlayerPed.Weapons.Current.Hash.ToString() != "Unarmed" && inGame ) {
+                if( !HashToModel.ContainsKey( (uint)Game.PlayerPed.Weapons.Current.Hash.GetHashCode() ) ) {
+                    Debug.WriteLine( "Removing " );
+                    Game.PlayerPed.Weapons.Remove( Game.PlayerPed.Weapons.Current );
+                }
+            }
         }
 
         public override void PlayerSpawned( ExpandoObject spawnInfo ) {
@@ -196,7 +203,7 @@ namespace Salty_Gamemodes_Client {
                     if( !PlayerWeapons.ContainsValue( weapon.Key ) )
                         continue;
                     if( WeaponTexts.Count <= weapon.Value ) {
-                        WeaponTexts.Add( new Text( weapon.Key, new System.Drawing.PointF( Screen.Width * 0.85f, Screen.Height * 0.85f + (offset * 0.4f) ), 0.3f ) );
+                        WeaponTexts.Add( new SaltyText( 0.85f, 0.85f + (offset * 0.4f), 0, 0, 0.3f, weapon.Key, 255, 255, 255, 255, false, false, 0, true ) );
                     }
 
                     if( Game.PlayerPed.Weapons.Current.Hash.GetHashCode() == GetHashKey( weapon.Key ) ) {
@@ -207,7 +214,7 @@ namespace Salty_Gamemodes_Client {
                     }
 
                     WeaponTexts[index].Caption = GameWeapons[weapon.Key];
-                    WeaponTexts[index].Position = new System.Drawing.PointF( Screen.Width * 0.85f, Screen.Height * (0.85f + (offset * 0.04f)) );
+                    WeaponTexts[index].Position = new Vector2( 0.85f, 0.85f + (offset * 0.04f) );
                     WeaponTexts[index].Draw();
                     index++;
                 }
@@ -226,19 +233,19 @@ namespace Salty_Gamemodes_Client {
             switch( team ) {
                 case ((int)Teams.Spectators):
                     TeamText.Caption = "Spectate";
-                    TeamText.Color = System.Drawing.Color.FromArgb( 150, 150, 0 );
+                    TeamText.Colour = System.Drawing.Color.FromArgb( 150, 150, 0 );
                     break;
                 case ((int)Teams.Traitors):
                     TeamText.Caption = "Traitor";
-                    TeamText.Color = System.Drawing.Color.FromArgb( 255, 255, 255 );
+                    TeamText.Colour = System.Drawing.Color.FromArgb( 255, 255, 255 );
                     break;
                 case ((int)Teams.Innocents):
                     TeamText.Caption = "Innocent";
-                    TeamText.Color = System.Drawing.Color.FromArgb( 255, 255, 255 );
+                    TeamText.Colour = System.Drawing.Color.FromArgb( 255, 255, 255 );
                     break;
                 case ((int)Teams.Detectives):
                     TeamText.Caption = "Detective";
-                    TeamText.Color = System.Drawing.Color.FromArgb( 255, 255, 255 );
+                    TeamText.Colour = System.Drawing.Color.FromArgb( 255, 255, 255 );
                     break;
             }
             base.SetTeam( team );

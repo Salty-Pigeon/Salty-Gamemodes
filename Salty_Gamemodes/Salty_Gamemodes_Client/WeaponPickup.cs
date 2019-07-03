@@ -60,12 +60,9 @@ namespace Salty_Gamemodes_Client {
             int wepCount = 0;
             if( GameMap.Gamemode != null )
                 wepCount = GameMap.Gamemode.PlayerWeapons.Count;
-            bool canPickupEvent = true;
-            if( GameMap.Gamemode != null )
-                canPickupEvent = GameMap.Gamemode.CanPickupWeapon( WeaponModel );
 
             if( Position.DistanceToSquared(Game.PlayerPed.Position) <= pickupRange && canPickup ) {
-                if( canPickupEvent ) {
+                if( GameMap.Gamemode.CanPickupWeapon( WeaponModel ) ) {
                     if( wepCount <= 1 ) {
                         GiveWeaponToPed( PlayerPedId(), WeaponHash, AmmoCount, false, true );
                         SetPedAmmo( PlayerPedId(), WeaponHash, AmmoCount );

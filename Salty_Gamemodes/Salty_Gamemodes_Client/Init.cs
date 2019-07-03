@@ -19,6 +19,9 @@ namespace Salty_Gamemodes_Client
 
         public static SaltyMenu testMenu;
 
+        public static int ScreenWidth = 0;
+        public static int ScreenHeight = 0;
+
         public Init() {
 
             RequestStreamedTextureDict("saltyTextures", true);
@@ -39,10 +42,11 @@ namespace Salty_Gamemodes_Client
             ActiveGame.SetNoClip( true );
             Tick += Update;
             SetMaxWantedLevel( 0 );
-
+            GetScreenActiveResolution( ref ScreenWidth, ref ScreenHeight );
         }
 
         public void StartGame( int id, int team, double duration, Vector3 mapPos, Vector3 mapSize, Vector3 startPos, ExpandoObject gunSpawns ) {
+            GetScreenActiveResolution( ref ScreenWidth, ref ScreenHeight );
             if( ActiveGame.inGame )
                 ActiveGame.End();
             ActiveGame.SetNoClip( false );
@@ -123,7 +127,6 @@ namespace Salty_Gamemodes_Client
 
 
         private void SpawnGUI( ExpandoObject mapObj, ExpandoObject spawnObj ) {
-
 
             Dictionary<string, Dictionary<int, List<Vector3>>> spawns = new Dictionary<string, Dictionary<int, List<Vector3>>>();
             
@@ -243,6 +246,10 @@ namespace Salty_Gamemodes_Client
             RegisterCommand("menu", new Action<int, List<object>, string>(( source, args, raw ) => {
                 testMenu = new TTT_Menu(0.5f, 0.5f, 0.2f, 0.2f, System.Drawing.Color.FromArgb(0, 0, 0));
             }), false);
+
+            RegisterCommand( "delmenu", new Action<int, List<object>, string>( ( source, args, raw ) => {
+                testMenu = null;
+            } ), false );
 
             RegisterCommand( "score", new Action<int, List<object>, string>( ( source, args, raw ) => {
                 ActiveGame.AddScore( 1 );

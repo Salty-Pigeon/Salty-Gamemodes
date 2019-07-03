@@ -14,13 +14,14 @@ namespace Salty_Gamemodes_Client {
 
         public Vector3 PlayerSpawn =  Vector3.Zero;
 
-        public Text HealthText;
-        public Text AmmoText;
-        public Text GameTimeText;
-        public Text ScoreText;
-        public Text AddScoreText;
-
-        public Text GoalText;
+        public SaltyText HealthText;
+        public SaltyText AmmoText;
+        public SaltyText GameTimeText;
+        public SaltyText ScoreText;
+        public SaltyText AddScoreText;
+        public SaltyText BoundText;
+        public SaltyText HUDText;
+        public SaltyText GoalText;
         public float GoalTextTime = 0;
 
         public int Score;
@@ -30,7 +31,7 @@ namespace Salty_Gamemodes_Client {
         public double GameTime = 0;
         public bool isTimed = false;
 
-        public List<Text> WeaponTexts = new List<Text>();
+        public List<SaltyText> WeaponTexts = new List<SaltyText>();
 
         public bool isNoclip = false;
 
@@ -49,7 +50,7 @@ namespace Salty_Gamemodes_Client {
             { "WEAPON_UNARMED", 0 },
         };
 
-        private Dictionary<int, string> HashToModel = new Dictionary<int, string>();
+        public Dictionary<uint, string> HashToModel = new Dictionary<uint, string>();
 
         //private Scaleform playerNameHUD = new Scaleform( "mp_mission_name_freemode" );
         //private Scaleform playerNameHUD = new Scaleform( "RACE_MESSAGE" );
@@ -57,8 +58,7 @@ namespace Salty_Gamemodes_Client {
         public Dictionary<string, string> GameWeapons = new Dictionary<string, string>();
         public float lastLooked = 0;
 
-        public Text BoundText;
-        public Text HUDText;
+        
 
         public bool isScoped = false;
 
@@ -74,19 +74,16 @@ namespace Salty_Gamemodes_Client {
         public int Team;
 
         public BaseGamemode() {
-            HealthText = new Text( "Health: ", new System.Drawing.PointF( Screen.Width * 0.033f, Screen.Height * 0.895f ), 0.5f );
-            AmmoText = new Text( "Ammo: ", new System.Drawing.PointF( Screen.Width * 0.033f, Screen.Height * 0.935f ), 0.5f );
+            HealthText = new SaltyText( 0.085f, 0.895f, 0, 0, 0.5f, "Health: ", 255, 255, 255, 255, false, true, 0, true );
+            AmmoText = new SaltyText( 0.085f, 0.935f, 0, 0, 0.5f, "Ammo: ", 255, 255, 255, 255, false, true, 0, true );
 
-            GameTimeText = new Text( "", new System.Drawing.PointF( Screen.Width * 0.1f, Screen.Height * 0.855f ), 0.5f );
-            ScoreText = new Text( "Score: 0", new System.Drawing.PointF( Screen.Width * 0.5f, Screen.Height * 0.01f ), 0.7f, System.Drawing.Color.FromArgb(255,255,255) );
-            AddScoreText = new Text( "", new System.Drawing.PointF( Screen.Width * 0.5f + (ScoreText.Width/2), Screen.Height * 0.025f ), 0.3f, System.Drawing.Color.FromArgb(255,255,255) );
-            ScoreText.Centered = true;
-            BoundText = new Text( "", new System.Drawing.PointF( Screen.Width * 0.2f, Screen.Height * 0.1f ), 1.0f );
-            HUDText = new Text( "", new System.Drawing.PointF( Screen.Width * 0.5f, Screen.Height * 0.5f ), 0.5f );
-            HUDText.Centered = true;
+            GameTimeText = new SaltyText( 0.121f, 0.855f, 0, 0, 0.5f, "", 255, 255, 255, 255, false, true, 0, true );
+            ScoreText = new SaltyText( 0.5f, 0.01f, 0, 0, 0.7f, "Score: 0", 255, 255, 255, 255, false, true, 0, true );
+            AddScoreText = new SaltyText( 0.5f + (ScoreText.Caption.Length), 0.025f, 0, 0, 0.3f, "", 255, 255, 255, 255, false, true, 0, true );
+            BoundText = new SaltyText( 0.2f, 0.1f, 0, 0, 1, "", 255, 255, 255, 255, false, true, 0, true );
+            HUDText = new SaltyText( 0.5f, 0.5f, 0, 0, 0.5f, "", 255, 255, 255, 255, false, true, 0, true );
 
-            GoalText = new Text( "", new System.Drawing.PointF( Screen.Width * 0.5f, Screen.Height * 0.1f ), 1f, System.Drawing.Color.FromArgb( 0, 200, 0 ) );
-            GoalText.Centered = true;
+            GoalText = new SaltyText( 0.5f, 0.1f, 0, 0, 1f, "", 255, 255, 255, 255, false, true, 0, true );
 
             StripWeapons();
 
@@ -101,7 +98,8 @@ namespace Salty_Gamemodes_Client {
             }
 
             foreach( var wep in GameWeapons ) {
-                HashToModel.Add( GetHashKey( wep.Key ), wep.Key );
+                HashToModel.Add( (uint)GetHashKey( wep.Key ), wep.Key );
+                Debug.WriteLine( wep.Key + " : " + GetHashKey( wep.Key ) );
             }
 
             inGame = true;
@@ -165,7 +163,7 @@ namespace Salty_Gamemodes_Client {
             Score = score;
             showScoreTimer = GetGameTimer() + showScoreLength;
             ScoreText.Caption = "Score: " + score;
-            AddScoreText.Position = new System.Drawing.PointF( Screen.Width * 0.5f + (ScoreText.Width / 2), Screen.Height * 0.025f );
+            AddScoreText.Position = new Vector2( 0.5f + (ScoreText.Size.X), 0.025f );
         }
 
         public void AddScore(int offset) {
@@ -180,10 +178,9 @@ namespace Salty_Gamemodes_Client {
 
             if ( lastScroll + (2 * 1000) > GetGameTimer() ) {
                 int index = 0;
-                var resolution = Screen.Resolution;
                 foreach( var weapon in PlayerWeapons ) {
                     if( WeaponTexts.Count <= index ) {
-                        WeaponTexts.Add( new Text( weapon.Value, new System.Drawing.PointF( Screen.Width * 0.85f, Screen.Height * 0.85f + (index * 0.4f) ), 0.3f ) );
+                        WeaponTexts.Add( new SaltyText( 0.85f, 0.85f + (index * 0.4f), 0, 0, 0.3f, weapon.Value, 255, 255, 255, 255, false, false, 0, true ) );
                     }
 
                     if( Game.PlayerPed.Weapons.Current.Hash.GetHashCode() == GetHashKey( weapon.Value ) ) {
@@ -194,7 +191,7 @@ namespace Salty_Gamemodes_Client {
                     }
 
                     WeaponTexts[index].Caption = GameWeapons[weapon.Value];
-                    WeaponTexts[index].Position = new System.Drawing.PointF( Screen.Width * 0.85f, Screen.Height * (0.85f + (index * 0.04f)) );
+                    WeaponTexts[index].Position = new Vector2(0.85f, 0.85f + (index * 0.04f) );
                     WeaponTexts[index].Draw();
 
                     index++;
@@ -335,6 +332,7 @@ namespace Salty_Gamemodes_Client {
                         slot = WeaponSlots[weps.Key];
                     }
                     if( PlayerWeapons.ContainsKey(slot) ) {
+                        Debug.WriteLine( "Removing" );
                         RemoveWeaponFromPed( PlayerPedId(), wepHash );
                     } else {
                         PlayerWeapons.Add( slot, weps.Key );
@@ -344,7 +342,7 @@ namespace Salty_Gamemodes_Client {
 
                 if( !HasPedGotWeapon( PlayerPedId(), wepHash, false ) && PlayerWeapons.ContainsValue( weps.Key ) ) {
                     RemoveWeapon( weps.Key );
-                    WeaponTexts = new List<Text>();
+                    WeaponTexts = new List<SaltyText>();
                     PlayerDroppedWeapon( weps.Key, PlayerWeapons.Count );
                 }
 
@@ -359,13 +357,14 @@ namespace Salty_Gamemodes_Client {
         }
 
         public virtual void PlayerPickedUpWeapon(string wepName, int count) {
-
+            PlayerWeapons[WeaponSlots[wepName]] = wepName;
         }
 
         public virtual void PlayerDroppedWeapon( string wepName, int count ) {
+            PlayerWeapons.Remove( WeaponSlots[wepName] );
 
         }
-        
+
         public void ShowNames() {
             Vector3 position = Game.PlayerPed.ForwardVector;
 
@@ -413,6 +412,16 @@ namespace Salty_Gamemodes_Client {
             }
         }
 
+        public virtual void RemoveWeaponCheck() {
+            if( Game.PlayerPed.Weapons.Current.Hash.ToString() != "Unarmed" && inGame ) {
+                if( !HashToModel.ContainsKey( (uint)Game.PlayerPed.Weapons.Current.Hash.GetHashCode() ) ) {
+                    Debug.WriteLine( "Weapon removed" );
+                    Game.PlayerPed.Weapons.Remove( Game.PlayerPed.Weapons.Current );
+                }
+            }
+                
+        }
+
         public virtual void Update() {
 
             HUD();
@@ -433,10 +442,8 @@ namespace Salty_Gamemodes_Client {
                 Game.PlayerPed.Weapons.Remove( Game.PlayerPed.Weapons.Current );
             }
 
-            if( Game.PlayerPed.Weapons.Current.Hash.ToString() != "Unarmed" && inGame )
-                if( !HashToModel.ContainsKey( Game.PlayerPed.Weapons.Current.Hash.GetHashCode() ) )
-                    Game.PlayerPed.Weapons.Remove( Game.PlayerPed.Weapons.Current );
-                
+            
+
 
             if( isNoclip ) {
                 SetPlayerMayNotEnterAnyVehicle( PlayerId() );
@@ -458,12 +465,14 @@ namespace Salty_Gamemodes_Client {
                         Game.Player.Character.Kill();
                         deathTimer = 0;
                     }
-                    BoundText.Color = System.Drawing.Color.FromArgb( 255, 0, 0 );
+                    BoundText.Colour = System.Drawing.Color.FromArgb( 255, 0, 0 );
                     BoundText.Caption = "You have " + Math.Round( secondsLeft / 1000 ) + " seconds to return or you will die.";
                     BoundText.Draw();
 
                 }
             }
+
+            RemoveWeaponCheck();
 
             if( isTimed && GameTime != 0 ) {
                 if( GameTime - GetGameTimer() < 0 ) {

@@ -46,14 +46,14 @@ namespace Salty_Gamemodes_Client {
             rand = new Random( GetGameTimer() );
             Game.Player.Character.MaxHealth = 100;
             Game.Player.Character.Health = 100;
-            GameTimeText.Position = new System.Drawing.PointF( 0, 0 );
+            GameTimeText.Position = new Vector2( 0, 0 );
             if( Team == (int)Teams.Driver ) {
                 SpawnTruck();
-                GoalText.Color = System.Drawing.Color.FromArgb( 200, 0, 0 );
+                GoalText.Colour = System.Drawing.Color.FromArgb( 200, 0, 0 );
             }
             if( Team == (int)Teams.Runner ) {
                 SpawnBike();
-                GoalText.Color = System.Drawing.Color.FromArgb( 0, 200, 0 );
+                GoalText.Colour = System.Drawing.Color.FromArgb( 0, 200, 0 );
             }
             WriteChat( "Game starting" );
             base.Start();

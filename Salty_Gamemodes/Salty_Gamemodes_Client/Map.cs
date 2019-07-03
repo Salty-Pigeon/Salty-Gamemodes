@@ -104,7 +104,7 @@ namespace Salty_Gamemodes_Client {
             weaponIntervals = new Dictionary<int, string>();
             int i = 0;
             foreach( var wep in Gamemode.GameWeapons ) {
-                if( wep.Key == "WEAPON_UNARMED" )
+                if( wep.Key == "WEAPON_UNARMED" || !WeaponWeights.ContainsKey( wep.Key ) )
                     continue;
                 i += WeaponWeights[wep.Key];
                 weaponIntervals.Add( i, wep.Key );

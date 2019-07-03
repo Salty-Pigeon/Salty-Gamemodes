@@ -61,7 +61,7 @@ namespace Salty_Gamemodes_Client {
             Game.Player.Character.MaxHealth = 100;
             Game.Player.Character.Health = 100;
             if( Team == (int)Teams.Murderer ) {
-                GiveWeaponToPed( PlayerPedId(), (uint)GetHashKey( "WEAPON_KNIFE" ), 1, false, true );
+                GiveWeaponToPed( PlayerPedId(), (uint)GetHashKey( "WEAPON_KNIFE" ), 1, false, false );
             }
             else if( Team == (int)Teams.Civilian ) {
                 RemoveWeaponFromPed( PlayerPedId(), (uint)GetHashKey( "WEAPON_UNARMED" ) );

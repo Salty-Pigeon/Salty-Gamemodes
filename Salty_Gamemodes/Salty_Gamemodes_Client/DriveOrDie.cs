@@ -57,11 +57,11 @@ namespace Salty_Gamemodes_Client {
 
             if( team == (int)Teams.Trucker ) {
                 GoalText.Caption = "Destroy all the bikes";
-                GoalText.Color = System.Drawing.Color.FromArgb( 200, 0, 0 );
+                GoalText.Colour = System.Drawing.Color.FromArgb( 200, 0, 0 );
             }
             else if( team == (int)Teams.Bikie ) {
                 GoalText.Caption = "Dodge the Monster Trucks\nAvoid getting stuck in water and other vehicles or KABOOM!";
-                GoalText.Color = System.Drawing.Color.FromArgb( 0, 200, 0 );
+                GoalText.Colour = System.Drawing.Color.FromArgb( 0, 200, 0 );
             }
             SetGoalTimer( 5 );
 
