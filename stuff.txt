@@ -32,3 +32,7 @@ Murder foot prints
 
 
 TTT menu with OpenIV
+ShowCursorThisFrame
+GetNuiCursorPosition
+
+https://github.com/AppiChudilko/FiveM-Trouble-in-Terrorist-Town/tree/master/resource/TTT/maps
