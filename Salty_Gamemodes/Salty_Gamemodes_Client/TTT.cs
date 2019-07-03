@@ -59,7 +59,7 @@ namespace Salty_Gamemodes_Client {
                 { "WEAPON_PUMPSHOTGUN", "Pump Shotgun"  },
                 { "WEAPON_MICROSMG", "Micro-SMG" },
                 { "WEAPON_COMBATMG", "Light Machine Gun" },
-                { "WEAPON_KINFE", "Knife" }
+                { "WEAPON_KNIFE", "Knife" }
             };
 
             WeaponSlots = new Dictionary<string, int>() {
@@ -149,18 +149,6 @@ namespace Salty_Gamemodes_Client {
             base.PlayerDied( killerType, deathcords );
         }
 
-        public override void RemoveWeaponCheck() {
-            if( Game.PlayerPed.Weapons.Current.Model.ToString() == "Knife" && Team == (int)Teams.Traitors ) 
-                return;
-            
-            if( Game.PlayerPed.Weapons.Current.Hash.ToString() != "Unarmed" && inGame ) {
-                if( !HashToModel.ContainsKey( (uint)Game.PlayerPed.Weapons.Current.Hash.GetHashCode() ) ) {
-                    Debug.WriteLine( "Removing " );
-                    Game.PlayerPed.Weapons.Remove( Game.PlayerPed.Weapons.Current );
-                }
-            }
-        }
-
         public override void PlayerSpawned( ExpandoObject spawnInfo ) {
             Game.Player.Character.MaxHealth = 100;
             Game.Player.Character.Health = 100;
@@ -195,26 +183,22 @@ namespace Salty_Gamemodes_Client {
         public void DrawWeaponHUD() {
             if( lastScroll + (2 * 1000) > GetGameTimer() ) {
                 int index = 0;
-                foreach( var weapon in WeaponSlots ) {
-                    int offset = weapon.Value;
-                    if( PlayerWeapons.Count-1 < offset ) {
-                        offset--;
-                    }
+                foreach( var weapon in WeaponSlots.OrderBy( x => x.Value ) ) {
                     if( !PlayerWeapons.ContainsValue( weapon.Key ) )
                         continue;
                     if( WeaponTexts.Count <= weapon.Value ) {
-                        WeaponTexts.Add( new SaltyText( 0.85f, 0.85f + (offset * 0.4f), 0, 0, 0.3f, weapon.Key, 255, 255, 255, 255, false, false, 0, true ) );
+                        WeaponTexts.Add( new SaltyText( 0.85f, 0.85f + (index * 0.4f), 0, 0, 0.3f, weapon.Key, 255, 255, 255, 255, false, false, 0, true ) );
                     }
 
-                    if( Game.PlayerPed.Weapons.Current.Hash.GetHashCode() == GetHashKey( weapon.Key ) ) {
-                        DrawRectangle( 0.85f, 0.85f + (0.04f * offset), 0.1f, 0.03f, 200, 200, 0, 200 );
+                    if( (uint)Game.PlayerPed.Weapons.Current.Hash.GetHashCode() == (uint)GetHashKey( weapon.Key ) ) {
+                        DrawRectangle( 0.85f, 0.85f + (0.04f * index), 0.1f, 0.03f, 200, 200, 0, 200 );
                     }
                     else {
-                        DrawRectangle( 0.85f, 0.85f + (0.04f * offset), 0.1f, 0.03f, 0, 0, 0, 200 );
+                        DrawRectangle( 0.85f, 0.85f + (0.04f * index), 0.1f, 0.03f, 0, 0, 0, 200 );
                     }
 
                     WeaponTexts[index].Caption = GameWeapons[weapon.Key];
-                    WeaponTexts[index].Position = new Vector2( 0.85f, 0.85f + (offset * 0.04f) );
+                    WeaponTexts[index].Position = new Vector2( 0.85f, 0.85f + (index * 0.04f) );
                     WeaponTexts[index].Draw();
                     index++;
                 }

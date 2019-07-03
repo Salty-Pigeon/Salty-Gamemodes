@@ -99,7 +99,7 @@ namespace Salty_Gamemodes_Client {
 
             foreach( var wep in GameWeapons ) {
                 HashToModel.Add( (uint)GetHashKey( wep.Key ), wep.Key );
-                Debug.WriteLine( wep.Key + " : " + GetHashKey( wep.Key ) );
+                Debug.WriteLine( wep.Key + " : " + (uint)GetHashKey( wep.Key ) );
             }
 
             inGame = true;
@@ -183,7 +183,7 @@ namespace Salty_Gamemodes_Client {
                         WeaponTexts.Add( new SaltyText( 0.85f, 0.85f + (index * 0.4f), 0, 0, 0.3f, weapon.Value, 255, 255, 255, 255, false, false, 0, true ) );
                     }
 
-                    if( Game.PlayerPed.Weapons.Current.Hash.GetHashCode() == GetHashKey( weapon.Value ) ) {
+                    if( (uint)Game.PlayerPed.Weapons.Current.Hash.GetHashCode() == (uint)GetHashKey( weapon.Value ) ) {
                         DrawRectangle( 0.85f, 0.85f + (0.04f * index), 0.1f, 0.03f, 200, 200, 0, 200 );
                     }
                     else {
@@ -210,10 +210,10 @@ namespace Salty_Gamemodes_Client {
 
         public int GetNextWeapon( int offset ) {
             int index = 0;
-            int currentWep = Game.PlayerPed.Weapons.Current.Hash.GetHashCode();
+            uint currentWep = (uint)Game.PlayerPed.Weapons.Current.Hash.GetHashCode();
             var playerWeapons = PlayerWeapons.OrderBy( i => i.Key );
             foreach( var wep in playerWeapons ) {
-                if( GetHashKey( wep.Value ) == currentWep ) {
+                if( (uint)GetHashKey( wep.Value ) == currentWep ) {
 
                     if( index + offset > PlayerWeapons.Count-1 && offset > 0 ) 
                         return playerWeapons.ElementAt( 0 ).Key;
@@ -324,7 +324,7 @@ namespace Salty_Gamemodes_Client {
                 uint wepHash = (uint)GetHashKey( weps.Key  );
                 //uint wepHash = (uint)GetWeaponHashFromPickup( GetHashKey( weps.Value ) );
                 if( HasPedGotWeapon( PlayerPedId(), wepHash, false) && !PlayerWeapons.ContainsValue(weps.Key) ) {
-
+                    Debug.WriteLine( weps.Key + " : something" );
                     int slot;
                     if( WeaponSlots.Count == 1 )
                         slot = PlayerWeapons.Count;
@@ -332,9 +332,10 @@ namespace Salty_Gamemodes_Client {
                         slot = WeaponSlots[weps.Key];
                     }
                     if( PlayerWeapons.ContainsKey(slot) ) {
-                        Debug.WriteLine( "Removing" );
+                        Debug.WriteLine( "Removing!!!" );
                         RemoveWeaponFromPed( PlayerPedId(), wepHash );
                     } else {
+                        Debug.WriteLine( "Adding" );
                         PlayerWeapons.Add( slot, weps.Key );
                     }
                     PlayerPickedUpWeapon(weps.Key, PlayerWeapons.Count);

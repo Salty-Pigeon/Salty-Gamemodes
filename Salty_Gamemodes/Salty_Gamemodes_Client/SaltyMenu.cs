@@ -13,14 +13,10 @@ namespace Salty_Gamemodes_Client {
         public Vector2 Position;
         public Vector2 Size;
         System.Drawing.Color Colour;
-        Vector3 heading; 
 
         List<SaltyButton> Buttons = new List<SaltyButton>();
 
         public SaltyMenu( float x, float y, float width, float height, System.Drawing.Color colour ) {
-            heading.X = GetGameplayCamRelativeHeading();
-            heading.Y = GetGameplayCamRelativePitch();
-
             GetScreenActiveResolution( ref Init.ScreenWidth, ref Init.ScreenHeight );
             Position = new Vector2(x, y);
             Size = new Vector2(width, height);
@@ -46,9 +42,12 @@ namespace Salty_Gamemodes_Client {
 
         public void Draw() {
             ShowCursorThisFrame();
-            SetGameplayCamRelativeHeading( heading.X );
 
-            SetGameplayCamRelativePitch( heading.Y, 1 );
+            DisableControlAction( 0, 24, true );
+            DisableControlAction( 0, 257, true );
+            DisableControlAction( 1, 1, true );
+            DisableControlAction( 1, 2, true );
+
 
             DrawRect( Position.X, Position.Y, Size.X, Size.Y, Colour.R, Colour.G, Colour.B, 255);
 
@@ -56,7 +55,7 @@ namespace Salty_Gamemodes_Client {
                 button.Draw();
             }
 
-            if( IsControlJustPressed(0, 24) ) {
+            if( IsControlJustPressed(0, 237 ) ) {
                 MouseClick();
             }
 
@@ -69,7 +68,6 @@ namespace Salty_Gamemodes_Client {
         public void MouseClick() {
             foreach( var button in Buttons ) {
                 if( button.MouseIntersecting()) {
-                    Debug.WriteLine("Button clicked!");
                     button.Action();
                 }
             }
