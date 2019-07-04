@@ -121,7 +121,6 @@ namespace Salty_Gamemodes_Client {
                         foreach( var x in weaponIntervals ) {      
                             
                             if( index > prevKey && index <= x.Key ) {
-                                Debug.WriteLine( string.Format( "{0} {1} {2} {3}", index, x.Value, x.Key, weaponIntervals.ElementAt( weaponIntervals.Count - 1 ).Key ) );
                                 wepModel = x.Value;
                                 worldModel = Weapons[x.Value];
                                 break;
@@ -172,7 +171,6 @@ namespace Salty_Gamemodes_Client {
 
         public void ClearBlip() {
             if( isVisible ) {
-                Debug.WriteLine( Blip.ToString() );
                 RemoveBlip( ref Blip );
                 isVisible = false;
             }

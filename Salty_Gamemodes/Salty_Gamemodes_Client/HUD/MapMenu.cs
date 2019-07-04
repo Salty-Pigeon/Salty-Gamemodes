@@ -23,12 +23,9 @@ namespace Salty_Gamemodes_Client {
             Menu mapMenu = new Menu( name, subtitle ) { Visible = true };
             MenuController.AddMenu( mapMenu );
 
-            Debug.WriteLine( "Hey" );
-
             foreach( var map in Maps.ToDictionary( x => x.Key, x => x.Value ) ) {
                 Vector3 selectedVector = map.Value.SpawnPoints.ElementAt( 0 ).Value[0];
                 int selectedTeam = map.Value.SpawnPoints.ElementAt( 0 ).Key;
-                Debug.WriteLine( selectedTeam.ToString() );
 
                 Menu mapEditor = AddSubMenu( mapMenu, "Edit " + map.Key );
 
@@ -134,8 +131,6 @@ namespace Salty_Gamemodes_Client {
                 };
 
                 mapMenu.OnIndexChange += ( _menu, _oldItem, _newItem, _oldIndex, _newIndex ) => {
-                    // Code in here would get executed whenever the up or down key is pressed and the index of the menu is changed.
-                    //Debug.WriteLine( $"OnIndexChange: [{_menu}, {_oldItem}, {_newItem}, {_oldIndex}, {_newIndex}]" );
 
                 };
 
@@ -156,68 +151,6 @@ namespace Salty_Gamemodes_Client {
             MenuController.AddSubmenu( parent, subMenu );
             return subMenu;
         }
-
-        public void CreatePosMenu(  ) {
-
-        }
-
-
-                                        /*
-                                 ########################################################
-                                                     Event handlers
-                                 ########################################################
-
-
-                                menu.OnItemSelect += ( _menu, _item, _index ) => {
-                                    // Code in here would get executed whenever an item is pressed.
-                                    Debug.WriteLine( $"OnItemSelect: [{_menu}, {_item}, {_index}]" );
-                                };
-
-                                menu.OnIndexChange += ( _menu, _oldItem, _newItem, _oldIndex, _newIndex ) => {
-                                    // Code in here would get executed whenever the up or down key is pressed and the index of the menu is changed.
-                                    Debug.WriteLine( $"OnIndexChange: [{_menu}, {_oldItem}, {_newItem}, {_oldIndex}, {_newIndex}]" );
-                                };
-
-                                menu.OnListIndexChange += ( _menu, _listItem, _oldIndex, _newIndex, _itemIndex ) => {
-                                    // Code in here would get executed whenever the selected value of a list item changes (when left/right key is pressed).
-                                    Debug.WriteLine( $"OnListIndexChange: [{_menu}, {_listItem}, {_oldIndex}, {_newIndex}, {_itemIndex}]" );
-                                };
-
-                                menu.OnListItemSelect += ( _menu, _listItem, _listIndex, _itemIndex ) => {
-                                    // Code in here would get executed whenever a list item is pressed.
-                                    Debug.WriteLine( $"OnListItemSelect: [{_menu}, {_listItem}, {_listIndex}, {_itemIndex}]" );
-                                };
-
-                                menu.OnSliderPositionChange += ( _menu, _sliderItem, _oldPosition, _newPosition, _itemIndex ) => {
-                                    // Code in here would get executed whenever the position of a slider is changed (when left/right key is pressed).
-                                    Debug.WriteLine( $"OnSliderPositionChange: [{_menu}, {_sliderItem}, {_oldPosition}, {_newPosition}, {_itemIndex}]" );
-                                };
-
-                                menu.OnSliderItemSelect += ( _menu, _sliderItem, _sliderPosition, _itemIndex ) => {
-                                    // Code in here would get executed whenever a slider item is pressed.
-                                    Debug.WriteLine( $"OnSliderItemSelect: [{_menu}, {_sliderItem}, {_sliderPosition}, {_itemIndex}]" );
-                                };
-
-                                menu.OnMenuClose += ( _menu ) => {
-                                    // Code in here gets triggered whenever the menu is closed.
-                                    Debug.WriteLine( $"OnMenuClose: [{_menu}]" );
-                                };
-
-                                menu.OnMenuOpen += ( _menu ) => {
-                                    // Code in here gets triggered whenever the menu is opened.
-                                    Debug.WriteLine( $"OnMenuOpen: [{_menu}]" );
-                                };
-
-                                menu.OnDynamicListItemCurrentItemChange += ( _menu, _dynamicListItem, _oldCurrentItem, _newCurrentItem ) => {
-                                    // Code in here would get executed whenever the value of the current item of a dynamic list item changes.
-                                    Debug.WriteLine( $"OnDynamicListItemCurrentItemChange: [{_menu}, {_dynamicListItem}, {_oldCurrentItem}, {_newCurrentItem}]" );
-                                };
-
-                                menu.OnDynamicListItemSelect += ( _menu, _dynamicListItem, _currentItem ) => {
-                                    // Code in here would get executed whenever a dynamic list item is pressed.
-                                    Debug.WriteLine( $"OnDynamicListItemSelect: [{_menu}, {_dynamicListItem}, {_currentItem}]" );
-                                };
-
-                                   */
+          
     }
 }

@@ -241,7 +241,6 @@ namespace Salty_Gamemodes_Client {
         public virtual void ChangeSelectedWeapon( int offset ) {
             lastScroll = GetGameTimer();
             string lastWepGroup = Game.PlayerPed.Weapons.Current.Group.ToString();
-            Debug.WriteLine( lastWepGroup );
             int next = GetNextWeapon( offset );
             try {
                 int pedId = PlayerPedId();

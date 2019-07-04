@@ -77,23 +77,17 @@ namespace Salty_Gamemodes_Server {
 
 
         public void UpdatePlayerBoolean( Player ply, string key ) {
-            Debug.WriteLine( ply.Name + " : " + key );
             if (PlayerDetails.ContainsKey(ply)) {
-                Debug.WriteLine( "Contains player" );
                 if(PlayerDetails[ply].ContainsKey(key)) {
-                    Debug.WriteLine( "Contains key" );
                     if( PlayerDetails[ply][key] == 1)
                         PlayerDetails[ply][key] = 0;
                     else
                         PlayerDetails[ply][key] = 1;
                 } else {
-                    Debug.WriteLine( "creating key" );
                     PlayerDetails[ply].Add(key, 1);
                 }
             } else {
-                Debug.WriteLine( "creating player and key" );
                 PlayerDetails.Add(ply, new Dictionary<string, int> { { key, 1 } });
-                Debug.WriteLine( "Added : " + ply.Handle.ToString() );
             }
             TriggerClientEvent("salty::GMPlayerUpdate", Convert.ToInt32(ply.Handle), key, PlayerDetails[ply][key]);
             
