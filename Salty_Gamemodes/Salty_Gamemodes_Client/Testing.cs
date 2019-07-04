@@ -12,34 +12,28 @@ namespace Salty_Gamemodes_Client {
 
         Init Init;
 
-        public SaltyMenu testMenu;
-
 
         public Testing( Init init ) {
             Init = init;
         }
-        
-        public void CloseMenu() {
-            testMenu = null;
-        }
+
+        DeadBody test;
 
         public void Update() {
-            if( testMenu != null )
-                testMenu.Draw();
+            if( test != null ) {
+                test.Update();
+            }
         }
 
         public void LoadCommands() {
-            RegisterCommand("menu", new Action<int, List<object>, string>(( source, args, raw ) => {
-                testMenu = new TTT_Menu(0.5f, 0.5f, 0.2f, 0.2f, System.Drawing.Color.FromArgb(0, 0, 0), CloseMenu);
+
+            RegisterCommand("body", new Action<int, List<object>, string>(( source, args, raw ) => {
+                test = new DeadBody( Game.PlayerPed.Position, (uint)Game.PlayerPed.Model.GetHashCode() );
             }), false);
 
-            RegisterCommand("delmenu", new Action<int, List<object>, string>(( source, args, raw ) => {
-                CloseMenu();
-            }), false);
-
-            RegisterCommand("mouse", new Action<int, List<object>, string>(( source, args, raw ) => {
-                Debug.WriteLine(string.Format("{0} {1} {2}", GetGameplayCamRot(0).X, GetGameplayCamRot(0).Y, GetGameplayCamRot(0).Z));
-            }), false);
+            RegisterCommand( "mouse", new Action<int, List<object>, string>( ( source, args, raw ) => {
+                Debug.WriteLine( string.Format( "{0} {1} {2}", GetGameplayCamRot( 0 ).X, GetGameplayCamRot( 0 ).Y, GetGameplayCamRot( 0 ).Z ) );
+            } ), false );
 
             RegisterCommand("heading", new Action<int, List<object>, string>(( source, args, raw ) => {
                 Debug.WriteLine(Game.PlayerPed.Heading.ToString());

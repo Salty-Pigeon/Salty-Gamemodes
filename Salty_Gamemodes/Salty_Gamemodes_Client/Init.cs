@@ -42,6 +42,7 @@ namespace Salty_Gamemodes_Client
             EventHandlers[ "salty::UpdateScore" ] += new Action<int>( UpdateScore );
             EventHandlers[ "salty::UpdateInfo" ] += new Action<int, double, Vector3, Vector3>( UpdateInfo );
             EventHandlers[ "salty::GMPlayerUpdate" ] += new Action<int, string, int>(UpdatePlayerInfo);
+            EventHandlers[ "salty::SpawnDeadBody" ] += new Action<Vector3, int>(SpawnDeadBody);
 
             ActiveGame.SetTeam( 0 );
             ActiveGame.SetNoClip( true );
@@ -76,19 +77,25 @@ namespace Salty_Gamemodes_Client
             ActiveGame.Start();
         }
 
+        public void SpawnDeadBody( Vector3 position, int ply ) {
+            ActiveGame.SpawnDeadBody( position, (uint)GetEntityModel( NetworkGetEntityFromNetworkId( ply ) ) );
+        }
+
         public void UpdateScore( int amount ) {
             ActiveGame.UpdateScore(amount);
         }
 
         public void UpdatePlayerInfo(int entID, string key, int value) {
-            Debug.WriteLine( "Updating " + key + " with value " + value + " for " + GetPlayerName( GetPlayerFromServerId( entID ) ) );
             ActiveGame.UpdatePlayerInfo( GetPlayerFromServerId( entID ), key, value);
         }
 
         public void EndGame() {
             ActiveGame.End();
             ActiveGame = new BaseGamemode();
-            ActiveGame.SetNoClip( true );
+            if( !ActiveGame.isNoclip ) {
+                ActiveGame.noclipPos = ActiveGame.PlayerSpawn;
+                ActiveGame.SetNoClip( true );
+            }
         }
 
         public void UpdateInfo( int id, double duration, Vector3 mapPos, Vector3 mapSize ) {

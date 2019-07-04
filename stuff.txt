@@ -36,3 +36,5 @@ ShowCursorThisFrame
 GetNuiCursorPosition
 
 https://github.com/AppiChudilko/FiveM-Trouble-in-Terrorist-Town/tree/master/resource/TTT/maps
+
+Radar with green square drawn with text with distance m

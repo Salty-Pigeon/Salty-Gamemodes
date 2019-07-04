@@ -53,6 +53,8 @@
     <Compile Include="Base\BaseGamemode.cs" />
     <Compile Include="Gamemodes\DriveOrDie.cs" />
     <Compile Include="Gamemodes\IceCreamMan.cs" />
+    <Compile Include="Gamemodes\TTT\DeadBody.cs" />
+    <Compile Include="Gamemodes\TTT\TTT_DetectiveMenu.cs" />
     <Compile Include="Init.cs" />
     <Compile Include="Base\Map.cs" />
     <Compile Include="HUD\MapMenu.cs" />
@@ -63,8 +65,8 @@
     <Compile Include="UI\SaltyButton.cs" />
     <Compile Include="UI\SaltyMenu.cs" />
     <Compile Include="UI\SaltyText.cs" />
-    <Compile Include="Gamemodes\TTT.cs" />
-    <Compile Include="HUD\TTT_Menu.cs" />
+    <Compile Include="Gamemodes\TTT\TTT.cs" />
+    <Compile Include="Gamemodes\TTT\TTT_TraitorMenu.cs" />
     <Compile Include="UI\VoteMenu.cs" />
     <Compile Include="Base\WeaponPickup.cs" />
   </ItemGroup>

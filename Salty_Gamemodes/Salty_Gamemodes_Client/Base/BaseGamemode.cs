@@ -69,7 +69,6 @@ namespace Salty_Gamemodes_Client {
         public string MapTag = "";
 
         public Vector3 noclipPos = Vector3.Zero;
-        Vector3 deathPos;
         private float deathTimer = 0;
         private float gracePeriod = 10 * 1000;
 
@@ -91,8 +90,8 @@ namespace Salty_Gamemodes_Client {
 
         }
 
-        public virtual void Start() {           
-
+        public virtual void Start() {
+            noclipPos = PlayerSpawn;
             foreach( var wep in GameMap.Weapons.ToList() ) {        
                 if( !GameWeapons.ContainsKey(wep.Key) ) {
                     GameMap.Weapons.Remove( wep.Key );
@@ -278,12 +277,16 @@ namespace Salty_Gamemodes_Client {
             isTimed = true;
         }
 
+        public virtual void SpawnDeadBody( Vector3 position, uint model ) {
+
+        }
+
         public virtual void PlayerKilled( int killerID, ExpandoObject deathData ) {
 
         }
 
         public virtual void PlayerDied( int killerType, Vector3 deathcords ) {
-            deathPos = deathcords;
+            noclipPos = deathcords;
         }
 
         public virtual void PlayerSpawned( ExpandoObject spawnInfo ) {
@@ -550,7 +553,6 @@ namespace Salty_Gamemodes_Client {
 
         public virtual void SetNoClip( bool toggle ) {
             deathTimer = 0;
-            noclipPos = Game.Player.Character.Position;
             isNoclip = toggle;
             SetEntityVisible( PlayerPedId(), !isNoclip, false );
             SetEntityCollision( PlayerPedId(), !isNoclip, !isNoclip );
