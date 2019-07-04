@@ -209,12 +209,16 @@ namespace Salty_Gamemodes_Client {
         bool hasTeleported = false;
         bool isTeleporting = false;
         public void TeleportToSaved( float time ) {
+            if( isTeleporting) {
+                return;
+            }
             if (SavedTeleport == null) {
                 WriteChat("No destination set");
                 return;
             }
             teleportLength = time;
             teleportTime = GetGameTimer() + teleportLength;
+            isTeleporting = true;
         }
 
         public void DoTeleport() {
