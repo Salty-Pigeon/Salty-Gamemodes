@@ -204,6 +204,9 @@ namespace Salty_Gamemodes_Client {
             base.PlayerDied( killerType, deathcords );
         }
 
+
+
+
         float teleportLength;
         float teleportTime = 0;
         bool hasTeleported = false;
