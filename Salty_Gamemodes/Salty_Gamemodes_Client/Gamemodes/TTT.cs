@@ -121,9 +121,9 @@ namespace Salty_Gamemodes_Client {
                 
                 foreach( WeaponPickup wep in GameMap.CreatedWeapons.Values.ToList() ) {
                     if( (wep.WorldModel == Game.PlayerPed.Weapons.Current.Model.GetHashCode()) ) {
-                        WeaponPickup item = new WeaponPickup( GameMap, wep.WeaponModel, wep.WeaponHash, wep.WorldModel, Game.Player.Character.Position, true, 1500, Game.PlayerPed.Weapons.Current.Ammo );
+                        WeaponPickup item = new WeaponPickup( GameMap, wep.WeaponModel, wep.WeaponHash, wep.WorldModel, Game.Player.Character.Position, true, 1500, Game.PlayerPed.Weapons.Current.Ammo, Game.PlayerPed.Weapons.Current.AmmoInClip );
                         item.Throw();
-                        Game.PlayerPed.Weapons.Remove( Game.PlayerPed.Weapons.Current );
+                        RemoveWeapon( wep.WeaponModel, true );
                         break;
                     }
                 }

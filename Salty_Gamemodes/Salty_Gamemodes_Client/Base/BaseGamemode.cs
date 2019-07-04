@@ -236,11 +236,32 @@ namespace Salty_Gamemodes_Client {
             return -1;
         }
 
+        public Dictionary<uint, List<int>> AmmoInClip = new Dictionary<uint, List<int>>();
+
         public virtual void ChangeSelectedWeapon( int offset ) {
             lastScroll = GetGameTimer();
+            string lastWepGroup = Game.PlayerPed.Weapons.Current.Group.ToString();
+            Debug.WriteLine( lastWepGroup );
             int next = GetNextWeapon( offset );
             try {
-                SetCurrentPedWeapon( PlayerPedId(), (uint)GetHashKey( PlayerWeapons[next] ), true );
+                int pedId = PlayerPedId();
+                uint code = (uint)Game.PlayerPed.Weapons.Current.Hash.GetHashCode();
+                if( lastWepGroup != "Melee" && lastWepGroup != "Unarmed" ) {
+                    if( AmmoInClip.ContainsKey( code ) ) {
+                        AmmoInClip[code][0] = Game.PlayerPed.Weapons.Current.AmmoInClip;
+                        AmmoInClip[code][1] = Game.PlayerPed.Weapons.Current.Ammo;
+                    }
+                    else {
+                        AmmoInClip.Add( code, new List<int> { Game.PlayerPed.Weapons.Current.AmmoInClip, Game.PlayerPed.Weapons.Current.Ammo } );
+                    }
+                }
+                uint newCode = (uint)GetHashKey( PlayerWeapons[next] );
+                SetCurrentPedWeapon( pedId, newCode, true );
+                if( AmmoInClip.ContainsKey( newCode ) ) {
+                    SetAmmoInClip( pedId, newCode, AmmoInClip[newCode][0] );
+                    SetPedAmmo( pedId, newCode, AmmoInClip[newCode][1]);
+                    AmmoInClip.Remove( newCode );
+                }
             } catch {
                 Debug.WriteLine( "No weapons" );
             }
@@ -279,6 +300,7 @@ namespace Salty_Gamemodes_Client {
         public void StripWeapons() {
             RemoveAllPedWeapons( PlayerPedId(), true );
             PlayerWeapons = new Dictionary<int, string>() { { 0, "WEAPON_UNARMED" } };
+            AmmoInClip = new Dictionary<uint, List<int>>();
 
         }
 
@@ -302,11 +324,31 @@ namespace Salty_Gamemodes_Client {
             return PlayerWeapons.ContainsValue( weaponModel );
         }
 
-        public void RemoveWeapon( string weaponName ) {
+        public void RemoveWeapon( string weaponName, bool fromPlayer ) {
             foreach( var i in PlayerWeapons.Keys.ToList() )  {
                 if( PlayerWeapons[i] == weaponName )
                     PlayerWeapons.Remove( i );
             }
+            uint key = (uint)GetHashKey( weaponName );
+            if( AmmoInClip.ContainsKey( key )){
+                AmmoInClip.Remove( (uint)GetHashKey( weaponName ) );
+            }
+            if( fromPlayer )
+                RemoveWeaponFromPed( PlayerPedId(), key );
+        }
+
+        public void RemoveWeapon( Weapon removedWeapon ) {
+            string weaponName = HashToModel[(uint)removedWeapon.Hash.GetHashCode()];
+            foreach( var i in PlayerWeapons.Keys.ToList() ) {
+                if( PlayerWeapons[i] == weaponName )
+                    PlayerWeapons.Remove( i );
+            }
+            uint key = (uint)GetHashKey( weaponName );
+            if( AmmoInClip.ContainsKey( key ) ) {
+                AmmoInClip.Remove( (uint)GetHashKey( weaponName ) );
+            }
+
+            Game.PlayerPed.Weapons.Remove( removedWeapon );
         }
 
         public void SetGoalTimer( float time ) {
@@ -344,7 +386,7 @@ namespace Salty_Gamemodes_Client {
                 }
 
                 if( !HasPedGotWeapon( PlayerPedId(), wepHash, false ) && PlayerWeapons.ContainsValue( weps.Key ) ) {
-                    RemoveWeapon( weps.Key );
+                    RemoveWeapon( weps.Key, false );
                     WeaponTexts = new List<SaltyText>();
                     PlayerDroppedWeapon( weps.Key, PlayerWeapons.Count );
                 }
@@ -440,7 +482,7 @@ namespace Salty_Gamemodes_Client {
             if( Game.PlayerPed.Weapons.Current.Hash.ToString() != "Unarmed" && inGame ) {
                 if( !HashToModel.ContainsKey( (uint)Game.PlayerPed.Weapons.Current.Hash.GetHashCode() ) ) {
                     Debug.WriteLine( "Weapon removed" );
-                    Game.PlayerPed.Weapons.Remove( Game.PlayerPed.Weapons.Current );
+                    RemoveWeapon( Game.PlayerPed.Weapons.Current );
                 }
             }
                 
@@ -463,7 +505,7 @@ namespace Salty_Gamemodes_Client {
             }
 
             if( Game.PlayerPed.Weapons.Current.Ammo <= 0 && Game.PlayerPed.Weapons.Current.Group.ToString() != "Melee" ) {
-                Game.PlayerPed.Weapons.Remove( Game.PlayerPed.Weapons.Current );
+                RemoveWeapon( Game.PlayerPed.Weapons.Current );
             }
 
             

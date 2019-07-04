@@ -70,7 +70,7 @@ namespace Salty_Gamemodes_Client {
 
 
         public override void HUD() {
-            
+            HideHudAndRadarThisFrame();
             base.HUD();
         }
 
@@ -78,7 +78,8 @@ namespace Salty_Gamemodes_Client {
             Game.PlayerPed.IsInvincible = true;
             playerList = new PlayerList().ToList();
             playerList.Remove( Game.Player );
-
+            GameTimeText.Position = new Vector2( 0, 0 );
+            GameTimeText.Centre = false;
             if( Team == (int)Teams.Trucker ) {
                 SpawnTruck();
             } else {
@@ -199,10 +200,7 @@ namespace Salty_Gamemodes_Client {
             SetVehicleHandlingFloat( NetworkGetEntityFromNetworkId( Truck.NetworkId ), "CHandlingData", "fCamberStiffnesss", 0.1f );
             SetVehicleHandlingFloat( NetworkGetEntityFromNetworkId( Truck.NetworkId ), "CHandlingData", "fInitialDragCoeff ", 10f );
             SetVehicleHandlingFloat( NetworkGetEntityFromNetworkId( Truck.NetworkId ), "CHandlingData", "fMass", 10000f );
-            SetVehicleHandlingFloat( NetworkGetEntityFromNetworkId( Truck.NetworkId ), "CHandlingData", "fInitialDriveForce", 2f );
-            SetVehicleHandlingFloat( NetworkGetEntityFromNetworkId( Truck.NetworkId ), "CHandlingData", "FTRACTIONSPRINGDELTAMAX", 100f );
             SetVehicleHandlingFloat( NetworkGetEntityFromNetworkId( Truck.NetworkId ), "CHandlingData", "fSteeringLock", 40f );
-            SetVehicleHandlingFloat( NetworkGetEntityFromNetworkId( Truck.NetworkId ), "CHandlingData", "fDownForceModifier", 100f );
             SetVehicleHandlingFloat( NetworkGetEntityFromNetworkId( Truck.NetworkId ), "CHandlingData", "fDriveInertia", 1f );
             SetVehicleHandlingFloat( NetworkGetEntityFromNetworkId( Truck.NetworkId ), "CHandlingData", "fDriveBiasFront", 0.5f );
             SetVehicleHandlingFloat( NetworkGetEntityFromNetworkId( Truck.NetworkId ), "CHandlingData", "fTractionCurveLateral", 25f );
@@ -213,7 +211,6 @@ namespace Salty_Gamemodes_Client {
             SetVehicleHandlingFloat( NetworkGetEntityFromNetworkId( Truck.NetworkId ), "CHandlingData", "fSuspensionReboundDamp", 2f );
             SetVehicleHandlingFloat( NetworkGetEntityFromNetworkId( Truck.NetworkId ), "CHandlingData", "fSuspensionCompDamp", 2f );
             SetVehicleHandlingFloat( NetworkGetEntityFromNetworkId( Truck.NetworkId ), "CHandlingData", "fSuspensionForce", 3f );
-            SetVehicleHandlingFloat( NetworkGetEntityFromNetworkId( Truck.NetworkId ), "CHandlingData", "FCOLLISIONDAMAGEMULT", 0f );
             SetVehicleHasStrongAxles( NetworkGetEntityFromNetworkId( Truck.NetworkId ), true );
             SetVehicleHighGear( NetworkGetEntityFromNetworkId( Truck.NetworkId ), 1 );
 

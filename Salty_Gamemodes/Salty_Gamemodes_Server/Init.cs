@@ -122,6 +122,7 @@ namespace Salty_Gamemodes_Server
 
         public void StartDriveOrDie() {
             ActiveGame = new DriveOrDie( MapManager, (int)Gamemodes.DriveOrDie, "dod" );
+            ActiveGame.CreateGameTimer( 3 * 60 );
             ActiveGame.Start();
         }
 

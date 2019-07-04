@@ -102,7 +102,7 @@ namespace Salty_Gamemodes_Client {
 
         public override void PlayerDroppedWeapon( string wepName, int count ) {
             if( wepName == "WEAPON_PISTOL" ) {
-                WeaponPickup item = new WeaponPickup( GameMap, "WEAPON_PISTOL", (uint)GetHashKey( "WEAPON_PISTOL" ), GetHashKey( "W_PI_PISTOL" ), Game.Player.Character.Position, true, 5000, 1 );
+                WeaponPickup item = new WeaponPickup( GameMap, "WEAPON_PISTOL", (uint)GetHashKey( "WEAPON_PISTOL" ), GetHashKey( "W_PI_PISTOL" ), Game.Player.Character.Position, true, 5000, 1, -1 );
                 item.Throw();
             }
             

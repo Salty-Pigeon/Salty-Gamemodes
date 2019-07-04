@@ -132,12 +132,12 @@ namespace Salty_Gamemodes_Client {
                         }
                         uint pickupHash = (uint)GetHashKey( wepModel );
                         int worldHash = GetHashKey( worldModel );
-                        WeaponPickup item = new WeaponPickup( this, wepModel, pickupHash, worldHash, gunPos, false, 0, Gamemode.WeaponMaxAmmo[wepModel]/3 );
+                        WeaponPickup item = new WeaponPickup( this, wepModel, pickupHash, worldHash, gunPos, false, 0, Gamemode.WeaponMaxAmmo[wepModel]/3, -1 );
                         if( !CreatedWeapons.ContainsKey( wepModel ) )
                             CreatedWeapons.Add( wepModel, item );
                     }
                     else {
-                        WeaponPickup item = new WeaponPickup( this, gunTypes.Key, ( uint)GetHashKey( gunTypes.Key ), GetHashKey( Weapons[gunTypes.Key] ), gunPos, false, 0, Gamemode.WeaponMaxAmmo[gunTypes.Key] / 3 );
+                        WeaponPickup item = new WeaponPickup( this, gunTypes.Key, ( uint)GetHashKey( gunTypes.Key ), GetHashKey( Weapons[gunTypes.Key] ), gunPos, false, 0, Gamemode.WeaponMaxAmmo[gunTypes.Key] / 3, -1 );
                         if( !CreatedWeapons.ContainsKey( gunTypes.Key ) )
                             CreatedWeapons.Add( gunTypes.Key, item );
                     }

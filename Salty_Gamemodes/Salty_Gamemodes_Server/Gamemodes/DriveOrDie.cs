@@ -35,7 +35,7 @@ namespace Salty_Gamemodes_Server {
             }
             if( TeamCount((int)Teams.Bikie) == 0 ) {
                 WriteChat( "All bikers defeated" );
-                //End();
+                End();
             }
             base.PlayerDied( player, killerType, deathcords );
         }
