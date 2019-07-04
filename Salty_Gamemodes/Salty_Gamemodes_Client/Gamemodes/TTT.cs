@@ -160,15 +160,15 @@ namespace Salty_Gamemodes_Client {
             RaycastResult result = Raycast(Game.PlayerPed.Position, position, 75, IntersectOptions.Peds1, null);
             if (result.DitHitEntity) {
                 if (result.HitEntity != Game.PlayerPed) {
-                    int ent = NetworkGetEntityFromNetworkId(result.HitEntity.NetworkId);
-                    if (GetPlayerBool(ent, "disguised"))
+                    int ent = result.HitEntity.Handle;
+                    if( GetPlayerBool( NetworkGetPlayerIndexFromPed( ent ), "disguised" ) ) {
                         return;
+                    }
                     if (IsPedAPlayer(ent)) {
                         HUDText.Caption = GetPlayerName(GetPlayerPed(ent)).ToString();
                         lastLooked = GetGameTimer();
                     }
                 }
-
             }
         }
 

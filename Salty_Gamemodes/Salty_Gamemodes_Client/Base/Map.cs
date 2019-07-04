@@ -126,14 +126,7 @@ namespace Salty_Gamemodes_Client {
                                 worldModel = Weapons[x.Value];
                                 break;
                             }
-                            /*
-                            if( index <= x.Key ) {
-                                Debug.WriteLine( string.Format( "{0} {1} {2} {3}", index, x.Value, x.Key, weaponIntervals.ElementAt( weaponIntervals.Count-1 ).Key ) );
-                                wepModel = prevItem;
-                                worldModel = Weapons[prevItem];
-                                break;
-                            }
-                            */
+
                             prevItem = x.Value;
                             prevKey = x.Key;
                         }

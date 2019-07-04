@@ -81,7 +81,8 @@ namespace Salty_Gamemodes_Client
         }
 
         public void UpdatePlayerInfo(int entID, string key, int value) {
-            ActiveGame.UpdatePlayerInfo(entID, key, value);
+            Debug.WriteLine( "Updating " + key + " with value " + value + " for " + GetPlayerName( GetPlayerFromServerId( entID ) ) );
+            ActiveGame.UpdatePlayerInfo( GetPlayerFromServerId( entID ), key, value);
         }
 
         public void EndGame() {

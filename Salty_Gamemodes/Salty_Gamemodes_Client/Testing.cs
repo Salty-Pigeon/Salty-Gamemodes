@@ -49,6 +49,10 @@ namespace Salty_Gamemodes_Client {
                 Init.ActiveGame.AddScore(1);
             }), false);
 
+            RegisterCommand( "id", new Action<int, List<object>, string>( ( source, args, raw ) => {
+                Debug.WriteLine( Game.Player.Character.NetworkId + " : " + Game.Player.ServerId );
+            } ), false );
+
             RegisterCommand("street", new Action<int, List<object>, string>(( source, args, raw ) => {
                 uint streetName = 0;
                 uint crossingRoad = 0;

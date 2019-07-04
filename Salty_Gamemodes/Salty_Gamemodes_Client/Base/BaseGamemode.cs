@@ -101,7 +101,6 @@ namespace Salty_Gamemodes_Client {
 
             foreach( var wep in GameWeapons ) {
                 HashToModel.Add( (uint)GetHashKey( wep.Key ), wep.Key );
-                Debug.WriteLine( wep.Key + " : " + (uint)GetHashKey( wep.Key ) );
             }
 
             inGame = true;
@@ -330,7 +329,6 @@ namespace Salty_Gamemodes_Client {
                 uint wepHash = (uint)GetHashKey( weps.Key  );
                 //uint wepHash = (uint)GetWeaponHashFromPickup( GetHashKey( weps.Value ) );
                 if( HasPedGotWeapon( PlayerPedId(), wepHash, false) && !PlayerWeapons.ContainsValue(weps.Key) ) {
-                    Debug.WriteLine( weps.Key + " : something" );
                     int slot;
                     if( WeaponSlots.Count == 1 )
                         slot = PlayerWeapons.Count;
@@ -338,10 +336,8 @@ namespace Salty_Gamemodes_Client {
                         slot = WeaponSlots[weps.Key];
                     }
                     if( PlayerWeapons.ContainsKey(slot) ) {
-                        Debug.WriteLine( "Removing!!!" );
                         RemoveWeaponFromPed( PlayerPedId(), wepHash );
                     } else {
-                        Debug.WriteLine( "Adding" );
                         PlayerWeapons.Add( slot, weps.Key );
                     }
                     PlayerPickedUpWeapon(weps.Key, PlayerWeapons.Count);
