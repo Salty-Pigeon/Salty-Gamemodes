@@ -16,6 +16,10 @@ namespace Salty_Gamemodes_Client {
 
         public SaltyMenu TTTMenu;
 
+        public Vector3 SavedTeleport;
+        public bool CanTeleport = false;
+        public bool CanDisguise = false;
+
         public List<DeadBody> DeadBodies = new List<DeadBody>();
 
         public float RadarTime = 0f;
@@ -155,14 +159,30 @@ namespace Salty_Gamemodes_Client {
                 }
             }
 
-            if( IsControlJustPressed( 0, 244 ) && Team == (int)Teams.Traitors ) {
-                if( TTTMenu == null ) {
-                    TTTMenu = new TTT_TraitorMenu( this, 0.5f, 0.8f, 0.2f, 0.15f, System.Drawing.Color.FromArgb(  44, 62, 80 ), CloseTTTMenu );
+            if( IsControlJustPressed( 0, 244 ) ) {
+                if( Team == (int)Teams.Traitors) {
+                    TTTMenu = TTTMenu == null ? new TTT_TraitorMenu(this, 0.5f, 0.8f, 0.2f, 0.15f, System.Drawing.Color.FromArgb(44, 62, 80), CloseTTTMenu) : null;
                 }
-                else {
-                    TTTMenu = null;
+                if( Team == (int)Teams.Detectives) {
+                    TTTMenu = TTTMenu == null ? new TTT_DetectiveMenu(this, 0.5f, 0.8f, 0.2f, 0.15f, System.Drawing.Color.FromArgb(44, 62, 80), CloseTTTMenu) : null;
                 }
             }
+
+            if( IsControlJustPressed(0, 243)) { // Tilde
+                if( CanDisguise )
+                    TriggerServerEvent("salty::netUpdatePlayerBool", "disguised");
+            }
+
+            if ( IsControlJustPressed(0, 19)) { // Left alt
+                if (CanTeleport)
+                    TeleportToSaved(3 * 1000);
+            }
+
+            if( IsControlJustPressed(0, 121)) { // Insert
+                if( CanTeleport )
+                    SavedTeleport = Game.PlayerPed.Position;
+            }
+
             base.Controls();
         }
 
@@ -183,6 +203,39 @@ namespace Salty_Gamemodes_Client {
 
             base.PlayerDied( killerType, deathcords );
         }
+
+        float teleportLength;
+        float teleportTime = 0;
+        bool hasTeleported = false;
+        bool isTeleporting = false;
+        public void TeleportToSaved( float time ) {
+            if (SavedTeleport == null) {
+                WriteChat("No destination set");
+                return;
+            }
+            teleportLength = time;
+            teleportTime = GetGameTimer() + teleportLength;
+        }
+
+        public void DoTeleport() {
+            float gameTime = GetGameTimer();
+            if ( teleportTime > gameTime ) {
+                DisableControlAction(0, 30, true); // Disable movement
+                DisableControlAction(0, 31, true);
+                int alpha = (int)Math.Round(255 * ((teleportTime - gameTime) / (teleportLength / 2)));
+                if ( teleportTime - gameTime <= (teleportLength/2)) {
+                    if( !hasTeleported ) {
+                        hasTeleported = true;
+                        Game.PlayerPed.Position = SavedTeleport;
+                    }
+                    alpha = 255 - alpha;
+                }
+                SetEntityAlpha( PlayerPedId(), alpha, 0 );
+            } else if ( teleportTime < gameTime) {
+                isTeleporting = false;
+            }
+        }
+
 
         public override void SpawnDeadBody( Vector3 position, uint model ) {
             DeadBodies.Add( new DeadBody( position, model ) );
@@ -288,6 +341,12 @@ namespace Salty_Gamemodes_Client {
             DrawWeaponHUD();
             ShowNames();
 
+            if( CanDisguise) {
+                if (GetPlayerBool(NetworkGetPlayerIndexFromPed(PlayerPedId()), "disguised")) {
+                    Debug.WriteLine("Disguised");
+                }
+            }
+            
 
             base.HUD();
         }
@@ -358,6 +417,10 @@ namespace Salty_Gamemodes_Client {
             foreach( var body in DeadBodies ) {
                 if( !IsPedRagdoll( body.ID ) )
                     body.Update();
+            }
+
+            if (isTeleporting) {
+                DoTeleport();
             }
 
             base.Update();

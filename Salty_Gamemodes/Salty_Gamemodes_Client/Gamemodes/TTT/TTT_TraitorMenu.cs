@@ -26,21 +26,22 @@ namespace Salty_Gamemodes_Client {
             Close();
         }
 
+        public void Teleport_Click() {
+            ActiveGame.CanTeleport = true;
+        }
+
         public void Armour_Click() {
             Game.PlayerPed.Armor = 30;
             Close();
         }
 
         public void Disguise_Click() {
-            TriggerServerEvent("salty::netUpdatePlayerBool", "disguised");
+            ActiveGame.CanDisguise = true;
             Close();
         }
 
         public void Knife_Click() {
             GiveWeaponToPed( PlayerPedId(), (uint)GetHashKey("weapon_knife"), 1, false, false );
-            Close();
-        }
-        public void Test_Click() {
             Close();
         }
 
