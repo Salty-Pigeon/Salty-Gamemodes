@@ -61,16 +61,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BaseGamemode.cs" />
-    <Compile Include="Database.cs" />
-    <Compile Include="DriveOrDie.cs" />
-    <Compile Include="IceCreamMan.cs" />
+    <Compile Include="Base\BaseGamemode.cs" />
+    <Compile Include="Base\Database.cs" />
+    <Compile Include="Gamemodes\DriveOrDie.cs" />
+    <Compile Include="Gamemodes\IceCreamMan.cs" />
     <Compile Include="Init.cs" />
-    <Compile Include="Map.cs" />
-    <Compile Include="MapManager.cs" />
-    <Compile Include="Murder.cs" />
+    <Compile Include="Base\Map.cs" />
+    <Compile Include="Base\MapManager.cs" />
+    <Compile Include="Gamemodes\Murder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TTT.cs" />
+    <Compile Include="Gamemodes\TTT.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

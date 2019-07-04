@@ -11,7 +11,7 @@ namespace Salty_Gamemodes_Client {
     class TTT_Menu : SaltyMenu {
 
 
-        public TTT_Menu( float x, float y, float width, float height, System.Drawing.Color colour ) : base ( x, y, width, height, colour ) {
+        public TTT_Menu( float x, float y, float width, float height, System.Drawing.Color colour, Action OnClose ) : base ( x, y, width, height, colour, OnClose ) {
             AddTextButton("Test", 1f, 1f, 0.1f, 0.1f, System.Drawing.Color.FromArgb(200, 0, 0), Test_Click);
             Debug.WriteLine( HasStreamedTextureDictLoaded( "saltyTextures" ).ToString() );
             AddSpriteButton( "mask", 0f, 0f, 0.1f, 0.2f, 0, Disguise_Click );

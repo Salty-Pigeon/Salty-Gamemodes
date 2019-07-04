@@ -14,13 +14,16 @@ namespace Salty_Gamemodes_Client {
         public Vector2 Size;
         System.Drawing.Color Colour;
 
+        Action OnClose;
+
         List<SaltyButton> Buttons = new List<SaltyButton>();
 
-        public SaltyMenu( float x, float y, float width, float height, System.Drawing.Color colour ) {
+        public SaltyMenu( float x, float y, float width, float height, System.Drawing.Color colour, Action OnClose ) {
             GetScreenActiveResolution( ref Init.ScreenWidth, ref Init.ScreenHeight );
             Position = new Vector2(x, y);
             Size = new Vector2(width, height);
             Colour = colour;
+            this.OnClose = OnClose;
         }
 
         public void AddSpriteButton( string texture, float x, float y, float width, float height, float rotation, Action action ) {
@@ -62,7 +65,7 @@ namespace Salty_Gamemodes_Client {
         }
 
         public void Close() {
-            Init.testMenu = null;
+            OnClose();
         }
 
         public void MouseClick() {

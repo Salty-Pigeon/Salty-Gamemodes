@@ -116,6 +116,10 @@ namespace Salty_Gamemodes_Client {
             GameTimeText.Draw();
         }
 
+        public void GiveGun( string weapon, int ammo ) {
+            GiveWeaponToPed(PlayerPedId(), (uint)GetHashKey(weapon), ammo, false, true);
+        }
+
         public void DrawBaseHealthHUD() {
 
             HideHudAndRadarThisFrame();
