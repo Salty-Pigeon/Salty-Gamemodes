@@ -115,6 +115,8 @@ namespace Salty_Gamemodes_Client {
 
         public override void Start() {
 
+            NetworkSetVoiceChannel( 1 );
+
             foreach( var player in new PlayerList() ) {
                 uint model = (uint)player.Character.Model.Hash;
                 if( !HasModelLoaded( model ) ) {
@@ -446,18 +448,22 @@ namespace Salty_Gamemodes_Client {
                 case ((int)Teams.Spectators):
                     TeamText.Caption = "Spectate";
                     TeamText.Colour = System.Drawing.Color.FromArgb( 150, 150, 0 );
+                    NetworkSetVoiceChannel( 0 );
                     break;
                 case ((int)Teams.Traitors):
                     TeamText.Caption = "Traitor";
                     TeamText.Colour = System.Drawing.Color.FromArgb( 255, 255, 255 );
+                    NetworkSetVoiceChannel( 1 );
                     break;
                 case ((int)Teams.Innocents):
                     TeamText.Caption = "Innocent";
                     TeamText.Colour = System.Drawing.Color.FromArgb( 255, 255, 255 );
+                    NetworkSetVoiceChannel( 1 );
                     break;
                 case ((int)Teams.Detectives):
                     TeamText.Caption = "Detective";
                     TeamText.Colour = System.Drawing.Color.FromArgb( 255, 255, 255 );
+                    NetworkSetVoiceChannel( 1 );
                     break;
             }
             base.SetTeam( team );
