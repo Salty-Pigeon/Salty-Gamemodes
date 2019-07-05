@@ -66,7 +66,6 @@ namespace Salty_Gamemodes_Server {
                 Player traitor = players[traitorID];
                 SetTeam( traitor, (int)Teams.Traitors );
                 SpawnClient( traitor, (int)Teams.Traitors );
-                TriggerClientEvent( "salty::GMPlayerUpdate", Convert.ToInt32( traitor.Handle ), "Team", (int)Teams.Traitors );
                 players.RemoveAt( traitorID );
             }
 
@@ -81,7 +80,12 @@ namespace Salty_Gamemodes_Server {
         public override void PlayerDied( [FromSource] Player player, int killerType, Vector3 deathcords ) {
             SetTeam(player, (int)Teams.Spectators);
             TriggerClientEvent( "salty::SpawnDeadBody", deathcords, Convert.ToInt32( player.Handle ) );
+            if( GetTeam(player) == (int)Teams.Traitors ) {
+                GameTime += 30 * 1000;
+            }
+            foreach( var ply in InGamePlayers ) {
 
+            }
             base.PlayerDied(player, killerType, deathcords);
         }
 

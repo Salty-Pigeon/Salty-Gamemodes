@@ -31,6 +31,11 @@ namespace Salty_Gamemodes_Client {
             
         }
 
+        public void Discovered() {
+            isDiscovered = true;
+            Caption = Name + "'s dead body";
+        }
+
         public void View() {
 
         }

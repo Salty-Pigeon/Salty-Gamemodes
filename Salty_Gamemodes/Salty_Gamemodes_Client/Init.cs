@@ -44,6 +44,7 @@ namespace Salty_Gamemodes_Client
             EventHandlers[ "salty::GMPlayerUpdate" ] += new Action<int, string, int>(UpdatePlayerInfo);
             EventHandlers[ "salty::SpawnDeadBody" ] += new Action<Vector3, int>(SpawnDeadBody);
             EventHandlers[ "salty::UpdateDeadBody" ] += new Action<int>(ViewDeadBody);
+            EventHandlers[ "salty::UpdateGameTime" ] += new Action<double>(UpdateGameTime);
             ActiveGame.noclipPos = Game.PlayerPed.Position;
             ActiveGame.SetTeam( 0 );
             ActiveGame.SetNoClip( true );
@@ -106,6 +107,10 @@ namespace Salty_Gamemodes_Client
                 ActiveGame.SetNoClip( true );
             }
         }
+        public void UpdateGameTime( double time ) {
+            ActiveGame.GameTime += time;
+        }
+
 
         public void UpdateInfo( int id, double duration, Vector3 mapPos, Vector3 mapSize ) {
             Map map = new Map( mapPos, mapSize, "" );

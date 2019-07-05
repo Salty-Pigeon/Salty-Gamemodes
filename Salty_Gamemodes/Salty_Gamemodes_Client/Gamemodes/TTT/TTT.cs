@@ -143,7 +143,6 @@ namespace Salty_Gamemodes_Client {
             TTTMenu = null;
         }
 
-
         public override void Controls() {
 
             //if( Team == 0 )
@@ -273,7 +272,7 @@ namespace Salty_Gamemodes_Client {
 
         public void BodyDiscovered( int body ) {
             if( !DeadBodies[body].isDiscovered ) {
-                DeadBodies[body].isDiscovered = true;
+                DeadBodies[body].Discovered();
                 WriteChat( "TTT", DeadBodies[body].Name + "'s body has been discovered", 255, 0, 0 );
             }
         }
@@ -291,7 +290,7 @@ namespace Salty_Gamemodes_Client {
 
         public void ShowTraitors() {
             foreach( var ply in OtherPlayerInfo ) {
-                if( ply.Value["Team"] == (int)Teams.Traitors ) {
+                if( GetTeam(ply.Key) == (int)Teams.Traitors ) {
                     Vector3 pos = GetEntityCoords( GetPlayerPed( ply.Key ), true ) + new Vector3( 0, 0, Game.PlayerPed.HeightAboveGround);
                     DrawSpriteOrigin( pos, "traitor", 0.02f, 0.03f, 0 );
                 }
@@ -322,19 +321,25 @@ namespace Salty_Gamemodes_Client {
                 Vector3 Position = GetPedBoneCoords( body.Value.ID, (int)Bone.SKEL_ROOT, 0, 0, 0 );
 
                 if( !body.Value.isDiscovered )
-                    DrawText3D( Position, Game.PlayerPed.Position, body.Value.Caption, 0.3f, 200, 200, 0, 255, 2 );
-                else
                     DrawText3D( Position, Game.PlayerPed.Position, body.Value.Caption, 0.3f, 255, 255, 0, 255, 2 );
+                else
+                    DrawText3D( Position, Game.PlayerPed.Position, body.Value.Caption, 0.3f, 255, 255, 255, 255, 2 );
+            }
+        }
+
+
+        public void UpdateRadar() {
+            RadarPositions = new List<Vector3>();
+            RadarTime += RadarScanTime;
+            foreach( var ply in GetInGamePlayers() ) {
+                RadarPositions.Add( GetEntityCoords( GetPlayerPed(ply), true ) );
             }
         }
 
         public void SetRadarActive( bool active ) {
             if( isRadarActive )
                 return;
-            RadarPositions = new List<Vector3>();
-            foreach( var ply in new PlayerList() ) {
-                RadarPositions.Add( ply.Character.Position );
-            }
+            UpdateRadar();
             RadarTime = GetGameTimer() + RadarScanTime;
             isRadarActive = active;
         }
@@ -342,11 +347,8 @@ namespace Salty_Gamemodes_Client {
         public void ShowRadar() {
 
             if( RadarTime < GetGameTimer() ) {
-                RadarPositions = new List<Vector3>();
                 RadarTime += RadarScanTime;
-                foreach( var ply in new PlayerList() ) {
-                    RadarPositions.Add( ply.Character.Position );
-                }
+                UpdateRadar();
             }
 
             foreach( var pos in RadarPositions ) {
@@ -417,7 +419,7 @@ namespace Salty_Gamemodes_Client {
                     }
 
                     if( (uint)Game.PlayerPed.Weapons.Current.Hash.GetHashCode() == (uint)GetHashKey( weapon.Key ) ) {
-                        DrawRectangle( 0.85f, 0.85f + (0.04f * index), 0.1f, 0.03f, 200, 200, 0, 200 );
+                        DrawRectangle( 0.85f, 0.85f + (0.04f * index), 0.1f, 0.03f, 230, 230, 0, 200 );
                     }
                     else {
                         DrawRectangle( 0.85f, 0.85f + (0.04f * index), 0.1f, 0.03f, 0, 0, 0, 200 );

@@ -75,6 +75,7 @@ namespace Salty_Gamemodes_Client {
         public int Team;
 
         public BaseGamemode() {
+            OtherPlayerInfo = new Dictionary<int, Dictionary<string, int>>();
             noclipPos = Game.PlayerPed.Position;
             HealthText = new SaltyText( 0.085f, 0.895f, 0, 0, 0.5f, "Health: ", 255, 255, 255, 255, false, true, 0, true );
             AmmoText = new SaltyText( 0.085f, 0.935f, 0, 0, 0.5f, "Ammo: ", 255, 255, 255, 255, false, true, 0, true );
@@ -140,7 +141,7 @@ namespace Salty_Gamemodes_Client {
 
             DrawRectangle( 0.025f, 0.94f, 0.12f, 0.03f, 0, 0, 0, 200 );
 
-            DrawRectangle( 0.025f, 0.94f, ammoPercent * 0.12f, 0.03f, 200, 200, 0, 200 );
+            DrawRectangle( 0.025f, 0.94f, ammoPercent * 0.12f, 0.03f, 230, 230, 0, 200 );
 
             HealthText.Draw();
             AmmoText.Draw();
@@ -160,6 +161,24 @@ namespace Salty_Gamemodes_Client {
                 }
                 AddScoreText.Draw();
             }
+        }
+
+        public List<int> GetInGamePlayers() {
+            List<int> players = new List<int>();
+            foreach( var ply in OtherPlayerInfo ) {
+                if( GetTeam(ply.Key) != 0 ) {
+                    players.Add( ply.Key );
+                }
+            }
+            return players;
+        }
+
+        public int GetTeam( int ply ) {
+            if( OtherPlayerInfo.ContainsKey( ply ) ) {
+                if( OtherPlayerInfo[ply].ContainsKey( "Team" ) )
+                    return OtherPlayerInfo[ply]["Team"];
+            }
+            return 0;
         }
 
         public void UpdateScore( int score ) {
@@ -188,7 +207,7 @@ namespace Salty_Gamemodes_Client {
                     }
 
                     if( (uint)Game.PlayerPed.Weapons.Current.Hash.GetHashCode() == (uint)GetHashKey( weapon.Value ) ) {
-                        DrawRectangle( 0.85f, 0.85f + (0.04f * index), 0.1f, 0.03f, 200, 200, 0, 200 );
+                        DrawRectangle( 0.85f, 0.85f + (0.04f * index), 0.1f, 0.03f, 230, 230, 0, 200 );
                     }
                     else {
                         DrawRectangle( 0.85f, 0.85f + (0.04f * index), 0.1f, 0.03f, 0, 0, 0, 200 );
@@ -476,7 +495,11 @@ namespace Salty_Gamemodes_Client {
             }
         }
 
-        public virtual void UpdatePlayerInfo( int entID, string key, int value  ) {
+        public virtual void OnUpdatedPlayerInfo( int entID, string key, int value ) {
+
+        }
+
+        public void UpdatePlayerInfo( int entID, string key, int value  ) {
             if (OtherPlayerInfo.ContainsKey(entID)) {
                 if (OtherPlayerInfo[entID].ContainsKey(key)) {
                     OtherPlayerInfo[entID][key] = value;
@@ -488,6 +511,7 @@ namespace Salty_Gamemodes_Client {
             else {
                 OtherPlayerInfo.Add(entID, new Dictionary<string, int>() { { key, value } });
             }
+            OnUpdatedPlayerInfo( entID, key, value );
         }
 
         public bool GetPlayerBool( int entID, string key ) {

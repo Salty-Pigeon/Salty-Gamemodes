@@ -45,6 +45,10 @@ namespace Salty_Gamemodes_Server {
         public virtual void Start() {
             if ( isTimed )
                 GameTime = GetGameTimer() + GameLength;
+
+            foreach( var ply in InGamePlayers ) {
+                TriggerClientEvent( "salty::GMPlayerUpdate", Convert.ToInt32( ply.Handle ), "Team", GetTeam(ply) );
+            }
         }
 
         public virtual void End() {
