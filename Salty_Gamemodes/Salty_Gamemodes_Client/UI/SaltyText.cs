@@ -25,7 +25,7 @@ namespace Salty_Gamemodes_Client {
             Size = new Vector2( width, height );
             Scale = scale;
             Caption = text;
-            Colour = System.Drawing.Color.FromArgb( r, g, b, a );
+            Colour = System.Drawing.Color.FromArgb( a, r, g, b);
             Outline = outline;
             Centre = centre;
             Font = font;

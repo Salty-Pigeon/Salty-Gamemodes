@@ -28,7 +28,7 @@ namespace Salty_Gamemodes_Client {
         public void LoadCommands() {
 
             RegisterCommand("body", new Action<int, List<object>, string>(( source, args, raw ) => {
-                test = new DeadBody( Game.PlayerPed.Position, (uint)Game.PlayerPed.Model.GetHashCode() );
+                test = new DeadBody( Game.PlayerPed.Position, PlayerPedId(), PlayerId() );
             }), false);
 
             RegisterCommand( "mouse", new Action<int, List<object>, string>( ( source, args, raw ) => {

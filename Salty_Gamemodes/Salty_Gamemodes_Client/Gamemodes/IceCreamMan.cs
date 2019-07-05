@@ -56,7 +56,7 @@ namespace Salty_Gamemodes_Client {
                 SpawnBike();
                 GoalText.Colour = System.Drawing.Color.FromArgb( 0, 200, 0 );
             }
-            WriteChat( "Game starting" );
+            WriteChat( "Ice Cream Man", "Game starting", 255, 0, 0 );
             base.Start();
         }
 
@@ -91,7 +91,7 @@ namespace Salty_Gamemodes_Client {
         }
 
         public override void PlayerPickedUpWeapon( string wepName, int count ) {
-            WriteChat( "Picked up " + wepName );
+            WriteChat( "Ice Cream Man", "Picked up " + wepName, 255, 0, 0 );
             base.PlayerPickedUpWeapon( wepName, count );
         }
 

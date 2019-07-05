@@ -43,7 +43,8 @@ namespace Salty_Gamemodes_Client
             EventHandlers[ "salty::UpdateInfo" ] += new Action<int, double, Vector3, Vector3>( UpdateInfo );
             EventHandlers[ "salty::GMPlayerUpdate" ] += new Action<int, string, int>(UpdatePlayerInfo);
             EventHandlers[ "salty::SpawnDeadBody" ] += new Action<Vector3, int>(SpawnDeadBody);
-
+            EventHandlers[ "salty::UpdateDeadBody" ] += new Action<int>(ViewDeadBody);
+            ActiveGame.noclipPos = Game.PlayerPed.Position;
             ActiveGame.SetTeam( 0 );
             ActiveGame.SetNoClip( true );
             Tick += Update;
@@ -78,7 +79,15 @@ namespace Salty_Gamemodes_Client
         }
 
         public void SpawnDeadBody( Vector3 position, int ply ) {
-            ActiveGame.SpawnDeadBody( position, (uint)GetEntityModel( NetworkGetEntityFromNetworkId( ply ) ) );
+            if( ActiveGame is TTT ) {
+                (ActiveGame as TTT).SpawnDeadBody( position, ply );
+            }
+        }
+
+        public void ViewDeadBody( int body ) {
+            if( ActiveGame is TTT ) {
+                (ActiveGame as TTT).BodyDiscovered( body );
+            }
         }
 
         public void UpdateScore( int amount ) {
@@ -93,7 +102,7 @@ namespace Salty_Gamemodes_Client
             ActiveGame.End();
             ActiveGame = new BaseGamemode();
             if( !ActiveGame.isNoclip ) {
-                ActiveGame.noclipPos = ActiveGame.PlayerSpawn;
+                ActiveGame.noclipPos = Game.PlayerPed.Position;
                 ActiveGame.SetNoClip( true );
             }
         }

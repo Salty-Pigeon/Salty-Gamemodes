@@ -75,13 +75,14 @@ namespace Salty_Gamemodes_Client {
         public int Team;
 
         public BaseGamemode() {
+            noclipPos = Game.PlayerPed.Position;
             HealthText = new SaltyText( 0.085f, 0.895f, 0, 0, 0.5f, "Health: ", 255, 255, 255, 255, false, true, 0, true );
             AmmoText = new SaltyText( 0.085f, 0.935f, 0, 0, 0.5f, "Ammo: ", 255, 255, 255, 255, false, true, 0, true );
 
             GameTimeText = new SaltyText( 0.121f, 0.855f, 0, 0, 0.5f, "", 255, 255, 255, 255, false, true, 0, true );
             ScoreText = new SaltyText( 0.5f, 0.01f, 0, 0, 0.7f, "Score: 0", 255, 255, 255, 255, false, true, 0, true );
             AddScoreText = new SaltyText( 0.5f + (ScoreText.Caption.Length), 0.025f, 0, 0, 0.3f, "", 255, 255, 255, 255, false, true, 0, true );
-            BoundText = new SaltyText( 0.2f, 0.1f, 0, 0, 1, "", 255, 255, 255, 255, false, true, 0, true );
+            BoundText = new SaltyText( 0.5f, 0.1f, 0, 0, 1, "", 255, 255, 255, 255, true, true, 0, true );
             HUDText = new SaltyText( 0.5f, 0.5f, 0, 0, 0.5f, "", 255, 255, 255, 255, false, true, 0, true );
 
             GoalText = new SaltyText( 0.5f, 0.1f, 0, 0, 1f, "", 255, 255, 255, 255, false, true, 0, true );
@@ -91,7 +92,6 @@ namespace Salty_Gamemodes_Client {
         }
 
         public virtual void Start() {
-            noclipPos = PlayerSpawn;
             foreach( var wep in GameMap.Weapons.ToList() ) {        
                 if( !GameWeapons.ContainsKey(wep.Key) ) {
                     GameMap.Weapons.Remove( wep.Key );
@@ -277,10 +277,6 @@ namespace Salty_Gamemodes_Client {
             isTimed = true;
         }
 
-        public virtual void SpawnDeadBody( Vector3 position, uint model ) {
-
-        }
-
         public virtual void PlayerKilled( int killerID, ExpandoObject deathData ) {
 
         }
@@ -410,6 +406,57 @@ namespace Salty_Gamemodes_Client {
         public virtual void PlayerDroppedWeapon( string wepName, int count ) {
             PlayerWeapons.Remove( WeaponSlots[wepName] );
 
+        }
+        
+        public void DrawText3D( Vector3 pos, string text, float scale, int r, int g, int b, int a, float minDistance ) {
+            float x = 0, y = 0;
+            bool offScreen = Get_2dCoordFrom_3dCoord( pos.X, pos.Y, pos.Z, ref x, ref y );
+
+            if( offScreen )
+                return;
+
+            Vector3 camPos = GetGameplayCamCoords();
+            float dist = GetDistanceBetweenCoords( pos.X, pos.Y, pos.Z, camPos.X, camPos.Y, camPos.Z, true );
+            if( dist > minDistance )
+                return;
+
+            SetTextScale( scale, scale );
+            SetTextFont( 0 );
+            SetTextProportional( true );
+            SetTextColour( r, g, b, a );
+            SetTextDropshadow( 0, 0, 0, 0, 55 );
+            SetTextEdge( 2, 0, 0, 0, 150 );
+            SetTextDropShadow();
+            SetTextOutline();
+            SetTextEntry( "STRING" );
+            SetTextCentre( true );
+            AddTextComponentString( text );
+            DrawText( x, y );
+        }
+
+        public void DrawText3D( Vector3 pos, Vector3 camPos, string text, float scale, int r, int g, int b, int a, float minDistance ) {
+            float x = 0, y = 0;
+            bool offScreen = Get_2dCoordFrom_3dCoord( pos.X, pos.Y, pos.Z, ref x, ref y );
+
+            if( offScreen )
+                return;
+
+            float dist = GetDistanceBetweenCoords( pos.X, pos.Y, pos.Z, camPos.X, camPos.Y, camPos.Z, true );
+            if( dist > minDistance )
+                return;
+
+            SetTextScale( scale, scale );
+            SetTextFont( 0 );
+            SetTextProportional( true );
+            SetTextColour( r, g, b, a );
+            SetTextDropshadow( 0, 0, 0, 0, 55 );
+            SetTextEdge( 2, 0, 0, 0, 150 );
+            SetTextDropShadow();
+            SetTextOutline();
+            SetTextEntry( "STRING" );
+            SetTextCentre( true );
+            AddTextComponentString( text );
+            DrawText( x, y );
         }
 
         public virtual void ShowNames() {
@@ -551,7 +598,17 @@ namespace Salty_Gamemodes_Client {
             
         }
 
+        public void DrawSpriteOrigin( Vector3 pos, string texture, float width, float height, float rotation ) {
+            SetDrawOrigin( pos.X, pos.Y, pos.Z, 0 );
+            DrawSprite( "saltyTextures", texture, 0, 0, width, height, rotation, 255, 255, 255, 255 );
+            ClearDrawOrigin();
+        }
+
+
+
         public virtual void SetNoClip( bool toggle ) {
+            if( noclipPos == Vector3.Zero )
+                noclipPos = Game.PlayerPed.Position;
             deathTimer = 0;
             isNoclip = toggle;
             SetEntityVisible( PlayerPedId(), !isNoclip, false );
@@ -559,6 +616,7 @@ namespace Salty_Gamemodes_Client {
             SetEntityInvincible( PlayerPedId(), isNoclip );
             SetEveryoneIgnorePlayer( PlayerPedId(), isNoclip );
         }
+
 
         private void NoClipUpdate() {
             SetEntityCoordsNoOffset( PlayerPedId(), noclipPos.X, noclipPos.Y, noclipPos.Z, false, false, false );
@@ -618,10 +676,10 @@ namespace Salty_Gamemodes_Client {
            
         }
 
-        public void WriteChat( string str ) {
+        public void WriteChat( string prefix, string str, int r, int g, int b ) {
             TriggerEvent( "chat:addMessage", new {
-                color = new[] { 255, 0, 0 },
-                args = new[] { GetType().ToString() , str }
+                color = new[] { r, g, b },
+                args = new[] { prefix, str }
             } );
         }
 

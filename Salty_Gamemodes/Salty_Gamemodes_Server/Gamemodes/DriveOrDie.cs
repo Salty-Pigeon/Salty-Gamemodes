@@ -34,7 +34,7 @@ namespace Salty_Gamemodes_Server {
                 SetTeam( player, (int)Teams.Trucker );
             }
             if( TeamCount((int)Teams.Bikie) == 0 ) {
-                WriteChat( "All bikers defeated" );
+                WriteChat( "Drive or Die", "All bikers defeated", 255, 0, 0 );
                 End();
             }
             base.PlayerDied( player, killerType, deathcords );

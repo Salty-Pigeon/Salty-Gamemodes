@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 namespace Salty_Gamemodes_Server {
     class TTT : BaseGamemode {
 
+        public Dictionary<int, bool> DeadBodies = new Dictionary<int, bool>();
 
         public enum Teams {
             Spectators,
@@ -34,18 +35,40 @@ namespace Salty_Gamemodes_Server {
             base.PlayerJoined( ply );
         }
 
-        public override void Start() {
-            Debug.WriteLine( "TTT starting on " + GameMap.Name );
+        public override bool OnChatMessage( Player ply, string message ) {
+            if( GetTeam(ply) == (int)Teams.Spectators ) {
+                foreach( var player in PlayerDetails ) {
+                    if( GetTeam(player.Key) == (int)Teams.Spectators ) {
+                        WriteChat( "[DEAD] " + ply.Name, message, 200, 200, 0 );
+                    }
+                }
+            } else {
+                foreach( var player in PlayerDetails ) {
+                    int team = GetTeam( player.Key );
+                    if( team != (int)Teams.Spectators ) {
+                        if( team == (int)Teams.Detectives )
+                            WriteChat( ply.Name, message, 0, 0, 255 );
+                        else
+                            WriteChat( ply.Name, message, 0, 255, 0 );
+                    }
+                }
+            }
+            return true;
+        }
 
+        public override void Start() {
             Random rand = new Random();
             List<Player> players = Players.ToList();
 
-            int driverID = rand.Next(0, players.Count);
-            Player driver = players[driverID];
-            SetTeam(driver, (int)Teams.Traitors);
-            SpawnClient(driver, (int)Teams.Traitors);
-            players.RemoveAt(driverID);
-
+            int traitorCount = (int)Math.Ceiling((double)players.Count / 4);
+            for( var i = 0; i < traitorCount; i++ ) {
+                int traitorID = rand.Next( 0, players.Count );
+                Player traitor = players[traitorID];
+                SetTeam( traitor, (int)Teams.Traitors );
+                SpawnClient( traitor, (int)Teams.Traitors );
+                TriggerClientEvent( "salty::GMPlayerUpdate", Convert.ToInt32( traitor.Handle ), "Team", (int)Teams.Traitors );
+                players.RemoveAt( traitorID );
+            }
 
             foreach (var ply in players) {
                 SetTeam(ply, (int)Teams.Innocents);
@@ -58,6 +81,7 @@ namespace Salty_Gamemodes_Server {
         public override void PlayerDied( [FromSource] Player player, int killerType, Vector3 deathcords ) {
             SetTeam(player, (int)Teams.Spectators);
             TriggerClientEvent( "salty::SpawnDeadBody", deathcords, Convert.ToInt32( player.Handle ) );
+
             base.PlayerDied(player, killerType, deathcords);
         }
 

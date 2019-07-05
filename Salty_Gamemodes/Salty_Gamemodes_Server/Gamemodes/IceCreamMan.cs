@@ -34,13 +34,13 @@ namespace Salty_Gamemodes_Server {
         }
 
         public override void OnTimerEnd() {
-            WriteChat( "Ice cream man delivered ice cream safely" );
+            WriteChat( "Ice Cream Man", "Ice cream man delivered ice cream safely", 255, 0, 0 );
             base.OnTimerEnd();
         }
 
         public override void PlayerKilled( Player player, int killerID, ExpandoObject deathData ) {
             if( GetTeam(player) == (int)Teams.Driver ) {
-                WriteChat( "Ice cream man defeated. Bikers win." );
+                WriteChat( "Ice Cream Man", "Ice cream man defeated. Bikers win.", 255, 0, 0 );
                 End();
             }
             base.PlayerKilled( player, killerID, deathData );
@@ -81,7 +81,7 @@ namespace Salty_Gamemodes_Server {
         public override void End() {
             var winner = GetScores().OrderBy( x => x.Value ).ElementAt( 0 );
 
-            WriteChat( string.Format( "{0} got a score of {1}", Driver.Name, PlayerDetails[Driver]["Score"] ) );
+            WriteChat( "Ice Cream Man", string.Format( "{0} got a score of {1}", Driver.Name, PlayerDetails[Driver]["Score"] ), 255, 0, 0 );
 
             base.End();
         }

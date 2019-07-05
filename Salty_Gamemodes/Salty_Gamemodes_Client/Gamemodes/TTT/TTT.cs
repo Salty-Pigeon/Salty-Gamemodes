@@ -13,14 +13,15 @@ namespace Salty_Gamemodes_Client {
 
 
         public SaltyText TeamText;
+        public SaltyText DisguisedText;
 
         public SaltyMenu TTTMenu;
 
-        public Vector3 SavedTeleport;
+        public Vector3 SavedTeleport = Vector3.Zero;
         public bool CanTeleport = false;
         public bool CanDisguise = false;
 
-        public List<DeadBody> DeadBodies = new List<DeadBody>();
+        public Dictionary<int, DeadBody> DeadBodies = new Dictionary<int, DeadBody>();
 
         public float RadarTime = 0f;
         public float RadarScanTime = 30 * 1000;
@@ -107,6 +108,7 @@ namespace Salty_Gamemodes_Client {
             };
 
             TeamText = new SaltyText( 0.033f, 0.855f, 0, 0, 0.5f, "Spectator", 255, 255, 255, 255, false, false, 0, true );
+            DisguisedText = new SaltyText( 0f, 0f, 0, 0, 0.5f, "Disguise enabled", 200, 0, 0, 255, false, false, 0, true );
 
             SetTeam( team );
         }
@@ -124,14 +126,14 @@ namespace Salty_Gamemodes_Client {
             Game.Player.Character.Health = 100;
             GameMap.SpawnWeapons();
             SetPlayerMayNotEnterAnyVehicle( PlayerId() );
-            WriteChat( "Game starting" );
+            WriteChat( "TTT", "Game starting", 255, 0, 0 );
             GameMap.CreateBlip();
             RadarPositions.Add( PlayerSpawn );
             base.Start();
         }
 
         public override void End() {
-            WriteChat( "Game ending" );
+            WriteChat( "TTT", "Game ending", 255, 0, 0 );
             GameMap.ClearWeapons();
             base.End();
 
@@ -143,6 +145,9 @@ namespace Salty_Gamemodes_Client {
 
 
         public override void Controls() {
+
+            //if( Team == 0 )
+                //return;
 
             if( IsControlJustPressed( 0, 23 ) && Game.PlayerPed.Weapons.Current.Hash.ToString() != "Unarmed" ) {
 
@@ -161,10 +166,10 @@ namespace Salty_Gamemodes_Client {
 
             if( IsControlJustPressed( 0, 244 ) ) {
                 if( Team == (int)Teams.Traitors) {
-                    TTTMenu = TTTMenu == null ? new TTT_TraitorMenu(this, 0.5f, 0.8f, 0.2f, 0.15f, System.Drawing.Color.FromArgb(44, 62, 80), CloseTTTMenu) : null;
+                    TTTMenu = TTTMenu == null ? new TTT_TraitorMenu(this, 0.5f, 0.8f, 0.3f, 0.15f, System.Drawing.Color.FromArgb(44, 62, 80), CloseTTTMenu) : null;
                 }
                 if( Team == (int)Teams.Detectives) {
-                    TTTMenu = TTTMenu == null ? new TTT_DetectiveMenu(this, 0.5f, 0.8f, 0.2f, 0.15f, System.Drawing.Color.FromArgb(44, 62, 80), CloseTTTMenu) : null;
+                    TTTMenu = TTTMenu == null ? new TTT_DetectiveMenu(this, 0.5f, 0.8f, 0.3f, 0.15f, System.Drawing.Color.FromArgb(44, 62, 80), CloseTTTMenu) : null;
                 }
             }
 
@@ -173,14 +178,31 @@ namespace Salty_Gamemodes_Client {
                     TriggerServerEvent("salty::netUpdatePlayerBool", "disguised");
             }
 
-            if ( IsControlJustPressed(0, 19)) { // Left alt
+            if ( IsControlJustPressed(0, 27) ) { // Up arrow
                 if (CanTeleport)
                     TeleportToSaved(3 * 1000);
             }
 
             if( IsControlJustPressed(0, 121)) { // Insert
-                if( CanTeleport )
+                if( CanTeleport ) {
+                    WriteChat( "TTT", "Teleport position set.", 0, 0, 200 );
                     SavedTeleport = Game.PlayerPed.Position;
+
+                }
+            }
+
+            if( IsControlJustPressed( 0, 38 ) ) { // E dead body
+                foreach( var body in DeadBodies ) {
+                    if( body.Value.isDiscovered )
+                        continue;
+                    Vector3 myPos = Game.PlayerPed.Position;
+                    float dist = GetDistanceBetweenCoords( myPos.X, myPos.Y, myPos.Z, body.Value.Position.X, body.Value.Position.Y, body.Value.Position.Z, true );
+                    if( dist <= 2 ) {
+                        body.Value.View();
+                        if( !body.Value.isDiscovered )
+                            TriggerServerEvent( "salty::netBodyDiscovered", body.Key );
+                    }
+                }
             }
 
             base.Controls();
@@ -215,8 +237,11 @@ namespace Salty_Gamemodes_Client {
             if( isTeleporting) {
                 return;
             }
-            if (SavedTeleport == null) {
-                WriteChat("No destination set");
+            if( Game.PlayerPed.IsShooting || Game.PlayerPed.IsJumping || Game.PlayerPed.IsInAir || Game.PlayerPed.IsReloading || Game.PlayerPed.IsClimbing || Game.PlayerPed.IsGoingIntoCover || Game.PlayerPed.IsRagdoll || Game.PlayerPed.IsGettingUp  )
+                return;
+
+            if (SavedTeleport == Vector3.Zero) {
+                WriteChat( "TTT", "No destination set", 0, 0, 200 );
                 return;
             }
             teleportLength = time;
@@ -229,6 +254,8 @@ namespace Salty_Gamemodes_Client {
             if ( teleportTime > gameTime ) {
                 DisableControlAction(0, 30, true); // Disable movement
                 DisableControlAction(0, 31, true);
+                DisableControlAction(0, 24, true);
+                DisableControlAction(0, 257, true);
                 int alpha = (int)Math.Round(255 * ((teleportTime - gameTime) / (teleportLength / 2)));
                 if ( teleportTime - gameTime <= (teleportLength/2)) {
                     if( !hasTeleported ) {
@@ -240,12 +267,20 @@ namespace Salty_Gamemodes_Client {
                 SetEntityAlpha( PlayerPedId(), alpha, 0 );
             } else if ( teleportTime < gameTime) {
                 isTeleporting = false;
+                hasTeleported = false;
             }
         }
 
+        public void BodyDiscovered( int body ) {
+            if( !DeadBodies[body].isDiscovered ) {
+                DeadBodies[body].isDiscovered = true;
+                WriteChat( "TTT", DeadBodies[body].Name + "'s body has been discovered", 255, 0, 0 );
+            }
+        }
 
-        public override void SpawnDeadBody( Vector3 position, uint model ) {
-            DeadBodies.Add( new DeadBody( position, model ) );
+        public void SpawnDeadBody( Vector3 position, int ply ) {
+            int player = GetPlayerFromServerId( ply );
+            DeadBodies.Add( ply, new DeadBody( position, GetPlayerPed( player ), player ) );
         }
 
         public override void PlayerSpawned( ExpandoObject spawnInfo ) {
@@ -254,14 +289,22 @@ namespace Salty_Gamemodes_Client {
             base.PlayerSpawned( spawnInfo );
         }
 
-        public override void ShowNames() {
-            Vector3 position = Game.PlayerPed.ForwardVector;
+        public void ShowTraitors() {
+            foreach( var ply in OtherPlayerInfo ) {
+                if( ply.Value["Team"] == (int)Teams.Traitors ) {
+                    Vector3 pos = GetEntityCoords( GetPlayerPed( ply.Key ), true ) + new Vector3( 0, 0, Game.PlayerPed.HeightAboveGround);
+                    DrawSpriteOrigin( pos, "traitor", 0.02f, 0.03f, 0 );
+                }
+            }
+        }
 
+        public override void ShowNames() {
+            ShowDeadName();
+            Vector3 position = Game.PlayerPed.ForwardVector;
             RaycastResult result = Raycast(Game.PlayerPed.Position, position, 75, IntersectOptions.Peds1, null);
             if (result.DitHitEntity) {
                 if( result.HitEntity != Game.PlayerPed) {
                     int ent = result.HitEntity.Handle;
-                    ShowDeadName( result, ent );
                     if( GetPlayerBool( NetworkGetPlayerIndexFromPed( ent ), "disguised" ) ) {
                         return;
                     }
@@ -274,12 +317,24 @@ namespace Salty_Gamemodes_Client {
 
         }
 
-        public void ShowDeadName(RaycastResult result, int ent) {
-            Debug.WriteLine( result.HitEntity.IsDead.ToString() );
-            Debug.WriteLine( result.HitEntity.Model.GetHashCode().ToString() );
+        public void ShowDeadName( ) {
+            foreach( var body in DeadBodies ) {
+                Vector3 Position = GetPedBoneCoords( body.Value.ID, (int)Bone.SKEL_ROOT, 0, 0, 0 );
+
+                if( !body.Value.isDiscovered )
+                    DrawText3D( Position, Game.PlayerPed.Position, body.Value.Caption, 0.3f, 200, 200, 0, 255, 2 );
+                else
+                    DrawText3D( Position, Game.PlayerPed.Position, body.Value.Caption, 0.3f, 255, 255, 0, 255, 2 );
+            }
         }
 
         public void SetRadarActive( bool active ) {
+            if( isRadarActive )
+                return;
+            RadarPositions = new List<Vector3>();
+            foreach( var ply in new PlayerList() ) {
+                RadarPositions.Add( ply.Character.Position );
+            }
             RadarTime = GetGameTimer() + RadarScanTime;
             isRadarActive = active;
         }
@@ -295,28 +350,16 @@ namespace Salty_Gamemodes_Client {
             }
 
             foreach( var pos in RadarPositions ) {
-                float x = 0, y = 0;
-                bool offScreen = Get_2dCoordFrom_3dCoord( pos.X, pos.Y, pos.Z, ref x, ref y );
-
-                if( offScreen )
-                    continue;
 
                 Vector3 camPos = GetGameplayCamCoords();
                 float dist = GetDistanceBetweenCoords( pos.X, pos.Y, pos.Z, camPos.X, camPos.Y, camPos.Z, true );
-                SetTextScale( 0.3f, 0.3f );
-                SetTextFont( 0 );
-                SetTextProportional( true );
-                SetTextColour( 255, 255, 255, 255 );
-                SetTextDropshadow( 0, 0, 0, 0, 55 );
-                SetTextEdge( 2, 0, 0, 0, 150 );
-                SetTextDropShadow();
-                SetTextOutline();
-                SetTextEntry( "STRING" );
-                SetTextCentre( true );
-                AddTextComponentString( Math.Round( dist, 1 ) + "m" );
-                DrawText( x, y );
+
+                DrawText3D( pos, Math.Round( dist, 1 ) + "m", 0.3f, 255, 255, 255, 255, 999999 );
+
+                float x = 0, y = 0;
                 Get_2dCoordFrom_3dCoord( pos.X, pos.Y, pos.Z - 0.08f, ref x, ref y );
                 DrawRect( x, y, 0.02f, 0.02f, 0, 200, 0, 255 );
+                
             }
 
             
@@ -347,10 +390,12 @@ namespace Salty_Gamemodes_Client {
             DrawBaseHealthHUD();
             DrawWeaponHUD();
             ShowNames();
+            if( Team == (int)Teams.Traitors)
+                ShowTraitors();
 
-            if( CanDisguise) {
+            if( CanDisguise ) {
                 if (GetPlayerBool(NetworkGetPlayerIndexFromPed(PlayerPedId()), "disguised")) {
-                    Debug.WriteLine("Disguised");
+                    DisguisedText.Draw();
                 }
             }
             
@@ -418,12 +463,12 @@ namespace Salty_Gamemodes_Client {
 
         public override void Update() {
 
-            FirstPersonForAlive();
+            //FirstPersonForAlive();
             SetPlayerMayNotEnterAnyVehicle( PlayerId() );
 
             foreach( var body in DeadBodies ) {
-                if( !IsPedRagdoll( body.ID ) )
-                    body.Update();
+                if( !IsPedRagdoll( body.Value.ID ) )
+                    body.Value.Update();
             }
 
             if (isTeleporting) {

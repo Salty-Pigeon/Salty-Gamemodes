@@ -48,6 +48,8 @@ namespace Salty_Gamemodes_Server
             EventHandlers[ "salty::netVoteMap" ] += new Action<Player, string>( MapManager.PlayerVote );
             EventHandlers[ "salty::netJoined" ] += new Action<Player>( PlayerJoined );
             EventHandlers[ "salty::netUpdatePlayerBool" ] += new Action<Player, string>( UpdatePlayerBool );
+            EventHandlers[ "salty::netBodyDiscovered" ] += new Action<Player, int>( BodyDiscovered );
+            EventHandlers["chatMessage"] += new Action<int, string, string>( ChatMessage );
 
 
             RegisterCommand( "startTTT", new Action<int, List<object>, string>( ( source, args, raw ) => {
@@ -65,7 +67,6 @@ namespace Salty_Gamemodes_Server
             RegisterCommand( "startIceCreamMan", new Action<int, List<object>, string>( ( source, args, raw ) => {
                 StartIceCreamMan();
             } ), false );
-
 
             RegisterCommand( "endGame", new Action<int, List<object>, string>( ( source, args, raw ) => {
                 EndGame();
@@ -94,8 +95,27 @@ namespace Salty_Gamemodes_Server
             ActiveGame.PlayerJoined( ply );
         }
 
+        public void ChatMessage( int author, string message, string lol ) {
+            foreach( var ply in new PlayerList() ) {
+                if( Convert.ToInt32(ply.Handle) == author ) {
+                    if (ActiveGame.OnChatMessage( ply, lol ) ) {
+                        CancelEvent();
+                    }
+                }
+            }
+            
+        }
+
+        public void BodyDiscovered( [FromSource] Player ply, int body ) {
+            if( ActiveGame is TTT ) {
+                (ActiveGame as TTT).DeadBodies[body] = true;
+                TriggerClientEvent( "salty::UpdateDeadBody", body );
+            }
+        }
+
         public void UpdatePlayerBool( [FromSource]Player ply, string key ) {
             ActiveGame.UpdatePlayerBoolean(ply, key);
+            
         }
 
         private async Task Init_Tick() {

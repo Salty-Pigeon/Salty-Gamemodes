@@ -55,14 +55,14 @@ namespace Salty_Gamemodes_Server {
         public override void PlayerDied( Player player, int killerType, Vector3 deathcords ) {
 
             if( GetTeam(player) == (int)Teams.Murderer ) {
-                WriteChat( "Murderer dead, civilians win!" );
+                WriteChat( "Murder", "Murderer dead, civilians win!", 255, 0, 0 );
                 End();
             }
 
             SetTeam( player, (int)Teams.Spectators );
 
             if( TeamCount((int)Teams.Murderer) == 0 ) {
-                WriteChat( "Civilians dead, murderer wins!" );
+                WriteChat( "Murder", "Civilians dead, murderer wins!", 255, 0, 0 );
                 End();
             }
 

@@ -97,6 +97,10 @@ namespace Salty_Gamemodes_Server {
             ply.TriggerEvent( "salty::StartGame", ID, team, GameLength, GameMap.Position, GameMap.Size, GameMap.GetNextSpawn(team), GameMap.GunSpawns );
         }
 
+        public virtual bool OnChatMessage( Player ply, string message ) {
+            return false;
+        }
+
         public void CreateGameTimer( double length ) {
             GameLength = length * 1000;
             isTimed = true;
@@ -178,10 +182,10 @@ namespace Salty_Gamemodes_Server {
             Debug.WriteLine(ply.Name + " has score: " + PlayerDetails[ply]["Score"]);
         }
 
-        public void WriteChat( string str ) {
+        public void WriteChat( string prefix, string str, int r, int g, int b ) {
             TriggerClientEvent( "chat:addMessage", new {
-                color = new[] { 255, 0, 0 },
-                args = new[] { GetType().ToString(), str }
+                color = new[] { r, g, b },
+                args = new[] { prefix, str }
             } );
         }
 
