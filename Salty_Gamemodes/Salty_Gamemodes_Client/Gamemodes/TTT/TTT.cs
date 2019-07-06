@@ -134,15 +134,13 @@ namespace Salty_Gamemodes_Client {
             Game.Player.Character.MaxHealth = 100;
             Game.Player.Character.Health = 100;
             GameMap.SpawnWeapons();
-            SetPlayerMayNotEnterAnyVehicle( PlayerId() );
-            WriteChat( "TTT", "Game starting", 255, 0, 0 );
+            SetPlayerMayNotEnterAnyVehicle( PlayerId() );       
             GameMap.CreateBlip();
             RadarPositions.Add( PlayerSpawn );
             base.Start();
         }
 
         public override void End() {
-            WriteChat( "TTT", "Game ending", 255, 0, 0 );
             GameMap.ClearWeapons();
             CloseTTTMenu();
             base.End();

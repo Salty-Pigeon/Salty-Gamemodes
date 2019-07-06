@@ -56,7 +56,7 @@ namespace Salty_Gamemodes_Client {
                 SpawnBike();
                 GoalText.Colour = System.Drawing.Color.FromArgb( 0, 200, 0 );
             }
-            WriteChat( "Ice Cream Man", "Game starting", 255, 0, 0 );
+            
             base.Start();
         }
 

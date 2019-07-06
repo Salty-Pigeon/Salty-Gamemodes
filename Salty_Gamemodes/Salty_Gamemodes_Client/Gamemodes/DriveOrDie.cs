@@ -223,6 +223,8 @@ namespace Salty_Gamemodes_Client {
         public override void End() {
             if( Truck != null )
                 Truck.Delete();
+            if( Bike != null )
+                Bike.Delete();
             base.End();
         }
     }

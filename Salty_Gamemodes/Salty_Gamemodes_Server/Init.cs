@@ -178,50 +178,58 @@ namespace Salty_Gamemodes_Server
         }
 
         public void StartIceCreamMan() {
+            ActiveGame.End();
             ActiveGame = new IceCreamMan( MapManager, (int)Gamemodes.IceCreamMan, "icm" );
-            ActiveGame.CreateGameTimer( 3 * 60 );
+            ActiveGame.CreateGameTimer( 8 * 60 );
             ActiveGame.Start();
         }
 
         public void StartIceCreamMan(Map map) {
+            ActiveGame.End();
             ActiveGame = new IceCreamMan( MapManager, (int)Gamemodes.IceCreamMan, map );
-            ActiveGame.CreateGameTimer( 3 * 60 );
+            ActiveGame.CreateGameTimer( 8 * 60 );
             ActiveGame.Start();
         }
 
         public void StartMurder() {
+            ActiveGame.End();
             ActiveGame = new Murder( MapManager, (int)Gamemodes.Murder, "mmm" );
-            ActiveGame.CreateGameTimer( 3 * 60 );
+            ActiveGame.CreateGameTimer( 5 * 60 );
             ActiveGame.Start();
         }
 
         public void StartMurder(Map map) {
+            ActiveGame.End();
             ActiveGame = new Murder( MapManager, (int)Gamemodes.Murder, map );
-            ActiveGame.CreateGameTimer( 3 * 60 );
+            ActiveGame.CreateGameTimer( 5 * 60 );
             ActiveGame.Start();
         }
 
         public void StartDriveOrDie() {
+            ActiveGame.End();
             ActiveGame = new DriveOrDie( MapManager, (int)Gamemodes.DriveOrDie, "dod" );
-            ActiveGame.CreateGameTimer( 3 * 60 );
+            ActiveGame.CreateGameTimer( 15 * 60 );
             ActiveGame.Start();
         }
 
         public void StartDriveOrDie(Map map) {
+            ActiveGame.End();
             ActiveGame = new DriveOrDie( MapManager, (int)Gamemodes.DriveOrDie, map );
-            ActiveGame.CreateGameTimer( 3 * 60 );
+            ActiveGame.CreateGameTimer( 15 * 60 );
             ActiveGame.Start();
         }
 
         public void StartTTT() {
+            ActiveGame.End();
             ActiveGame = new TTT( MapManager, (int)Gamemodes.TTT, "ttt" );
-            ActiveGame.CreateGameTimer( 3 * 60 );
+            ActiveGame.CreateGameTimer( 10 * 60 );
             ActiveGame.Start();
         }
 
         public void StartTTT( Map map ) {
+            ActiveGame.End();
             ActiveGame = new TTT( MapManager, (int)Gamemodes.TTT, map );
-            ActiveGame.CreateGameTimer( 3 * 60 );
+            ActiveGame.CreateGameTimer( 10 * 60 );
             ActiveGame.Start();
         }
 
@@ -250,7 +258,6 @@ namespace Salty_Gamemodes_Server
         }
 
         private void ModifyMap([FromSource] Player ply, string setting, string mapName, int team, Vector3 position, Vector3 size ) {
-            Debug.WriteLine( string.Format( "{0} {1} {2} {3} {4}", setting, mapName, team.ToString(), position.ToString(), size.ToString() ) );
             if( setting == "delete" ) {
                 MapManager.Maps.Remove( mapName );
                 SQLConnection.Remove( mapName );

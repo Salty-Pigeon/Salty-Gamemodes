@@ -279,7 +279,7 @@ namespace Salty_Gamemodes_Client {
                     AmmoInClip.Remove( newCode );
                 }
             } catch {
-                Debug.WriteLine( "No weapons" );
+
             }
         }
 
@@ -595,7 +595,6 @@ namespace Salty_Gamemodes_Client {
         public virtual void RemoveWeaponCheck() {
             if( Game.PlayerPed.Weapons.Current.Hash.ToString() != "Unarmed" && inGame ) {
                 if( !HashToModel.ContainsKey( (uint)Game.PlayerPed.Weapons.Current.Hash.GetHashCode() ) ) {
-                    Debug.WriteLine( "Weapon removed" );
                     RemoveWeapon( Game.PlayerPed.Weapons.Current );
                 }
             }

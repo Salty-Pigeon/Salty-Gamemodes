@@ -111,8 +111,7 @@ namespace Salty_Gamemodes_Server {
         }
 
         public override void End() {
-            Debug.WriteLine( "Game ending" );
-
+            WriteChat( "TTT", "Game ending", 255, 0, 0 );
             base.End();
         }
 

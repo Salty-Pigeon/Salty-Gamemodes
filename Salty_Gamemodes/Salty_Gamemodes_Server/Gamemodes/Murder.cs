@@ -30,7 +30,7 @@ namespace Salty_Gamemodes_Server {
         }
 
         public override void Start() {
-            Debug.WriteLine( "Murder starting on " + GameMap.Name );
+            WriteChat( "Murder", "Game starting", 255, 0, 0 );
 
             Random rand = new Random();
             List<Player> players = Players.ToList();
@@ -65,7 +65,7 @@ namespace Salty_Gamemodes_Server {
 
             SetTeam( player, (int)Teams.Spectators );
 
-            if( TeamCount((int)Teams.Murderer) == 0 ) {
+            if( TeamCount((int)Teams.Civilian) == 0 ) {
                 WriteChat( "Murder", "Civilians dead, murderer wins!", 255, 0, 0 );
                 End();
             }
@@ -74,6 +74,8 @@ namespace Salty_Gamemodes_Server {
         }
 
         public override void End() {
+            WriteChat( "Murder", "Game ending", 255, 0, 0 );
+
             base.End();
         }
     }

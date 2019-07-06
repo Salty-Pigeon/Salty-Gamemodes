@@ -200,7 +200,6 @@ namespace Salty_Gamemodes_Server {
             else {
                 PlayerDetails[ply]["Score"] += amount;
             }
-            Debug.WriteLine(ply.Name + " has score: " + PlayerDetails[ply]["Score"]);
         }
 
         public void WriteChat( string prefix, string str, int r, int g, int b ) {

@@ -60,9 +60,7 @@ namespace Salty_Gamemodes_Server {
         }
 
         public override void Start() {
-
-            Debug.WriteLine( "Ice cream man starting on " + GameMap.Name );
-
+            WriteChat( "Ice Cream Man", "Game starting", 255, 0, 0 );
             Random rand = new Random();
             List<Player> players = Players.ToList();
 

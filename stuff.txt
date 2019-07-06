@@ -45,3 +45,5 @@ Voice channel for T's only as well as normal chat
 Green rectangle when talking
 
 Crouching
+
+https://github.com/ESX-Org/es_camera/blob/master/client/main.lua

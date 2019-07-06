@@ -42,6 +42,7 @@ namespace Salty_Gamemodes_Server {
         }
 
         public override void Start() {
+            WriteChat( "Drive or Die", "Game starting", 255, 0, 0 );
 
             Random rand = new Random();
             List<Player> players = Players.ToList();
@@ -65,7 +66,8 @@ namespace Salty_Gamemodes_Server {
         }
 
         public override void End() {
-           
+            WriteChat( "Drive or Die", "Game ending", 255, 0, 0 );
+
             base.End();
         }
     }
