@@ -59,42 +59,8 @@ namespace Salty_Gamemodes_Server {
             return maps;
         }
 
-        public void VoteMapGUI( string gameType ) {
-            TriggerClientEvent( "salty::VoteMap", MapList(gameType) );
-            VoteStarted = true;
-            PlayerVoted = new List<Player>();
-            MapVotes = new Dictionary<string, int>();
-            VoteTime = GetGameTimer() + (15 * 1000);
-        }
-
-        public void PlayerVote( [FromSource] Player ply, string map ) {
-            if( PlayerVoted.Contains( ply ) )
-                return;
-            Debug.WriteLine( ply.Name + " voted for " + map );
-            if( MapVotes.ContainsKey(map) ) {
-                MapVotes[map]++;
-            } else {
-                MapVotes.Add( map, 1 );
-            }
-            PlayerVoted.Add( ply );
-            if( PlayerVoted.Count >= Players.Count() ) {
-                Debug.WriteLine( "Everyone voted" );
-                DecideVoteWinner();
-            }
-        }
-
-        public void DecideVoteWinner() {
-            string winner = MapVotes.OrderBy( x => x.Value ).ElementAt( 0 ).Key;
-            Debug.WriteLine( winner );
-            VoteStarted = false;
-        }
-
         public void Update() {
-            if( VoteStarted )
-                if( VoteTime - GetGameTimer() < 0 ) {
-                    Debug.WriteLine( "Vote ended" );
-                    DecideVoteWinner();
-                }
+
         }
 
     }

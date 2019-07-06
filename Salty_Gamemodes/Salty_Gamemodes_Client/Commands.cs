@@ -18,15 +18,21 @@ namespace Salty_Gamemodes_Client {
         }
 
         public void Load() {
+
+
+
+            RegisterCommand( "respawn", new Action<int, List<object>, string>( ( source, args, raw ) => {
+                if( Init.ActiveGame is IceCreamMan ) {
+                    (Init.ActiveGame as IceCreamMan).Respawn();
+                }
+            } ), false );
+
+            /*
             RegisterCommand("noclip", new Action<int, List<object>, string>(( source, args, raw ) => {
                 Init.ActiveGame.SetNoClip(!Init.ActiveGame.isNoclip);
             }), false);
 
-            RegisterCommand("respawn", new Action<int, List<object>, string>(( source, args, raw ) => {
-                if (Init.ActiveGame is IceCreamMan) {
-                    (Init.ActiveGame as IceCreamMan).Respawn();
-                }
-            }), false);
+            
 
             RegisterCommand("spawnPoints", new Action<int, List<object>, string>(( source, args, raw ) => {
                 TriggerServerEvent("salty::netSpawnPointGUI");
@@ -115,6 +121,8 @@ namespace Salty_Gamemodes_Client {
                     args = new[] { "[CarSpawner]", $"Woohoo! Enjoy your new ^*{model}!" }
                 });
             }), false);
+
+    */
         }
 
     }

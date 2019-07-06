@@ -23,12 +23,15 @@ namespace Salty_Gamemodes_Client
         public static int ScreenWidth = 0;
         public static int ScreenHeight = 0;
 
+        VoteMenu voteMenu;
+
+
         public Init() {
 
             RequestStreamedTextureDict("saltyTextures", true);
 
-            commands = new Commands(this);
-            test = new Testing(this);
+            //commands = new Commands(this);
+            //test = new Testing(this);
 
             EventHandlers[ "onClientResourceStart" ] += new Action<string>( OnClientResourceStart );
             EventHandlers[ "playerSpawned" ] += new Action<ExpandoObject>( PlayerSpawn );
@@ -53,7 +56,10 @@ namespace Salty_Gamemodes_Client
         }
 
         public void StartGame( int id, int team, double duration, Vector3 mapPos, Vector3 mapSize, Vector3 startPos, ExpandoObject gunSpawns ) {
+            NetworkSetVoiceChannel( 0 );
             GetScreenActiveResolution( ref ScreenWidth, ref ScreenHeight );
+            voteMenu.Close();
+            voteMenu = null;
             if( ActiveGame.inGame )
                 ActiveGame.End();
             ActiveGame.SetNoClip( false );
@@ -146,11 +152,14 @@ namespace Salty_Gamemodes_Client
             }
             return spawns;
         }
-
-
         private void VoteMap( List<dynamic> maps ) {
             List<string> mapsList = maps.OfType<string>().ToList();
-            VoteMenu menu = new VoteMenu( this, "Vote Map", "Vote for next map", mapsList );
+            if( voteMenu == null ) {
+                voteMenu = new VoteMenu( this, "Vote Gamemode", "Vote for the next gamemode", mapsList );
+            } else {
+                voteMenu.Close();
+                voteMenu = new VoteMenu( this, "Vote Map", "Vote for next map", mapsList );
+            }
         }
 
 
@@ -247,7 +256,8 @@ namespace Salty_Gamemodes_Client
                 }
             }
 
-            test.Update();
+            if( test != null )
+                test.Update();
 
         }
 
@@ -262,9 +272,10 @@ namespace Salty_Gamemodes_Client
             ActiveGame.SetNoClip( false );
 
             TriggerServerEvent( "salty::netJoined" );
-
-            commands.Load();
-            test.LoadCommands();
+            if( commands != null )
+                commands.Load();
+            if( test != null )
+                test.LoadCommands();
 
         }
     }

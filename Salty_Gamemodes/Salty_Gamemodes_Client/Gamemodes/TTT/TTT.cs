@@ -183,7 +183,7 @@ namespace Salty_Gamemodes_Client {
                 }
             }
 
-            if( IsControlJustPressed( 0, 244 ) ) {
+            if( IsControlJustPressed( 0, 244 ) ) { // M 244
                 if( Team == (int)Teams.Traitors) {
                     TTTMenu = TTTMenu == null ? new TTT_TraitorMenu(this, 0.5f, 0.8f, 0.3f, 0.15f, System.Drawing.Color.FromArgb(44, 62, 80), CloseTTTMenu, CanBuy ) : null;
                 }

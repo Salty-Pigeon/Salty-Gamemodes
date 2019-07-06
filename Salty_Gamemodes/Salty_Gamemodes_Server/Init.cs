@@ -20,12 +20,14 @@ namespace Salty_Gamemodes_Server
         }
 
 
+        public int GamemodeVoteCount = 0;
+
         public bool inGame = false;
         public static BaseGamemode ActiveGame;
 
         Database SQLConnection;
         MapManager MapManager;
-
+        Vote ActiveVote;
         public Init() {
 
             SQLConnection = new Database();
@@ -45,7 +47,7 @@ namespace Salty_Gamemodes_Server
             EventHandlers[ "salty::netModifyWeaponPos" ] += new Action<Player, string, string, string, Vector3>( ModifyWeaponPosition );
             EventHandlers[ "salty::netModifyMap" ] += new Action<Player, string, string, int, Vector3, Vector3>( ModifyMap );
             EventHandlers[ "salty::netAddScore" ] += new Action<Player, int>( AddScoreToPlayer );
-            EventHandlers[ "salty::netVoteMap" ] += new Action<Player, string>( MapManager.PlayerVote );
+            EventHandlers[ "salty::netVoteMap" ] += new Action<Player, string>( PlayerVote );
             EventHandlers[ "salty::netJoined" ] += new Action<Player>( PlayerJoined );
             EventHandlers[ "salty::netUpdatePlayerBool" ] += new Action<Player, string>( UpdatePlayerBool );
             EventHandlers[ "salty::netBodyDiscovered" ] += new Action<Player, int>( BodyDiscovered );
@@ -53,38 +55,83 @@ namespace Salty_Gamemodes_Server
             
 
             RegisterCommand( "startTTT", new Action<int, List<object>, string>( ( source, args, raw ) => {
+                if( source != 0 ) { return; }
                 StartTTT();
             } ), false );
 
             RegisterCommand( "startMurder", new Action<int, List<object>, string>( ( source, args, raw ) => {
+                if( source != 0 ) { return; }
                 StartMurder();
             } ), false );
 
             RegisterCommand( "startDod", new Action<int, List<object>, string>( ( source, args, raw ) => {
+                if( source != 0 ) { return; }
                 StartDriveOrDie();
             } ), false );
 
             RegisterCommand( "startIceCreamMan", new Action<int, List<object>, string>( ( source, args, raw ) => {
+                if( source != 0 ) { return; }
                 StartIceCreamMan();
             } ), false );
 
             RegisterCommand( "endGame", new Action<int, List<object>, string>( ( source, args, raw ) => {
+                if( source != 0 ) { return; }
                 EndGame();
             } ), false );
 
-            RegisterCommand( "voteMap", new Action<int, List<object>, string>( ( source, args, raw ) => {
-                MapManager.VoteMapGUI( "ttt" );
+            RegisterCommand( "vote", new Action<int, List<object>, string>( ( source, args, raw ) => {
+                if( source == 0 ) {
+                    ActiveVote = new Vote( new Dictionary<string, string> { { "Trouble in Terrorist Town", "ttt" }, { "Murder", "mmm" }, { "Drive Or Die", "dod" }, { "Ice Cream Man", "icm" } }, GamemodeVoteOver );
+                    return;
+                }
+                GamemodeVoteCount++;
+                int needed = (int)Math.Round( new PlayerList().ToList().Count * 0.7 );
+                if( GamemodeVoteCount >= needed) {
+                    ActiveGame.WriteChat( "Salty Gamemodes", "Gamemode vote started", 230, 230, 0 );
+                    ActiveVote = new Vote( new Dictionary<string, string> { { "Trouble in Terrorist Town", "ttt" }, { "Murder", "mmm" }, { "Drive Or Die", "dod" }, { "Ice Cream Man", "icm" } }, GamemodeVoteOver );
+                    GamemodeVoteCount = 0;
+                } else {
+                    ActiveGame.WriteChat( "Salty Gamemodes", needed + " more vote(s) needed to vote new gamemode.", 230, 230, 0 );
+                }
+
             } ), false );
 
             RegisterCommand( "loadSQL", new Action<int, List<object>, string>( ( source, args, raw ) => {
+                if( source != 0 ) { return; }
                 SQLConnection.Load();
             } ), false );
 
             RegisterCommand( "saveSQL", new Action<int, List<object>, string>( ( source, args, raw ) => {
+                if( source != 0 ) { return; }
                 SQLConnection.SaveAll(MapManager.Maps);
             } ), false );
 
             Tick += Init_Tick;
+        }
+
+
+        private string MapTagWinner;
+
+        public void MapVoteOver( string winner ) {
+            switch( MapTagWinner ) {
+                case ("ttt"):
+                    StartTTT( MapManager.Maps[winner] );
+                    break;
+                case ("mmm"):
+                    StartMurder( MapManager.Maps[winner] );
+                    break;
+                case ("icm"):
+                    StartIceCreamMan( MapManager.Maps[winner] );
+                    break;
+                case ("dod"):
+                    StartDriveOrDie( MapManager.Maps[winner] );
+                    break;
+            }
+            ActiveVote = null;
+        }
+        public void GamemodeVoteOver( string winner, string mapTag ) {
+            MapTagWinner = mapTag;
+            ActiveVote = new Vote(  MapManager.Maps.Keys.Where( x => x.Contains(mapTag)).ToList(), MapVoteOver );
         }
 
         public void PlayerJoined( [FromSource]Player ply ) {
@@ -121,6 +168,8 @@ namespace Salty_Gamemodes_Server
         private async Task Init_Tick() {
             if( ActiveGame != null )
                 ActiveGame.Update();
+            if( ActiveVote != null )
+                ActiveVote.Update();
             MapManager.Update();
         }
 
@@ -134,8 +183,20 @@ namespace Salty_Gamemodes_Server
             ActiveGame.Start();
         }
 
+        public void StartIceCreamMan(Map map) {
+            ActiveGame = new IceCreamMan( MapManager, (int)Gamemodes.IceCreamMan, map );
+            ActiveGame.CreateGameTimer( 3 * 60 );
+            ActiveGame.Start();
+        }
+
         public void StartMurder() {
             ActiveGame = new Murder( MapManager, (int)Gamemodes.Murder, "mmm" );
+            ActiveGame.CreateGameTimer( 3 * 60 );
+            ActiveGame.Start();
+        }
+
+        public void StartMurder(Map map) {
+            ActiveGame = new Murder( MapManager, (int)Gamemodes.Murder, map );
             ActiveGame.CreateGameTimer( 3 * 60 );
             ActiveGame.Start();
         }
@@ -146,8 +207,20 @@ namespace Salty_Gamemodes_Server
             ActiveGame.Start();
         }
 
+        public void StartDriveOrDie(Map map) {
+            ActiveGame = new DriveOrDie( MapManager, (int)Gamemodes.DriveOrDie, map );
+            ActiveGame.CreateGameTimer( 3 * 60 );
+            ActiveGame.Start();
+        }
+
         public void StartTTT() {
             ActiveGame = new TTT( MapManager, (int)Gamemodes.TTT, "ttt" );
+            ActiveGame.CreateGameTimer( 3 * 60 );
+            ActiveGame.Start();
+        }
+
+        public void StartTTT( Map map ) {
+            ActiveGame = new TTT( MapManager, (int)Gamemodes.TTT, map );
             ActiveGame.CreateGameTimer( 3 * 60 );
             ActiveGame.Start();
         }
@@ -229,6 +302,13 @@ namespace Salty_Gamemodes_Server
 
         private void SpawnPointGUI([FromSource] Player ply) {
              ply.TriggerEvent( "salty::SpawnPointGUI", MapManager.AllMapsBounds(), MapManager.AllMapsSpawns() );
+        }
+
+
+        public void PlayerVote( [FromSource] Player ply, string vote ) {
+            if( ActiveVote != null ) {
+                ActiveVote.PlayerVote( ply, vote );
+            }
         }
 
     }

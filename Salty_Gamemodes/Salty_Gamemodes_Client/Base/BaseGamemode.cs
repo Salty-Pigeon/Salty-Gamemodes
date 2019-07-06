@@ -516,8 +516,8 @@ namespace Salty_Gamemodes_Client {
                     foreach( var ply in new PlayerList() ) {
                         if( !NetworkIsPlayerTalking( ply.Handle ) ) { continue; }
                         if( GetTeam( ply.Handle ) == 0 ) {
-                            DrawRectangle( 0.85f, 0.05f + (offset * 0.06f), 0.13f, 0.06f, 230, 230, 0, 255 );
-                            DrawText2D( 0.86f, 0.06f + (offset * 0.06f), ply.Name, 0.5f, 255, 255, 255, 255, false );
+                            DrawRectangle( 0.85f, 0.05f + (offset * 0.052f), 0.13f, 0.05f, 230, 230, 0, 255 );
+                            DrawText2D( 0.915f, 0.061f + (offset * 0.052f), ply.Name, 0.5f, 255, 255, 255, 255, true );
                             offset++;
                         }
                     }
@@ -525,8 +525,8 @@ namespace Salty_Gamemodes_Client {
                     foreach( var ply in new PlayerList() ) {
                         if (!NetworkIsPlayerTalking(ply.Handle)) { continue; }
                         if( GetTeam( ply.Handle ) != 0 ) {
-                            DrawRectangle( 0.85f, 0.05f + ( offset * 0.06f ), 0.13f, 0.06f, 0, 230, 0, 255 );
-                            DrawText2D( 0.86f, 0.06f + (offset * 0.06f), ply.Name, 0.5f, 255, 255, 255, 255, false );
+                            DrawRectangle( 0.85f, 0.05f + ( offset * 0.052f ), 0.13f, 0.05f, 0, 230, 0, 255 );
+                            DrawText2D( 0.915f, 0.061f + (offset * 0.052f), ply.Name, 0.5f, 255, 255, 255, 255, true );
                             offset++;
                         }
                     }
@@ -568,6 +568,7 @@ namespace Salty_Gamemodes_Client {
             }
 
             DrawGoal();
+            ShowTalking();
 
             if( lastLooked + 300 > GetGameTimer() ) {
                 HUDText.Draw();

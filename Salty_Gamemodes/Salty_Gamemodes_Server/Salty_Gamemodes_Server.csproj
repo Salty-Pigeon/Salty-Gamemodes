@@ -71,6 +71,7 @@
     <Compile Include="Gamemodes\Murder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Gamemodes\TTT.cs" />
+    <Compile Include="Vote.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

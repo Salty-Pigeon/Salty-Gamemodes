@@ -29,6 +29,10 @@ namespace Salty_Gamemodes_Server {
 
         }
 
+        public IceCreamMan( MapManager manager, int ID, Map map ) : base( manager, ID, map ) {
+
+        }
+
         public override void Update() {
             base.Update();
         }

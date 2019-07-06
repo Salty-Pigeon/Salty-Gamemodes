@@ -8,9 +8,6 @@ using System.Threading.Tasks;
 namespace Salty_Gamemodes_Server {
     class DriveOrDie : BaseGamemode {
 
-        List<Player> trucker = new List<Player>();
-        List<Player> bikie = new List<Player>();
-
         public enum Teams {
             Spectators,
             Trucker,
@@ -25,6 +22,10 @@ namespace Salty_Gamemodes_Server {
         }
 
         public DriveOrDie( MapManager manager, int ID, string MapTag ) : base( manager, ID, MapTag ) {
+
+        }
+
+        public DriveOrDie( MapManager manager, int ID, Map map ) : base( manager, ID, map ) {
 
         }
 
@@ -45,16 +46,18 @@ namespace Salty_Gamemodes_Server {
             Random rand = new Random();
             List<Player> players = Players.ToList();
 
-            int driverID = rand.Next(0, players.Count);
-            Player driver = players[driverID];
-            SetTeam(driver, (int)Teams.Trucker);
-            SpawnClient(driver, (int)Teams.Trucker);
-            players.RemoveAt(driverID);
-
+            int bikeCount = (int)Math.Ceiling( (double)players.Count / 3 );
+            for( var i = 0; i < bikeCount; i++ ) {
+                int bikeID = rand.Next( 0, players.Count );
+                Player biker = players[bikeID];
+                SetTeam( biker, (int)Teams.Bikie );
+                SpawnClient( biker, (int)Teams.Bikie );
+                players.RemoveAt( bikeID );
+            }
 
             foreach (var ply in players) {
-                SetTeam(ply, (int)Teams.Bikie);
-                SpawnClient(ply, (int)Teams.Bikie);
+                SetTeam(ply, (int)Teams.Trucker);
+                SpawnClient(ply, (int)Teams.Trucker);
             }
 
             base.Start();

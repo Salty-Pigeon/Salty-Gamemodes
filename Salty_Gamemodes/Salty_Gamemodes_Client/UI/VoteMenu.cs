@@ -10,10 +10,12 @@ namespace Salty_Gamemodes_Client {
 
     class VoteMenu : BaseScript {
 
+        Menu mapMenu;
+
         public VoteMenu( Init instance, string name, string subtitle, List<string> VoteList ) {
 
             MenuController.MenuAlignment = MenuController.MenuAlignmentOption.Right;
-            Menu mapMenu = new Menu( name, subtitle ) { Visible = true };
+            mapMenu = new Menu( name, subtitle ) { Visible = true };
             MenuController.AddMenu( mapMenu );
 
             foreach( var map in VoteList ) {
@@ -23,9 +25,16 @@ namespace Salty_Gamemodes_Client {
 
             mapMenu.OnItemSelect += ( _menu, _item, _index ) => {
                 TriggerServerEvent( "salty::netVoteMap", _item.Text );
-                mapMenu.CloseMenu();
+                
             };
 
+        }
+
+        public void Close() {
+            mapMenu.CloseMenu();
+            mapMenu.ClearMenuItems();
+            MenuController.Menus.Remove( mapMenu );
+            mapMenu = null;
         }
 
     }

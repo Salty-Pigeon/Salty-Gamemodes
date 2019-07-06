@@ -42,6 +42,16 @@ namespace Salty_Gamemodes_Server {
             GameMap = map;
         }
 
+        public BaseGamemode( MapManager manager, int ID, Map map ) {
+            MapManager = manager;
+            this.ID = ID;
+            this.MapTag = map.Name.Split('_')[0];
+
+            InGamePlayers = new PlayerList().ToList();
+
+            GameMap = map;
+        }
+
         public virtual void Start() {
             if ( isTimed )
                 GameTime = GetGameTimer() + GameLength;
@@ -102,7 +112,13 @@ namespace Salty_Gamemodes_Server {
         }
 
         public virtual bool OnChatMessage( Player ply, string message ) {
-            return false;
+            if( GetTeam( ply ) == 0 ) {
+                WriteChat( "[DEAD] " + ply.Name, message, 230, 0, 0 );
+            }
+            else {
+                WriteChat( ply.Name, message, 0, 230, 0 );
+            }
+            return true;
         }
 
         public void CreateGameTimer( double length ) {
@@ -189,6 +205,13 @@ namespace Salty_Gamemodes_Server {
 
         public void WriteChat( string prefix, string str, int r, int g, int b ) {
             TriggerClientEvent( "chat:addMessage", new {
+                color = new[] { r, g, b },
+                args = new[] { prefix, str }
+            } );
+        }
+
+        public void WriteChat( Player ply, string prefix, string str, int r, int g, int b ) {
+            ply.TriggerEvent( "chat:addMessage", new {
                 color = new[] { r, g, b },
                 args = new[] { prefix, str }
             } );

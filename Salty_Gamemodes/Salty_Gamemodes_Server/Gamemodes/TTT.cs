@@ -32,6 +32,10 @@ namespace Salty_Gamemodes_Server {
 
         }
 
+        public TTT( MapManager manager, int ID, Map map ) : base( manager, ID, map ) {
+
+        }
+
         public override void PlayerJoined( Player ply ) {
             base.PlayerJoined( ply );
         }
@@ -40,17 +44,15 @@ namespace Salty_Gamemodes_Server {
             if( GetTeam(ply) == (int)Teams.Spectators ) {
                 foreach( var player in PlayerDetails ) {
                     if( GetTeam(player.Key) == (int)Teams.Spectators ) {
-                        WriteChat( "[DEAD] " + ply.Name, message, 200, 200, 0 );
+                        WriteChat( player.Key, "[DEAD] " + ply.Name, message, 200, 200, 0 );
                     }
                 }
             } else {
                 foreach( var player in PlayerDetails ) {
-                    int team = GetTeam( player.Key );
-                    if( team != (int)Teams.Spectators ) {
-                        if( team == (int)Teams.Detectives )
-                            WriteChat( ply.Name, message, 0, 0, 255 );
-                        else
-                            WriteChat( ply.Name, message, 0, 255, 0 );
+                    if( GetTeam( ply ) == (int)Teams.Detectives ) {
+                        WriteChat( player.Key, "[DETECTIVE] " + ply.Name, message, 0, 0, 230 );
+                    } else {
+                        WriteChat( player.Key, ply.Name, message, 0, 230, 0 );
                     }
                 }
             }
@@ -70,9 +72,17 @@ namespace Salty_Gamemodes_Server {
                 players.RemoveAt( traitorID );
             }
 
+            if( players.Count >= 4 ) {
+                int detectiveID = rand.Next( 0, players.Count );
+                Player detective = players[detectiveID];
+                SetTeam( detective, (int)Teams.Detectives );
+                SpawnClient( detective, 1 );
+                players.RemoveAt( detectiveID );
+            }
+
             foreach (var ply in players) {
-                SetTeam(ply, (int)Teams.Innocents);
-                SpawnClient(ply, 1);
+                SetTeam( ply, (int)Teams.Innocents );
+                SpawnClient( ply, 1 );
             }
 
             base.Start();
