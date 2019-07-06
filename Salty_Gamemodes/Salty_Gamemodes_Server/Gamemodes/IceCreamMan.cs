@@ -38,12 +38,12 @@ namespace Salty_Gamemodes_Server {
             base.OnTimerEnd();
         }
 
-        public override void PlayerKilled( Player player, int killerID, ExpandoObject deathData ) {
+        public override void PlayerKilled( Player player, int killerID, Vector3 deathCoords ) {
             if( GetTeam(player) == (int)Teams.Driver ) {
                 WriteChat( "Ice Cream Man", "Ice cream man defeated. Bikers win.", 255, 0, 0 );
                 End();
             }
-            base.PlayerKilled( player, killerID, deathData );
+            base.PlayerKilled( player, killerID, deathCoords );
         }
 
         public override void PlayerDied( Player player, int killerType, Vector3 deathcords ) {

@@ -42,3 +42,6 @@ Radar with green square drawn with text with distance m
 Spawn dead body with server ID, player interacts with body, sends ping to server with ID, ID updates everyone else.
 Body contains time of death, if they were typing what it was
 Voice channel for T's only as well as normal chat
+Green rectangle when talking
+
+Crouching

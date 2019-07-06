@@ -97,8 +97,8 @@ namespace Salty_Gamemodes_Server {
             
         }
 
-        public void SpawnClient( Player ply, int team ) {
-            ply.TriggerEvent( "salty::StartGame", ID, team, GameLength, GameMap.Position, GameMap.Size, GameMap.GetNextSpawn(team), GameMap.GunSpawns );
+        public void SpawnClient( Player ply, int teamSpawn ) {
+            ply.TriggerEvent( "salty::StartGame", ID, GetTeam(ply), GameLength, GameMap.Position, GameMap.Size, GameMap.GetNextSpawn( teamSpawn ), GameMap.GunSpawns );
         }
 
         public virtual bool OnChatMessage( Player ply, string message ) {
@@ -110,7 +110,7 @@ namespace Salty_Gamemodes_Server {
             isTimed = true;
         }
 
-        public virtual void PlayerKilled( Player player, int killerID, ExpandoObject deathData ) {
+        public virtual void PlayerKilled( Player player, int killerID, Vector3 deathcords ) {
   
         }
 
@@ -140,6 +140,7 @@ namespace Salty_Gamemodes_Server {
             } else {
                 PlayerTeams[team].Add(ply);
             }
+            TriggerClientEvent( "salty::GMPlayerUpdate", Convert.ToInt32( ply.Handle ), "Team", team );
         }
 
         public int TeamCount( int team ) {

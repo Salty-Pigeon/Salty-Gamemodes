@@ -27,10 +27,6 @@ namespace Salty_Gamemodes_Client {
 
         public void LoadCommands() {
 
-            RegisterCommand("body", new Action<int, List<object>, string>(( source, args, raw ) => {
-                test = new DeadBody( Game.PlayerPed.Position, PlayerPedId(), PlayerId() );
-            }), false);
-
             RegisterCommand( "mouse", new Action<int, List<object>, string>( ( source, args, raw ) => {
                 Debug.WriteLine( string.Format( "{0} {1} {2}", GetGameplayCamRot( 0 ).X, GetGameplayCamRot( 0 ).Y, GetGameplayCamRot( 0 ).Z ) );
             } ), false );

@@ -76,7 +76,6 @@ namespace Salty_Gamemodes_Client {
 
         public BaseGamemode() {
             OtherPlayerInfo = new Dictionary<int, Dictionary<string, int>>();
-            noclipPos = Game.PlayerPed.Position;
             HealthText = new SaltyText( 0.085f, 0.895f, 0, 0, 0.5f, "Health: ", 255, 255, 255, 255, false, true, 0, true );
             AmmoText = new SaltyText( 0.085f, 0.935f, 0, 0, 0.5f, "Ammo: ", 255, 255, 255, 255, false, true, 0, true );
 
@@ -426,7 +425,22 @@ namespace Salty_Gamemodes_Client {
             PlayerWeapons.Remove( WeaponSlots[wepName] );
 
         }
-        
+
+        public void DrawText2D( float x, float y, string text, float scale, int r, int g, int b, int a, bool centre ) {
+            SetTextScale( scale, scale );
+            SetTextFont( 0 );
+            SetTextProportional( true );
+            SetTextColour( r, g, b, a );
+            SetTextDropshadow( 0, 0, 0, 0, 55 );
+            SetTextEdge( 2, 0, 0, 0, 150 );
+            SetTextDropShadow();
+            SetTextOutline();
+            SetTextEntry( "STRING" );
+            SetTextCentre( centre );
+            AddTextComponentString( text );
+            DrawText( x, y );
+        }
+
         public void DrawText3D( Vector3 pos, string text, float scale, int r, int g, int b, int a, float minDistance ) {
             float x = 0, y = 0;
             bool offScreen = Get_2dCoordFrom_3dCoord( pos.X, pos.Y, pos.Z, ref x, ref y );
@@ -492,6 +506,32 @@ namespace Salty_Gamemodes_Client {
 
                 }
 
+            }
+        }
+
+        public virtual void ShowTalking() {
+            if( IsControlPressed(0, 249) ) {
+                int offset = 0;
+                if( Team == 0 ) {
+                    foreach( var ply in new PlayerList() ) {
+                        if( !NetworkIsPlayerTalking( ply.Handle ) ) { continue; }
+                        if( GetTeam( ply.Handle ) == 0 ) {
+                            DrawRectangle( 0.85f, 0.05f + (offset * 0.06f), 0.13f, 0.06f, 230, 230, 0, 255 );
+                            DrawText2D( 0.86f, 0.06f + (offset * 0.06f), ply.Name, 0.5f, 255, 255, 255, 255, false );
+                            offset++;
+                        }
+                    }
+                } else {
+                    foreach( var ply in new PlayerList() ) {
+                        if (!NetworkIsPlayerTalking(ply.Handle)) { continue; }
+                        if( GetTeam( ply.Handle ) != 0 ) {
+                            DrawRectangle( 0.85f, 0.05f + ( offset * 0.06f ), 0.13f, 0.06f, 0, 230, 0, 255 );
+                            DrawText2D( 0.86f, 0.06f + (offset * 0.06f), ply.Name, 0.5f, 255, 255, 255, 255, false );
+                            offset++;
+                        }
+                    }
+                }
+                
             }
         }
 
@@ -631,7 +671,7 @@ namespace Salty_Gamemodes_Client {
 
 
         public virtual void SetNoClip( bool toggle ) {
-            if( noclipPos == Vector3.Zero )
+            if( GetDistanceBetweenCoords( noclipPos.X, noclipPos.Y, noclipPos.Z, 0, 0, 0, true) <= 10 )
                 noclipPos = Game.PlayerPed.Position;
             deathTimer = 0;
             isNoclip = toggle;

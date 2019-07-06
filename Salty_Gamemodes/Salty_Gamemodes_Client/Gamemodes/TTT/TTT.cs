@@ -23,12 +23,19 @@ namespace Salty_Gamemodes_Client {
 
         public Dictionary<int, DeadBody> DeadBodies = new Dictionary<int, DeadBody>();
 
+        public float DNATime = 0f;
+        public float DNAScanTime = 10 * 1000;
+        public Vector3 DNALastPos;
+
         public float RadarTime = 0f;
         public float RadarScanTime = 30 * 1000;
         public bool isRadarActive = false;
         public List<Vector3> RadarPositions = new List<Vector3>();
         uint pedModel = 0;
 
+        public int DetectiveTracing = -1;
+
+        public int SpendPoints = 1;
 
         public enum Teams {
             Spectators,
@@ -137,6 +144,7 @@ namespace Salty_Gamemodes_Client {
         public override void End() {
             WriteChat( "TTT", "Game ending", 255, 0, 0 );
             GameMap.ClearWeapons();
+            CloseTTTMenu();
             base.End();
 
         }
@@ -144,11 +152,21 @@ namespace Salty_Gamemodes_Client {
         public void CloseTTTMenu() {
             TTTMenu = null;
         }
+        
+
+        public bool CanBuy() {
+            if( SpendPoints <= 0 ) {
+                WriteChat( "TTT", "Not enough funds", 0, 0, 230 );
+                return false;
+            }
+            SpendPoints--;
+            return true;
+        }
 
         public override void Controls() {
 
-            //if( Team == 0 )
-                //return;
+           if( Team == 0 )
+                return;
 
             if( IsControlJustPressed( 0, 23 ) && Game.PlayerPed.Weapons.Current.Hash.ToString() != "Unarmed" ) {
 
@@ -167,10 +185,10 @@ namespace Salty_Gamemodes_Client {
 
             if( IsControlJustPressed( 0, 244 ) ) {
                 if( Team == (int)Teams.Traitors) {
-                    TTTMenu = TTTMenu == null ? new TTT_TraitorMenu(this, 0.5f, 0.8f, 0.3f, 0.15f, System.Drawing.Color.FromArgb(44, 62, 80), CloseTTTMenu) : null;
+                    TTTMenu = TTTMenu == null ? new TTT_TraitorMenu(this, 0.5f, 0.8f, 0.3f, 0.15f, System.Drawing.Color.FromArgb(44, 62, 80), CloseTTTMenu, CanBuy ) : null;
                 }
                 if( Team == (int)Teams.Detectives) {
-                    TTTMenu = TTTMenu == null ? new TTT_DetectiveMenu(this, 0.5f, 0.8f, 0.3f, 0.15f, System.Drawing.Color.FromArgb(44, 62, 80), CloseTTTMenu) : null;
+                    TTTMenu = TTTMenu == null ? new TTT_DetectiveMenu(this, 0.5f, 0.8f, 0.3f, 0.15f, System.Drawing.Color.FromArgb(44, 62, 80), CloseTTTMenu, CanBuy ) : null;
                 }
             }
 
@@ -179,7 +197,7 @@ namespace Salty_Gamemodes_Client {
                     TriggerServerEvent("salty::netUpdatePlayerBool", "disguised");
             }
 
-            if ( IsControlJustPressed(0, 27) ) { // Up arrow
+            if ( IsControlJustPressed(0, 212) ) { // Up arrow
                 if (CanTeleport)
                     TeleportToSaved(3 * 1000);
             }
@@ -194,14 +212,17 @@ namespace Salty_Gamemodes_Client {
 
             if( IsControlJustPressed( 0, 38 ) ) { // E dead body
                 foreach( var body in DeadBodies ) {
-                    if( body.Value.isDiscovered )
-                        continue;
                     Vector3 myPos = Game.PlayerPed.Position;
                     float dist = GetDistanceBetweenCoords( myPos.X, myPos.Y, myPos.Z, body.Value.Position.X, body.Value.Position.Y, body.Value.Position.Z, true );
-                    if( dist <= 2 ) {
+                    if( dist > 2 ) { continue; }
+                    if( body.Value.isDiscovered ) {
+                        if( Team == (int)Teams.Detectives ) {
+                            WriteChat( "TTT", "Scanning DNA", 0, 0, 230 );
+                            DetectiveTracing = body.Value.KillerPed;
+                        } 
+                    } else {
                         body.Value.View();
-                        if( !body.Value.isDiscovered )
-                            TriggerServerEvent( "salty::netBodyDiscovered", body.Key );
+                        TriggerServerEvent( "salty::netBodyDiscovered", body.Key );
                     }
                 }
             }
@@ -222,8 +243,6 @@ namespace Salty_Gamemodes_Client {
 
         public override void PlayerDied( int killerType, Vector3 deathcords ) {
             SetTeam( (int)Teams.Spectators );
-            //ApplyDamageToPed( ped, 10000, false );
-
             base.PlayerDied( killerType, deathcords );
         }
 
@@ -257,6 +276,9 @@ namespace Salty_Gamemodes_Client {
                 DisableControlAction(0, 31, true);
                 DisableControlAction(0, 24, true);
                 DisableControlAction(0, 257, true);
+                DisableControlAction( 0, 22, true );
+                DisableControlAction( 0, 21, true );
+
                 int alpha = (int)Math.Round(255 * ((teleportTime - gameTime) / (teleportLength / 2)));
                 if ( teleportTime - gameTime <= (teleportLength/2)) {
                     if( !hasTeleported ) {
@@ -279,9 +301,10 @@ namespace Salty_Gamemodes_Client {
             }
         }
 
-        public void SpawnDeadBody( Vector3 position, int ply ) {
+        public void SpawnDeadBody( Vector3 position, int ply, int killer ) {
             int player = GetPlayerFromServerId( ply );
-            DeadBodies.Add( ply, new DeadBody( position, GetPlayerPed( player ), player ) );
+            int kill = GetPlayerFromServerId( killer );
+            DeadBodies.Add( ply, new DeadBody( position, player, kill ) );
         }
 
         public override void PlayerSpawned( ExpandoObject spawnInfo ) {
@@ -326,13 +349,16 @@ namespace Salty_Gamemodes_Client {
                     DrawText3D( Position, Game.PlayerPed.Position, body.Value.Caption, 0.3f, 255, 255, 0, 255, 2 );
                 else
                     DrawText3D( Position, Game.PlayerPed.Position, body.Value.Caption, 0.3f, 255, 255, 255, 255, 2 );
+                if( Team == (int)Teams.Spectators ) {
+                    DrawText3D( Position - new Vector3(0,0,0.2f), Game.PlayerPed.Position, "Press E to scan for DNA", 0.3f, 230, 230, 0, 255, 2 );
+                }
             }
         }
 
 
         public void UpdateRadar() {
             RadarPositions = new List<Vector3>();
-            RadarTime += RadarScanTime;
+            RadarTime = GetGameTimer() + RadarScanTime;
             foreach( var ply in GetInGamePlayers() ) {
                 RadarPositions.Add( GetEntityCoords( GetPlayerPed(ply), true ) );
             }
@@ -342,7 +368,6 @@ namespace Salty_Gamemodes_Client {
             if( isRadarActive )
                 return;
             UpdateRadar();
-            RadarTime = GetGameTimer() + RadarScanTime;
             isRadarActive = active;
         }
 
@@ -361,18 +386,60 @@ namespace Salty_Gamemodes_Client {
                 DrawText3D( pos, Math.Round( dist, 1 ) + "m", 0.3f, 255, 255, 255, 255, 999999 );
 
                 float x = 0, y = 0;
-                Get_2dCoordFrom_3dCoord( pos.X, pos.Y, pos.Z - 0.08f, ref x, ref y );
-                DrawRect( x, y, 0.02f, 0.02f, 0, 200, 0, 255 );
+                var offscreen = Get_2dCoordFrom_3dCoord( pos.X, pos.Y, pos.Z - 0.08f, ref x, ref y );
+                if( !offscreen )
+                    DrawRect( x, y, 0.02f, 0.02f, 0, 200, 0, 255 );
                 
             }
 
-            
+            DrawText2D( 0.025f, 0.97f, "Radar update in " + (Math.Round((RadarTime - GetGameTimer()) / 1000)).ToString(), 0.3f, 255, 255, 255, 255, false );
+
         }
+
+
+        public void UpdateDNA() {
+            DNATime = GetGameTimer() + DNAScanTime;
+            Vector3 newCoord = GetEntityCoords( DetectiveTracing, true );
+            if( newCoord != Vector3.Zero ) {
+                DNALastPos = newCoord;
+            }
+        }
+
+        public void ShowDNA() {
+
+            if( DNATime < GetGameTimer() ) {
+                DNATime += DNAScanTime;
+                UpdateDNA();
+            }
+
+            if( DNALastPos != Vector3.Zero ) {
+                Vector3 camPos = GetGameplayCamCoords();
+                float dist = GetDistanceBetweenCoords( DNALastPos.X, DNALastPos.Y, DNALastPos.Z, camPos.X, camPos.Y, camPos.Z, true );
+
+                DrawText3D( DNALastPos, Math.Round( dist, 1 ) + "m", 0.3f, 255, 255, 255, 255, 999999 );
+
+                float x = 0, y = 0;
+                var offscreen = Get_2dCoordFrom_3dCoord( DNALastPos.X, DNALastPos.Y, DNALastPos.Z - 0.08f, ref x, ref y );
+                if( !offscreen )
+                    DrawRect( x, y, 0.02f, 0.02f, 0, 0, 230, 255 );
+            }
+
+            DrawText2D( 0.025f, 0.835f, "DNA update in " + (Math.Round( (RadarTime - GetGameTimer()) / 1000 )).ToString(), 0.3f, 255, 255, 255, 255, false );
+
+        }
+
 
         public override void HUD() {
 
             if( TTTMenu != null ) {
                 TTTMenu.Draw();
+            }
+
+
+            ShowTalking();
+
+            if( DetectiveTracing > -1 ) {
+                ShowDNA();
             }
 
             HideReticle();
@@ -458,11 +525,13 @@ namespace Salty_Gamemodes_Client {
                 case ((int)Teams.Innocents):
                     TeamText.Caption = "Innocent";
                     TeamText.Colour = System.Drawing.Color.FromArgb( 255, 255, 255 );
+                    TeamText.Position.X -= 0.006f;
                     NetworkSetVoiceChannel( 1 );
                     break;
                 case ((int)Teams.Detectives):
                     TeamText.Caption = "Detective";
                     TeamText.Colour = System.Drawing.Color.FromArgb( 255, 255, 255 );
+                    TeamText.Position.X -= 0.008f;
                     NetworkSetVoiceChannel( 1 );
                     break;
             }
@@ -471,7 +540,7 @@ namespace Salty_Gamemodes_Client {
 
         public override void Update() {
 
-            //FirstPersonForAlive();
+            FirstPersonForAlive();
             SetPlayerMayNotEnterAnyVehicle( PlayerId() );
 
             foreach( var body in DeadBodies ) {

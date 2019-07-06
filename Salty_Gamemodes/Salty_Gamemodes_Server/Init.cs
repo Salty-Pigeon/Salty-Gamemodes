@@ -50,7 +50,7 @@ namespace Salty_Gamemodes_Server
             EventHandlers[ "salty::netUpdatePlayerBool" ] += new Action<Player, string>( UpdatePlayerBool );
             EventHandlers[ "salty::netBodyDiscovered" ] += new Action<Player, int>( BodyDiscovered );
             EventHandlers["chatMessage"] += new Action<int, string, string>( ChatMessage );
-
+            
 
             RegisterCommand( "startTTT", new Action<int, List<object>, string>( ( source, args, raw ) => {
                 StartTTT();
@@ -164,7 +164,7 @@ namespace Salty_Gamemodes_Server
                 }
             }
             PlayerDied( ply, killerType, deathCoords );
-            ActiveGame.PlayerKilled( ply, killerID, deathData );
+            ActiveGame.PlayerKilled( ply, killerID, new Vector3(deathCoords[0], deathCoords[1], deathCoords[2]) );
         }
 
         private void PlayerDied( [FromSource] Player ply, int killerType, List<dynamic> deathcords ) {

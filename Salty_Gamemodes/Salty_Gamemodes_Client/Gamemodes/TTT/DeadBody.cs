@@ -15,20 +15,28 @@ namespace Salty_Gamemodes_Client {
         public uint Model;
         public int PlayerPed;
         public int PlayerID;
+        public int KillerPed;
+        public int KillerID;
         public Vector3 Position;
         public string Name;
 
         public bool isDiscovered = false;
         public string Caption = "Unidentified body [E]";
 
-        public DeadBody( Vector3 position, int plyPed, int plyID ) {
-            Model = (uint)GetEntityModel( plyPed );
-            PlayerPed = plyPed;
+        public DeadBody( Vector3 position,int plyID, int killerID ) {
+            PlayerPed = GetPlayerPed( plyID );
+            Model = (uint)GetEntityModel( PlayerPed );
+            KillerPed = GetPlayerPed(killerID);
             PlayerID = plyID;
+            KillerID = killerID;
             Name = GetPlayerName( plyID );
             Position = position;
             ID = CreatePed( 4, Model, Game.PlayerPed.Position.X, Game.PlayerPed.Position.Y, Game.PlayerPed.Position.Z + 1, 0.0f, true, true );
             
+        }
+
+        public void Detective() {
+
         }
 
         public void Discovered() {

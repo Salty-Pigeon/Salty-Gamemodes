@@ -1,6 +1,7 @@
 ﻿using CitizenFX.Core;
 using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -65,26 +66,36 @@ namespace Salty_Gamemodes_Server {
                 int traitorID = rand.Next( 0, players.Count );
                 Player traitor = players[traitorID];
                 SetTeam( traitor, (int)Teams.Traitors );
-                SpawnClient( traitor, (int)Teams.Traitors );
+                SpawnClient( traitor, 1 );
                 players.RemoveAt( traitorID );
             }
 
             foreach (var ply in players) {
                 SetTeam(ply, (int)Teams.Innocents);
-                SpawnClient(ply, (int)Teams.Innocents);
+                SpawnClient(ply, 1);
             }
 
             base.Start();
         }
 
-        public override void PlayerDied( [FromSource] Player player, int killerType, Vector3 deathcords ) {
-            SetTeam(player, (int)Teams.Spectators);
-            TriggerClientEvent( "salty::SpawnDeadBody", deathcords, Convert.ToInt32( player.Handle ) );
-            if( GetTeam(player) == (int)Teams.Traitors ) {
+        public override void PlayerKilled( Player player, int killerID, Vector3 deathcords ) {
+            SetTeam( player, (int)Teams.Spectators );
+            TriggerClientEvent( "salty::SpawnDeadBody", deathcords, Convert.ToInt32( player.Handle ), killerID );
+            if( GetTeam( player ) == (int)Teams.Traitors ) {
                 GameTime += 30 * 1000;
             }
-            foreach( var ply in InGamePlayers ) {
+            base.PlayerKilled( player, killerID, deathcords );
+        }
 
+        public override void PlayerDied( [FromSource] Player player, int killerType, Vector3 deathcords ) {
+            SetTeam(player, (int)Teams.Spectators);
+            TriggerClientEvent( "salty::SpawnDeadBody", deathcords, Convert.ToInt32( player.Handle ), Convert.ToInt32( player.Handle ) );
+            if( TeamCount((int)Teams.Traitors) <= 0 ) {
+                //WriteChat( "TTT", "Innocents Win!", 0, 230, 0 );
+                //End();
+            } else if( TeamCount((int)Teams.Innocents) + TeamCount((int)Teams.Detectives) <= 0 ) {
+                //WriteChat( "TTT", "Traitors Win!", 230, 0, 0 );
+                //End();
             }
             base.PlayerDied(player, killerType, deathcords);
         }
