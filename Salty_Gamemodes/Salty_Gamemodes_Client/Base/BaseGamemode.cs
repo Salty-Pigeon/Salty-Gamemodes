@@ -284,9 +284,10 @@ namespace Salty_Gamemodes_Client {
         }
 
         public virtual void End() {
-            GameMap.ClearBlip();
+            SetNoClip( true );
+            if( GameMap != null )
+                GameMap.ClearBlip();
             inGame = false;
-
         }
 
 
@@ -329,7 +330,7 @@ namespace Salty_Gamemodes_Client {
         }
 
         public virtual void Controls() {
-            isScoped = IsControlPressed( 1, 25 );
+            isScoped = IsControlPressed( 1, 25 );       
         }
 
         public virtual bool CanPickupWeapon( string weaponModel ) {
@@ -612,6 +613,7 @@ namespace Salty_Gamemodes_Client {
             }
 
             if( Team == 0 ) {
+                DisableControlAction( 0, 0, true );
                 if( GetFollowPedCamViewMode() != 1 ) {
                     SetFollowPedCamViewMode( 1 );
                 }
@@ -668,7 +670,14 @@ namespace Salty_Gamemodes_Client {
             ClearDrawOrigin();
         }
 
+        public void CantEnterVehichles() {
+            SetPlayerMayNotEnterAnyVehicle( PlayerId() );
+            DisableControlAction( 0, 75, true );
+        }
 
+        public void CantExitVehichles() {
+            DisableControlAction( 0, 75, true );
+        }
 
         public virtual void SetNoClip( bool toggle ) {
             if( GetDistanceBetweenCoords( noclipPos.X, noclipPos.Y, noclipPos.Z, 0, 0, 0, true) <= 10 )
@@ -726,8 +735,10 @@ namespace Salty_Gamemodes_Client {
 
         public void FirstPersonForAlive() {
             if( Team != 0 ) {
+                DisableControlAction( 0, 0, true );
                 if( GetFollowPedCamViewMode() != 4 )
                     SetFollowPedCamViewMode( 4 );
+
             }
         }
 

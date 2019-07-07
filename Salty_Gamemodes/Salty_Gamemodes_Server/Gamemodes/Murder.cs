@@ -61,6 +61,7 @@ namespace Salty_Gamemodes_Server {
             if( GetTeam(player) == (int)Teams.Murderer ) {
                 WriteChat( "Murder", "Murderer dead, civilians win!", 255, 0, 0 );
                 End();
+                return;
             }
 
             SetTeam( player, (int)Teams.Spectators );
@@ -75,7 +76,6 @@ namespace Salty_Gamemodes_Server {
 
         public override void End() {
             WriteChat( "Murder", "Game ending", 255, 0, 0 );
-
             base.End();
         }
     }

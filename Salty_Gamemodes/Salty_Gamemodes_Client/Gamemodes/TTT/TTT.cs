@@ -539,7 +539,7 @@ namespace Salty_Gamemodes_Client {
         public override void Update() {
 
             FirstPersonForAlive();
-            SetPlayerMayNotEnterAnyVehicle( PlayerId() );
+            CantEnterVehichles();
 
             foreach( var body in DeadBodies ) {
                 if( !IsPedRagdoll( body.Value.ID ) )

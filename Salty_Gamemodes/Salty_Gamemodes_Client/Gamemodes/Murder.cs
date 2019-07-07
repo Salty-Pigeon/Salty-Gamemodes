@@ -73,7 +73,7 @@ namespace Salty_Gamemodes_Client {
         }
 
         public override void Update() {
-
+            CantEnterVehichles();
             base.Update();
         }
         

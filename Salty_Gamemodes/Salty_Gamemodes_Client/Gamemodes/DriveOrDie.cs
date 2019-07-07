@@ -26,6 +26,9 @@ namespace Salty_Gamemodes_Client {
             "Blazer4",
             "Chimera",
             "Thrust",
+            "Sanchez2",
+            "Lectro",
+            "Fcr"
         };
 
         public enum Teams {
@@ -91,7 +94,7 @@ namespace Salty_Gamemodes_Client {
 
         Random rand = new Random();
         public override void Update() {
-
+            CantExitVehichles();
             if( Bike != null ) {
                 if( Bike.IsInWater && !Bike.IsEngineRunning ) {
                     ExplodeVehicle( Bike );

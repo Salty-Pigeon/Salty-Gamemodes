@@ -16,7 +16,7 @@ namespace Salty_Gamemodes_Server {
             MySqlConnectionStringBuilder conn_string = new MySqlConnectionStringBuilder();
             conn_string.Server = "mysql-mariadb-dal01-9-101.zap-hosting.com";
             conn_string.UserID = "zap429233-1";
-            conn_string.Password = "8elLq3P3BUgFE7I3";
+            conn_string.Password = "I1agPTYxuRNJEBHc";
             conn_string.Database = "zap429233-1";
 
             Connection = new MySqlConnection( conn_string.ToString() );

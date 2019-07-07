@@ -101,11 +101,11 @@ namespace Salty_Gamemodes_Server {
             SetTeam(player, (int)Teams.Spectators);
             TriggerClientEvent( "salty::SpawnDeadBody", deathcords, Convert.ToInt32( player.Handle ), Convert.ToInt32( player.Handle ) );
             if( TeamCount((int)Teams.Traitors) <= 0 ) {
-                //WriteChat( "TTT", "Innocents Win!", 0, 230, 0 );
-                //End();
+                WriteChat( "TTT", "Innocents Win!", 0, 230, 0 );
+                End();
             } else if( TeamCount((int)Teams.Innocents) + TeamCount((int)Teams.Detectives) <= 0 ) {
-                //WriteChat( "TTT", "Traitors Win!", 230, 0, 0 );
-                //End();
+                WriteChat( "TTT", "Traitors Win!", 230, 0, 0 );
+                End();
             }
             base.PlayerDied(player, killerType, deathcords);
         }

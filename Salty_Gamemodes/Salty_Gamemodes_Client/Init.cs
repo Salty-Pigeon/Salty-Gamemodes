@@ -30,6 +30,8 @@ namespace Salty_Gamemodes_Client
 
             RequestStreamedTextureDict("saltyTextures", true);
 
+            ClearAreaOfObjects( Game.PlayerPed.Position.X, Game.PlayerPed.Position.Y, Game.PlayerPed.Position.Z, 100, 0 );
+
             //commands = new Commands(this);
             //test = new Testing(this);
 

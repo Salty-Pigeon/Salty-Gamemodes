@@ -159,6 +159,12 @@ namespace Salty_Gamemodes_Client {
             
         }
 
+        public void ClearObjects() {
+            ClearAreaOfObjects( Position.X, Position.Y, Position.Z, Size.X + Size.Y, 0 );
+            ClearAreaOfProjectiles( Position.X, Position.Y, Position.Z, Size.X + Size.Y, true );
+        }
+
+
         public void DrawSpawnPoints() {
             int i = 0;
             foreach(var spawns in SpawnPoints ) {             
@@ -174,6 +180,7 @@ namespace Salty_Gamemodes_Client {
                 RemoveBlip( ref Blip );
                 isVisible = false;
             }
+            ClearObjects();
         }
 
         public bool IsInZone( Vector3 pos ) {
