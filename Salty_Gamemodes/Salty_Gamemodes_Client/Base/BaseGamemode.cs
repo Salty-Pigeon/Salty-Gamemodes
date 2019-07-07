@@ -323,6 +323,9 @@ namespace Salty_Gamemodes_Client {
 
         public virtual void SetTeam( int team ) {
             Team = team;
+            if( team == 0 ) {
+                NetworkSetVoiceChannel( 0 );
+            }
         }
 
         public void DrawRectangle( float x, float y, float width, float height, int r, int g, int b, int alpha ) {

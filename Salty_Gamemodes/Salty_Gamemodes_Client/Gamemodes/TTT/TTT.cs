@@ -69,7 +69,7 @@ namespace Salty_Gamemodes_Client {
                 //{ "WEAPON_SNIPERRIFLE", 2 },
                 { "WEAPON_PUMPSHOTGUN", 4  },
                 { "WEAPON_MICROSMG", 6 },
-                { "WEAPON_COMBATMG", 3 }
+                { "WEAPON_COMBATMG", 2 }
             };
 
             GameWeapons = new Dictionary<string, string>() {
@@ -133,7 +133,7 @@ namespace Salty_Gamemodes_Client {
 
             Game.Player.Character.MaxHealth = 100;
             Game.Player.Character.Health = 100;
-            GameMap.SpawnWeapons();
+            //GameMap.SpawnWeapons();
             SetPlayerMayNotEnterAnyVehicle( PlayerId() );       
             GameMap.CreateBlip();
             RadarPositions.Add( PlayerSpawn );
@@ -513,7 +513,6 @@ namespace Salty_Gamemodes_Client {
                 case ((int)Teams.Spectators):
                     TeamText.Caption = "Spectate";
                     TeamText.Colour = System.Drawing.Color.FromArgb( 150, 150, 0 );
-                    NetworkSetVoiceChannel( 0 );
                     break;
                 case ((int)Teams.Traitors):
                     TeamText.Caption = "Traitor";

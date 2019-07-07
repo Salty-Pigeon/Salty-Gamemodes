@@ -29,11 +29,63 @@ namespace Salty_Gamemodes_Server {
 
 
         public TTT( MapManager manager, int ID, string MapTag ) : base ( manager, ID, MapTag ) {
-
+            Init();
         }
 
         public TTT( MapManager manager, int ID, Map map ) : base( manager, ID, map ) {
+            Init();
+        }
 
+        public void Init() {
+            GameMap.WeaponWeights = new Dictionary<string, int>() {
+                { "WEAPON_PISTOL", 8 },
+                { "WEAPON_COMBATPISTOL", 7  },
+                { "WEAPON_SMG", 6  },
+                { "WEAPON_CARBINERIFLE", 5  },
+                { "WEAPON_ASSAULTRIFLE", 4  },
+                { "WEAPON_PUMPSHOTGUN", 4  },
+                { "WEAPON_MICROSMG", 6 },
+                { "WEAPON_COMBATMG", 2 }
+            };
+
+            GameWeapons = new Dictionary<string, string>() {
+                { "WEAPON_UNARMED", "Fists" },
+                { "WEAPON_PISTOL", "Pistol"  },
+                { "WEAPON_COMBATPISTOL", "Combat Pistol" },
+                { "WEAPON_SMG", "SMG" },
+                { "WEAPON_CARBINERIFLE", "Carbine"  },
+                { "WEAPON_ASSAULTRIFLE", "AK47"  },
+                { "WEAPON_PUMPSHOTGUN", "Pump Shotgun"  },
+                { "WEAPON_MICROSMG", "Micro-SMG" },
+                { "WEAPON_COMBATMG", "Light Machine Gun" },
+                { "WEAPON_KNIFE", "Knife" }
+            };
+
+            WeaponSlots = new Dictionary<string, int>() {
+                { "WEAPON_UNARMED", 0 },
+                { "WEAPON_PISTOL", 1  },
+                { "WEAPON_COMBATPISTOL", 1 },
+                { "WEAPON_MICROSMG", 1 },
+                { "WEAPON_SMG", 2 },
+                { "WEAPON_CARBINERIFLE", 2  },
+                { "WEAPON_ASSAULTRIFLE", 2  },
+                { "WEAPON_PUMPSHOTGUN", 2  },
+                { "WEAPON_COMBATMG", 2 },
+                { "WEAPON_KNIFE", 3 },
+            };
+
+            WeaponMaxAmmo = new Dictionary<string, int>() {
+                { "WEAPON_UNARMED", 0 },
+                { "WEAPON_PISTOL", 38  },
+                { "WEAPON_COMBATPISTOL", 38 },
+                { "WEAPON_MICROSMG", 96 },
+                { "WEAPON_SMG", 180 },
+                { "WEAPON_CARBINERIFLE", 180  },
+                { "WEAPON_ASSAULTRIFLE", 180  },
+                { "WEAPON_PUMPSHOTGUN", 24  },
+                { "WEAPON_COMBATMG", 300 },
+                { "WEAPON_KNIFE", 1 },
+            };
         }
 
         public override void PlayerJoined( Player ply ) {

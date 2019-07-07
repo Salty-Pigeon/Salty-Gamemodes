@@ -53,8 +53,7 @@ namespace Salty_Gamemodes_Client {
         }
 
         public override void Start() {
-
-
+            NetworkSetVoiceChannel( 1 );
             SetPlayerMeleeWeaponDamageModifier( PlayerId(), 0 );
             SetPlayerWeaponDamageModifier( PlayerId(), 20 );
 

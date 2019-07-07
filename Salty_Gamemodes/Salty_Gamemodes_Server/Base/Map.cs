@@ -1,4 +1,5 @@
 ﻿using CitizenFX.Core;
+using static CitizenFX.Core.Native.API;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Salty_Gamemodes_Server {
-    public class Map {
+    public class Map : BaseScript {
 
         public string Name = "None";
         public bool isActive = false;
@@ -16,8 +17,29 @@ namespace Salty_Gamemodes_Server {
         public Dictionary<int, List<Vector3>> SpawnPoints = new Dictionary<int, List<Vector3>>();
         public Dictionary<string, List<Vector3>> GunSpawns = new Dictionary<string, List<Vector3>>();
 
+        public Dictionary<string, string> GameWeapons = new Dictionary<string, string>();
+
         private Dictionary<int, List<Vector3>> usedSpawns = new Dictionary<int, List<Vector3>>();
         private Random rand;
+
+
+        public Dictionary<string, string> Weapons = new Dictionary<string, string>(){
+            { "WEAPON_PISTOL", "W_PI_PISTOL"  },
+            { "WEAPON_COMBATPISTOL", "W_PI_COMBATPISTOL" },
+            { "WEAPON_SMG", "W_SB_SMG" },
+            { "WEAPON_CARBINERIFLE", "W_AR_CARBINERIFLE"  },
+            { "WEAPON_ASSAULTRIFLE", "W_AR_ASSAULTRIFLE"  },
+            { "WEAPON_SNIPERRIFLE", "W_SR_SNIPERRIFLE" },
+            { "WEAPON_PUMPSHOTGUN", "W_SG_PUMPSHOTGUN"  },
+            { "WEAPON_MICROSMG", "W_SB_MICROSMG" },
+            { "WEAPON_COMBATMG", "W_MG_COMBATMG" }
+        };
+
+        public Dictionary<string, int> WeaponWeights = new Dictionary<string, int>();
+
+        Dictionary<int, string> weaponIntervals = new Dictionary<int, string>();
+
+
         public Map( Vector3 position, Vector3 size, string name ) {
             rand = new Random(DateTime.Now.Millisecond);
             usedSpawns = new Dictionary<int, List<Vector3>>();
@@ -88,6 +110,11 @@ namespace Salty_Gamemodes_Server {
                 spawnPoints = string.Format("0,{0},{1},{2}:", Position.X, Position.Y, Position.Z);
             }
             return spawnPoints.Substring( 0, spawnPoints.Length - 1 );
+        }
+
+
+        public void SpawnWeapons() {
+
         }
 
         public string GunSpawnsAsString( ) {

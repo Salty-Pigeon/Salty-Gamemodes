@@ -96,6 +96,12 @@ namespace Salty_Gamemodes_Client {
             SpawnedWeapons.Remove( item );
         }
 
+        public void SpawnWeapon( string wepModel, uint pickupHash, int worldHash, Vector3 gunPos, bool playerDropped, float waitTime, int ammoCount, int ammoInClip ) {
+            WeaponPickup item = new WeaponPickup( this, wepModel, pickupHash, worldHash, gunPos, playerDropped, waitTime, ammoCount, ammoInClip );
+            if( !CreatedWeapons.ContainsKey( wepModel ) )
+                CreatedWeapons.Add( wepModel, item );
+        }
+
         public void SpawnWeapons() {
 
             Random rand = new Random( DateTime.Now.Millisecond );

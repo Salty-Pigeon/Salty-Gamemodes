@@ -47,3 +47,5 @@ Green rectangle when talking
 Crouching
 
 https://github.com/ESX-Org/es_camera/blob/master/client/main.lua
+
+Move weapon spawner from client to server, net command that creates the weapon pickup

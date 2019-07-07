@@ -50,11 +50,18 @@ namespace Salty_Gamemodes_Client
             EventHandlers[ "salty::SpawnDeadBody" ] += new Action<Vector3, int, int>(SpawnDeadBody);
             EventHandlers[ "salty::UpdateDeadBody" ] += new Action<int>(ViewDeadBody);
             EventHandlers[ "salty::UpdateGameTime" ] += new Action<double>(UpdateGameTime);
+            EventHandlers[ "salty::SpawnWeapon" ] += new Action<string, uint, int, Vector3, bool, float, int, int>(SpawnWeapon);
+
             ActiveGame.SetTeam( 0 );
             ActiveGame.SetNoClip( true );
             Tick += Update;
             SetMaxWantedLevel( 0 );
             GetScreenActiveResolution( ref ScreenWidth, ref ScreenHeight );
+        }
+
+        public void SpawnWeapon( string wepModel, uint pickupHash, int worldHash, Vector3 gunPos, bool playerDropped, float waitTime, int ammoCount, int ammoInClip ) {
+            if( ActiveGame.GameMap != null )
+                ActiveGame.GameMap.SpawnWeapon( wepModel, pickupHash, worldHash, gunPos, playerDropped, waitTime, ammoCount, ammoInClip );
         }
 
         public void StartGame( int id, int team, double duration, Vector3 mapPos, Vector3 mapSize, Vector3 startPos, ExpandoObject gunSpawns ) {

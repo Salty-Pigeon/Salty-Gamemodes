@@ -28,6 +28,19 @@ namespace Salty_Gamemodes_Server {
 
         public string MapTag = "";
 
+        public Dictionary<string, string> GameWeapons = new Dictionary<string, string>();
+        public Dictionary<uint, string> HashToModel = new Dictionary<uint, string>();
+
+        public Dictionary<string, int> WeaponSlots = new Dictionary<string, int>() {
+            { "WEAPON_UNARMED", 0 },
+        };
+
+        public Dictionary<string, int> WeaponMaxAmmo = new Dictionary<string, int>() {
+            { "WEAPON_UNARMED", 0 },
+        };
+
+
+
         public BaseGamemode( MapManager manager, int ID, string MapTag ) {
             MapManager = manager;
             this.ID = ID;
