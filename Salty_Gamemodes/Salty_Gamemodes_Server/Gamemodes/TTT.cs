@@ -48,7 +48,7 @@ namespace Salty_Gamemodes_Server {
                 { "WEAPON_COMBATMG", 2 }
             };
 
-            GameWeapons = new Dictionary<string, string>() {
+            GameMap.GameWeapons = new Dictionary<string, string>() {
                 { "WEAPON_UNARMED", "Fists" },
                 { "WEAPON_PISTOL", "Pistol"  },
                 { "WEAPON_COMBATPISTOL", "Combat Pistol" },
@@ -61,29 +61,16 @@ namespace Salty_Gamemodes_Server {
                 { "WEAPON_KNIFE", "Knife" }
             };
 
-            WeaponSlots = new Dictionary<string, int>() {
+            GameMap.WeaponSpawnAmmo = new Dictionary<string, int>() {
                 { "WEAPON_UNARMED", 0 },
-                { "WEAPON_PISTOL", 1  },
-                { "WEAPON_COMBATPISTOL", 1 },
-                { "WEAPON_MICROSMG", 1 },
-                { "WEAPON_SMG", 2 },
-                { "WEAPON_CARBINERIFLE", 2  },
-                { "WEAPON_ASSAULTRIFLE", 2  },
-                { "WEAPON_PUMPSHOTGUN", 2  },
-                { "WEAPON_COMBATMG", 2 },
-                { "WEAPON_KNIFE", 3 },
-            };
-
-            WeaponMaxAmmo = new Dictionary<string, int>() {
-                { "WEAPON_UNARMED", 0 },
-                { "WEAPON_PISTOL", 38  },
-                { "WEAPON_COMBATPISTOL", 38 },
-                { "WEAPON_MICROSMG", 96 },
-                { "WEAPON_SMG", 180 },
-                { "WEAPON_CARBINERIFLE", 180  },
-                { "WEAPON_ASSAULTRIFLE", 180  },
-                { "WEAPON_PUMPSHOTGUN", 24  },
-                { "WEAPON_COMBATMG", 300 },
+                { "WEAPON_PISTOL", 12  },
+                { "WEAPON_COMBATPISTOL", 12 },
+                { "WEAPON_MICROSMG", 32 },
+                { "WEAPON_SMG", 60 },
+                { "WEAPON_CARBINERIFLE", 60  },
+                { "WEAPON_ASSAULTRIFLE", 60  },
+                { "WEAPON_PUMPSHOTGUN", 8  },
+                { "WEAPON_COMBATMG", 100 },
                 { "WEAPON_KNIFE", 1 },
             };
         }
@@ -112,6 +99,7 @@ namespace Salty_Gamemodes_Server {
         }
 
         public override void Start() {
+
             Random rand = new Random();
             List<Player> players = Players.ToList();
 
@@ -136,6 +124,8 @@ namespace Salty_Gamemodes_Server {
                 SetTeam( ply, (int)Teams.Innocents );
                 SpawnClient( ply, 1 );
             }
+
+            GameMap.SpawnWeapons();
 
             base.Start();
         }

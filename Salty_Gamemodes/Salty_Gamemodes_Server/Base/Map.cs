@@ -19,6 +19,10 @@ namespace Salty_Gamemodes_Server {
 
         public Dictionary<string, string> GameWeapons = new Dictionary<string, string>();
 
+        public Dictionary<string, int> WeaponSpawnAmmo = new Dictionary<string, int>() {
+            { "WEAPON_UNARMED", 0 },
+        };
+
         private Dictionary<int, List<Vector3>> usedSpawns = new Dictionary<int, List<Vector3>>();
         private Random rand;
 
@@ -40,7 +44,7 @@ namespace Salty_Gamemodes_Server {
         Dictionary<int, string> weaponIntervals = new Dictionary<int, string>();
 
 
-        public Map( Vector3 position, Vector3 size, string name ) {
+        public Map( Vector3 position, Vector3 size, string name) {
             rand = new Random(DateTime.Now.Millisecond);
             usedSpawns = new Dictionary<int, List<Vector3>>();
             Position = position;
@@ -114,7 +118,48 @@ namespace Salty_Gamemodes_Server {
 
 
         public void SpawnWeapons() {
+            if( GameWeapons == null )
+                return;
 
+            Random rand = new Random( DateTime.Now.Millisecond );
+
+
+            weaponIntervals = new Dictionary<int, string>();
+            int i = 0;
+            foreach( var wep in GameWeapons ) {
+                if( wep.Key == "WEAPON_UNARMED" || !WeaponWeights.ContainsKey( wep.Key ) )
+                    continue;
+                i += WeaponWeights[wep.Key];
+                weaponIntervals.Add( i, wep.Key );
+            }
+
+            foreach( var gunTypes in GunSpawns ) {
+                foreach( var gunPos in gunTypes.Value ) {
+                    if( gunTypes.Key == "random" || !Weapons.ContainsKey( gunTypes.Key ) ) {
+
+                        int index = rand.Next( 0, i );
+                        string prevItem = Weapons.ElementAt( 0 ).Key;
+                        string wepModel = Weapons.ElementAt( Weapons.Count - 1 ).Key, worldModel = Weapons.ElementAt( Weapons.Count - 1 ).Value;
+                        int prevKey = 0;
+                        foreach( var x in weaponIntervals ) {
+
+                            if( index > prevKey && index <= x.Key ) {
+                                wepModel = x.Value;
+                                worldModel = Weapons[x.Value];
+                                break;
+                            }
+
+                            prevItem = x.Value;
+                            prevKey = x.Key;
+                        }
+                        uint pickupHash = (uint)GetHashKey( wepModel );
+                        int worldHash = GetHashKey( worldModel );
+                        TriggerClientEvent( "salty::SpawnWeapon", wepModel, pickupHash, worldHash, gunPos, false, 0, WeaponSpawnAmmo[wepModel], -1 );
+                    }
+                    else
+                        TriggerClientEvent( "salty::SpawnWeapon", gunTypes.Key, (uint)GetHashKey( gunTypes.Key ), GetHashKey( Weapons[gunTypes.Key] ), gunPos, false, 0, WeaponSpawnAmmo[gunTypes.Key], -1 );
+                }
+            }
         }
 
         public string GunSpawnsAsString( ) {

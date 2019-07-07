@@ -28,8 +28,6 @@ namespace Salty_Gamemodes_Client {
 
         public Dictionary<string, WeaponPickup> CreatedWeapons = new Dictionary<string, WeaponPickup>();
 
-        Dictionary<int, string> weaponIntervals = new Dictionary<int, string>();
-
         public List<WeaponPickup> SpawnedWeapons = new List<WeaponPickup>();
 
 
@@ -102,57 +100,7 @@ namespace Salty_Gamemodes_Client {
                 CreatedWeapons.Add( wepModel, item );
         }
 
-        public void SpawnWeapons() {
-
-            Random rand = new Random( DateTime.Now.Millisecond );
-
-
-            weaponIntervals = new Dictionary<int, string>();
-            int i = 0;
-            foreach( var wep in Gamemode.GameWeapons ) {
-                if( wep.Key == "WEAPON_UNARMED" || !WeaponWeights.ContainsKey( wep.Key ) )
-                    continue;
-                i += WeaponWeights[wep.Key];
-                weaponIntervals.Add( i, wep.Key );
-            }
-
-            foreach( var gunTypes in GunSpawns ) {
-                foreach( var gunPos in gunTypes.Value ) {
-                    if( gunTypes.Key == "random" || !Weapons.ContainsKey(gunTypes.Key) ) {
-
-                        int index = rand.Next( 0, i );
-                        string prevItem = Weapons.ElementAt( 0 ).Key;
-                        string wepModel = Weapons.ElementAt( Weapons.Count-1 ).Key, worldModel = Weapons.ElementAt( Weapons.Count-1 ).Value ;
-                        int prevKey = 0;
-                        foreach( var x in weaponIntervals ) {      
-                            
-                            if( index > prevKey && index <= x.Key ) {
-                                wepModel = x.Value;
-                                worldModel = Weapons[x.Value];
-                                break;
-                            }
-
-                            prevItem = x.Value;
-                            prevKey = x.Key;
-                        }
-                        uint pickupHash = (uint)GetHashKey( wepModel );
-                        int worldHash = GetHashKey( worldModel );
-                        WeaponPickup item = new WeaponPickup( this, wepModel, pickupHash, worldHash, gunPos, false, 0, Gamemode.WeaponMaxAmmo[wepModel]/3, -1 );
-                        if( !CreatedWeapons.ContainsKey( wepModel ) )
-                            CreatedWeapons.Add( wepModel, item );
-                    }
-                    else {
-                        WeaponPickup item = new WeaponPickup( this, gunTypes.Key, ( uint)GetHashKey( gunTypes.Key ), GetHashKey( Weapons[gunTypes.Key] ), gunPos, false, 0, Gamemode.WeaponMaxAmmo[gunTypes.Key] / 3, -1 );
-                        if( !CreatedWeapons.ContainsKey( gunTypes.Key ) )
-                            CreatedWeapons.Add( gunTypes.Key, item );
-                    }
-
-                }
-            }
-        }
-
         public void ClearWeapons() {
-
 
             foreach( var wep in SpawnedWeapons.ToList() ) {
                 try {
