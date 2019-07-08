@@ -51,10 +51,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Base\BaseGamemode.cs" />
+    <Compile Include="Base\HUD.cs" />
     <Compile Include="Gamemodes\DriveOrDie.cs" />
     <Compile Include="Gamemodes\IceCreamMan.cs" />
     <Compile Include="Gamemodes\TTT\DeadBody.cs" />
     <Compile Include="Gamemodes\TTT\TTT_DetectiveMenu.cs" />
+    <Compile Include="Gamemodes\TTT\TTT_HUD.cs" />
     <Compile Include="Init.cs" />
     <Compile Include="Base\Map.cs" />
     <Compile Include="HUD\MapMenu.cs" />
