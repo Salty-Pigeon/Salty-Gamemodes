@@ -27,7 +27,7 @@ namespace Salty_Gamemodes_Client {
 
         public void Radar_Click() {
             if( !CanBuy() ) { return; }; 
-            ActiveGame.SetRadarActive( true );
+            ActiveGame.GetHUD().SetRadarActive( true );
             ActiveGame.WriteChat( "TTT", "Radar activated", 0, 0, 200 );
             Close();
         }

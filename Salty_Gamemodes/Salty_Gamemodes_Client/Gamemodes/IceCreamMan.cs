@@ -41,33 +41,7 @@ namespace Salty_Gamemodes_Client {
             PostRound
         }
 
-        public override void Start() {
-            Game.PlayerPed.IsInvincible = false;
-            rand = new Random( GetGameTimer() );
-            Game.Player.Character.MaxHealth = 100;
-            Game.Player.Character.Health = 100;
-            GameTimeText.Position = new Vector2( 0, 0 );
-            GameTimeText.Centre = false;
-            if( Team == (int)Teams.Driver ) {
-                SpawnTruck();
-                GoalText.Colour = System.Drawing.Color.FromArgb( 200, 0, 0 );
-            }
-            if( Team == (int)Teams.Runner ) {
-                SpawnBike();
-                GoalText.Colour = System.Drawing.Color.FromArgb( 0, 200, 0 );
-            }
-            
-            base.Start();
-        }
-
         public IceCreamMan( Map gameMap, int team ) {
-
-            if( team == (int)Teams.Driver ) {
-                GoalText.Caption = "You are the Ice Cream Man\nDeliver as much ice cream as you can";
-            } else if( team == (int)Teams.Runner ) {
-                GoalText.Caption = "Stop the Ice Cream Man\nBangarang!";
-            }
-            SetGoalTimer( 5 );
 
             GameWeapons = new Dictionary<string, string>() {
                 { "WEAPON_UNARMED", "Fists" },
@@ -84,10 +58,27 @@ namespace Salty_Gamemodes_Client {
                 { "WEAPON_RPG", 100  },
             };
 
-
             GameMap = gameMap;
             GameMap.Gamemode = this;
             SetTeam( team );
+        }
+
+        public override void Start() {
+            Game.PlayerPed.IsInvincible = false;
+            rand = new Random(GetGameTimer());
+            Game.Player.Character.MaxHealth = 100;
+            Game.Player.Character.Health = 100;
+            ActiveHUD.SetGameTimePosition(0, 0, false);
+            if (Team == (int)Teams.Driver) {
+                ActiveHUD.SetGoal("You are the Ice Cream Man\nDeliver as much ice cream as you can", 230, 0, 0, 255, 5);
+                SpawnTruck();
+            }
+            if (Team == (int)Teams.Runner) {
+                ActiveHUD.SetGoal("Stop the Ice Cream Man\nBangarang!", 0, 230, 0, 255, 5);
+                SpawnBike();
+            }
+
+            base.Start();
         }
 
         public override void PlayerPickedUpWeapon( string wepName, int count ) {
@@ -218,9 +209,10 @@ namespace Salty_Gamemodes_Client {
         public override void HUD() {
             
             HideHudAndRadarThisFrame();
-            DrawBaseWeaponHUD();
+            ActiveHUD.DrawWeaponSwitch();
+
             if( Team == (int)Teams.Driver)
-                DrawScore();
+                ActiveHUD.DrawScore();
 
 
             base.HUD();
