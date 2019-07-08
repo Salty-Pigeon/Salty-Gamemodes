@@ -60,7 +60,6 @@ namespace Salty_Gamemodes_Client
         }
 
         public void SpawnWeapon( string wepModel, uint pickupHash, int worldHash, Vector3 gunPos, bool playerDropped, float waitTime, int ammoCount, int ammoInClip ) {
-            Debug.WriteLine( "Wep spawn recieved" );
             if( ActiveGame.GameMap != null )
                 ActiveGame.GameMap.SpawnWeapon( wepModel, pickupHash, worldHash, gunPos, playerDropped, waitTime, ammoCount, ammoInClip );
         }

@@ -51,13 +51,15 @@ namespace Salty_Gamemodes_Client {
 
             if (ActiveGame.isTimed)
                 DrawGameTimer();
+            if( GoalTextTime - GetGameTimer() > 0 )
+                GoalText.Draw();
 
         }
 
         public void SetGoal( string caption, int r, int g, int b, int a, int duration ) {
             GoalText.Caption = caption;
             GoalText.Colour = System.Drawing.Color.FromArgb(a, r, g, b);
-            SetGoalTimer(duration);
+            GoalTextTime = GetGameTimer() + (duration * 1000);
         }
 
         public void SetGameTimePosition( int x, int y, bool centre ) {
@@ -291,10 +293,6 @@ namespace Salty_Gamemodes_Client {
                     HideHudComponentThisFrame(14);
                 }
             }
-        }
-
-        public void SetGoalTimer( float time ) {
-            GoalTextTime = GetGameTimer() + (time * 1000);
         }
 
         public void DrawGoal() {

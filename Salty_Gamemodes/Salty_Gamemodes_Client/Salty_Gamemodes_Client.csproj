@@ -72,5 +72,8 @@
     <Compile Include="UI\VoteMenu.cs" />
     <Compile Include="Base\WeaponPickup.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Gamemodes\Salty\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -90,7 +90,7 @@ namespace Salty_Gamemodes_Client {
         public override void Update() {
             CantExitVehichles();
             if( Team == 1 ) {
-                if( !Game.PlayerPed.IsInVehicle() ) {
+                if( !Game.PlayerPed.IsInVehicle() && Truck != null ) {
                     Game.PlayerPed.SetIntoVehicle( Truck, VehicleSeat.Driver );
                 }
                 uint streetName = 0;
@@ -109,7 +109,7 @@ namespace Salty_Gamemodes_Client {
             }
             if( Team == 2 && !canKill) {
                 Game.PlayerPed.CanBeKnockedOffBike = false;
-                if( !Game.PlayerPed.IsInVehicle()  ) {
+                if( !Game.PlayerPed.IsInVehicle() && Bike != null  ) {
                     Game.PlayerPed.SetIntoVehicle( Bike, VehicleSeat.Driver );
                 }
                 uint streetName = 0;

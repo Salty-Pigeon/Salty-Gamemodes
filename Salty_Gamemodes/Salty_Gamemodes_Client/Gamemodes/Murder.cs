@@ -57,6 +57,8 @@ namespace Salty_Gamemodes_Client {
             SetPlayerMeleeWeaponDamageModifier( PlayerId(), 0 );
             SetPlayerWeaponDamageModifier( PlayerId(), 20 );
 
+            ActiveHUD.SetGameTimePosition( 0, 0, false );
+
             Game.Player.Character.MaxHealth = 100;
             Game.Player.Character.Health = 100;
             if( Team == (int)Teams.Murderer ) {

@@ -58,13 +58,6 @@ namespace Salty_Gamemodes_Client {
             GameMap.Gamemode = this;
             GameMap.CreateBlip();
 
-            if( team == (int)Teams.Trucker ) {
-                ActiveHUD.SetGoal("Destroy all the bikes", 230, 0, 0, 255, 5 );
-            }
-            else if( team == (int)Teams.Bikie ) {
-                ActiveHUD.SetGoal("Dodge the Monster Trucks\nAvoid getting stuck in water and other vehicles or KABOOM!", 0, 230, 0, 255, 5);
-            }
-
             SetTeam( team );
         }
 
@@ -75,13 +68,16 @@ namespace Salty_Gamemodes_Client {
         }
 
         public override void Start() {
+
             Game.PlayerPed.IsInvincible = true;
             playerList = new PlayerList().ToList();
             playerList.Remove( Game.Player );
             ActiveHUD.SetGameTimePosition(0, 0, false);
             if ( Team == (int)Teams.Trucker ) {
+                ActiveHUD.SetGoal( "Destroy all the bikes", 230, 0, 0, 255, 5 );
                 SpawnTruck();
             } else {
+                ActiveHUD.SetGoal( "Dodge the Monster Trucks\nAvoid getting stuck in water and other vehicles or KABOOM!", 0, 230, 0, 255, 5 );
                 SpawnBike();
             }
 
