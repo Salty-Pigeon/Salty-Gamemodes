@@ -68,7 +68,6 @@ namespace Salty_Gamemodes_Server
             } ), false );
 
             RegisterCommand( "joinroom", new Action<int, List<object>, string>( ( source, args, raw ) => {
-                if( source != 0 ) { return; }
                 Salty.JoinRoom( new PlayerList().ToList().Where( x => Convert.ToInt32(x.Handle) == source ).First(), Convert.ToInt32( args[0] ) );
             } ), false );
 
