@@ -139,7 +139,7 @@ namespace Salty_Gamemodes_Client {
                 Vector3 camPos = GetGameplayCamCoords();
                 float dist = GetDistanceBetweenCoords(pos.X, pos.Y, pos.Z, camPos.X, camPos.Y, camPos.Z, true);
 
-                DrawText3D(pos, Math.Round(dist, 1) + "m", 0.3f, 255, 255, 255, 255, 999999);
+                DrawText3D(pos, Math.Round(dist) + "m", 0.3f, 255, 255, 255, 255, 999999);
 
                 float x = 0, y = 0;
                 var offscreen = Get_2dCoordFrom_3dCoord(pos.X, pos.Y, pos.Z - 0.08f, ref x, ref y);
