@@ -21,11 +21,8 @@ namespace Salty_Gamemodes_Server {
             PostRound
         }
 
-        public DriveOrDie( MapManager manager, int ID, string MapTag ) : base( manager, ID, MapTag ) {
 
-        }
-
-        public DriveOrDie( MapManager manager, int ID, Map map ) : base( manager, ID, map ) {
+        public DriveOrDie( int ID, Map map, List<Player> players ) : base( ID, map, players ) {
 
         }
 
@@ -45,7 +42,7 @@ namespace Salty_Gamemodes_Server {
             WriteChat( "Drive or Die", "Game starting", 255, 0, 0 );
 
             Random rand = new Random();
-            List<Player> players = Players.ToList();
+            List<Player> players = InGamePlayers.ToList();
 
             int bikeCount = (int)Math.Ceiling( (double)players.Count / 3 );
             for( var i = 0; i < bikeCount; i++ ) {

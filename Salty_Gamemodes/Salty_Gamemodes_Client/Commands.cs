@@ -27,11 +27,11 @@ namespace Salty_Gamemodes_Client {
                 }
             } ), false );
 
-            /*
+            
             RegisterCommand("noclip", new Action<int, List<object>, string>(( source, args, raw ) => {
                 Init.ActiveGame.SetNoClip(!Init.ActiveGame.isNoclip);
             }), false);
-
+            /*
             
 
             RegisterCommand("spawnPoints", new Action<int, List<object>, string>(( source, args, raw ) => {

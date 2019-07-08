@@ -28,12 +28,15 @@ namespace Salty_Gamemodes_Server
         Database SQLConnection;
         MapManager MapManager;
         Vote ActiveVote;
+        public static SaltyTown Salty;
+
         public Init() {
 
             SQLConnection = new Database();
             MapManager = new MapManager( SQLConnection.Load() );
-            ActiveGame = new BaseGamemode( MapManager, (int)Gamemodes.None, "*" );
+            Salty = new SaltyTown( MapManager );
 
+            ActiveGame = new BaseGamemode( (int)Gamemodes.None, Map.None(), new PlayerList().ToList() );
 
             EventHandlers["playerDropped"] += new Action<Player, string>(ActiveGame.PlayerDropped);
 
@@ -54,29 +57,24 @@ namespace Salty_Gamemodes_Server
             EventHandlers["chatMessage"] += new Action<int, string, string>( ChatMessage );
             
 
-            RegisterCommand( "startTTT", new Action<int, List<object>, string>( ( source, args, raw ) => {
-                if( source != 0 ) { return; }
-                StartTTT();
-            } ), false );
-
-            RegisterCommand( "startMurder", new Action<int, List<object>, string>( ( source, args, raw ) => {
-                if( source != 0 ) { return; }
-                StartMurder();
-            } ), false );
-
-            RegisterCommand( "startDod", new Action<int, List<object>, string>( ( source, args, raw ) => {
-                if( source != 0 ) { return; }
-                StartDriveOrDie();
-            } ), false );
-
-            RegisterCommand( "startIceCreamMan", new Action<int, List<object>, string>( ( source, args, raw ) => {
-                if( source != 0 ) { return; }
-                StartIceCreamMan();
-            } ), false );
-
             RegisterCommand( "endGame", new Action<int, List<object>, string>( ( source, args, raw ) => {
                 if( source != 0 ) { return; }
                 EndGame();
+            } ), false );
+
+            RegisterCommand( "createroom", new Action<int, List<object>, string>( ( source, args, raw ) => {
+                if( source != 0 ) { return; }
+                Salty.StartRoom( Convert.ToInt32( args[0] ) );
+            } ), false );
+
+            RegisterCommand( "joinroom", new Action<int, List<object>, string>( ( source, args, raw ) => {
+                if( source != 0 ) { return; }
+                Salty.JoinRoom( new PlayerList().ToList().Where( x => Convert.ToInt32(x.Handle) == source ).First(), Convert.ToInt32( args[0] ) );
+            } ), false );
+
+            RegisterCommand( "startroom", new Action<int, List<object>, string>( ( source, args, raw ) => {
+                if( source != 0 ) { return; }
+                Salty.StartGame( Convert.ToInt32( args[0] ) );
             } ), false );
 
             RegisterCommand( "vote", new Action<int, List<object>, string>( ( source, args, raw ) => {
@@ -177,58 +175,32 @@ namespace Salty_Gamemodes_Server
             ActiveGame.End();
         }
 
-        public void StartIceCreamMan() {
-            ActiveGame.End();
-            ActiveGame = new IceCreamMan( MapManager, (int)Gamemodes.IceCreamMan, "icm" );
-            ActiveGame.CreateGameTimer( 8 * 60 );
-            ActiveGame.Start();
-        }
 
         public void StartIceCreamMan(Map map) {
             ActiveGame.End();
-            ActiveGame = new IceCreamMan( MapManager, (int)Gamemodes.IceCreamMan, map );
+            ActiveGame = new IceCreamMan( (int)Gamemodes.IceCreamMan, map, new PlayerList().ToList() );
             ActiveGame.CreateGameTimer( 8 * 60 );
             ActiveGame.Start();
         }
 
-        public void StartMurder() {
-            ActiveGame.End();
-            ActiveGame = new Murder( MapManager, (int)Gamemodes.Murder, "mmm" );
-            ActiveGame.CreateGameTimer( 5 * 60 );
-            ActiveGame.Start();
-        }
 
         public void StartMurder(Map map) {
             ActiveGame.End();
-            ActiveGame = new Murder( MapManager, (int)Gamemodes.Murder, map );
+            ActiveGame = new Murder( (int)Gamemodes.Murder, map, new PlayerList().ToList() );
             ActiveGame.CreateGameTimer( 5 * 60 );
-            ActiveGame.Start();
-        }
-
-        public void StartDriveOrDie() {
-            ActiveGame.End();
-            ActiveGame = new DriveOrDie( MapManager, (int)Gamemodes.DriveOrDie, "dod" );
-            ActiveGame.CreateGameTimer( 15 * 60 );
             ActiveGame.Start();
         }
 
         public void StartDriveOrDie(Map map) {
             ActiveGame.End();
-            ActiveGame = new DriveOrDie( MapManager, (int)Gamemodes.DriveOrDie, map );
+            ActiveGame = new DriveOrDie( (int)Gamemodes.DriveOrDie, map, new PlayerList().ToList() );
             ActiveGame.CreateGameTimer( 15 * 60 );
-            ActiveGame.Start();
-        }
-
-        public void StartTTT() {
-            ActiveGame.End();
-            ActiveGame = new TTT( MapManager, (int)Gamemodes.TTT, "ttt" );
-            ActiveGame.CreateGameTimer( 10 * 60 );
             ActiveGame.Start();
         }
 
         public void StartTTT( Map map ) {
             ActiveGame.End();
-            ActiveGame = new TTT( MapManager, (int)Gamemodes.TTT, map );
+            ActiveGame = new TTT( (int)Gamemodes.TTT, map, new PlayerList().ToList() );
             ActiveGame.CreateGameTimer( 10 * 60 );
             ActiveGame.Start();
         }

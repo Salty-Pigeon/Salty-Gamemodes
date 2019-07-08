@@ -13,8 +13,6 @@ using System.Net.Http;
 namespace Salty_Gamemodes_Server {
     public class BaseGamemode : BaseScript {
 
-        public MapManager MapManager;
-
         public Dictionary<Player, Dictionary<string, int>> PlayerDetails = new Dictionary<Player, Dictionary<string, int>>();
         public Dictionary<int, List<Player>> PlayerTeams = new Dictionary<int, List<Player>>();
 
@@ -35,28 +33,12 @@ namespace Salty_Gamemodes_Server {
         };
 
 
+        public BaseGamemode( int ID, Map map, List<Player> players ) {
 
-        public BaseGamemode( MapManager manager, int ID, string MapTag ) {
-            MapManager = manager;
-            this.ID = ID;
-            this.MapTag = MapTag;
-
-            InGamePlayers = new PlayerList().ToList();
-
-            Random rand = new Random();
-            List<Map> maps = MapManager.MapList( MapTag );
-            Map map = maps[rand.Next( 0, maps.Count )];
-            GameMap = map;
-
-
-        }
-
-        public BaseGamemode( MapManager manager, int ID, Map map ) {
-            MapManager = manager;
             this.ID = ID;
             this.MapTag = map.Name.Split('_')[0];
 
-            InGamePlayers = new PlayerList().ToList();
+            InGamePlayers = players;
 
             GameMap = map;
         }
@@ -69,7 +51,8 @@ namespace Salty_Gamemodes_Server {
         public virtual void End() {
             TriggerClientEvent( "salty::EndGame" );
             GameMap.ResetSpawns();
-            Init.ActiveGame = new BaseGamemode( MapManager, 0, "*" );
+            //Init.ActiveGame = new BaseGamemode( 0, null, new PlayerList().ToList() );
+            Init.Salty.EndGame(ID);
         }
 
         public virtual void Update() {

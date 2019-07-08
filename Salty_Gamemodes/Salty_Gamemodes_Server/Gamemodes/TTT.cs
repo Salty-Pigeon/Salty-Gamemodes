@@ -28,15 +28,7 @@ namespace Salty_Gamemodes_Server {
         public GameState CurrentState = GameState.None;
 
 
-        public TTT( MapManager manager, int ID, string MapTag ) : base ( manager, ID, MapTag ) {
-            Init();
-        }
-
-        public TTT( MapManager manager, int ID, Map map ) : base( manager, ID, map ) {
-            Init();
-        }
-
-        public void Init() {
+        public TTT( int ID, Map map, List<Player> players ) : base( ID, map, players ) {
             GameMap.WeaponWeights = new Dictionary<string, int>() {
                 { "WEAPON_PISTOL", 8 },
                 { "WEAPON_COMBATPISTOL", 7  },
@@ -75,6 +67,7 @@ namespace Salty_Gamemodes_Server {
             };
         }
 
+
         public override void PlayerJoined( Player ply ) {
             base.PlayerJoined( ply );
         }
@@ -101,7 +94,7 @@ namespace Salty_Gamemodes_Server {
         public override void Start() {
 
             Random rand = new Random();
-            List<Player> players = Players.ToList();
+            List<Player> players = InGamePlayers.ToList();
 
             int traitorCount = (int)Math.Ceiling((double)players.Count / 4);
             for( var i = 0; i < traitorCount; i++ ) {

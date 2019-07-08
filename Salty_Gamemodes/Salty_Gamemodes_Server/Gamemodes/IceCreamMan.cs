@@ -25,11 +25,8 @@ namespace Salty_Gamemodes_Server {
             PostRound
         }
 
-        public IceCreamMan( MapManager manager, int ID, string MapTag ) : base( manager, ID, MapTag ) {
 
-        }
-
-        public IceCreamMan( MapManager manager, int ID, Map map ) : base( manager, ID, map ) {
+        public IceCreamMan( int ID, Map map, List<Player> players ) : base( ID, map, players ) {
 
         }
 
@@ -62,7 +59,7 @@ namespace Salty_Gamemodes_Server {
         public override void Start() {
             WriteChat( "Ice Cream Man", "Game starting", 255, 0, 0 );
             Random rand = new Random();
-            List<Player> players = Players.ToList();
+            List<Player> players = InGamePlayers.ToList();
 
             int driverID = rand.Next(0, players.Count);
             Driver = players[driverID];

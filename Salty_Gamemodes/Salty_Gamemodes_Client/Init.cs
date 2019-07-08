@@ -20,6 +20,8 @@ namespace Salty_Gamemodes_Client
         Vector3 spawnPos = Vector3.Zero;
         public Dictionary<string, Map> Maps = new Dictionary<string, Map>();
 
+        Dictionary<string, Map> ActiveMaps = new Dictionary<string, Map>();
+
         public static int ScreenWidth = 0;
         public static int ScreenHeight = 0;
 
@@ -32,7 +34,7 @@ namespace Salty_Gamemodes_Client
 
             ClearAreaOfObjects( Game.PlayerPed.Position.X, Game.PlayerPed.Position.Y, Game.PlayerPed.Position.Z, 100, 0 );
 
-            //commands = new Commands(this);
+            commands = new Commands(this);
             //test = new Testing(this);
 
             EventHandlers[ "onClientResourceStart" ] += new Action<string>( OnClientResourceStart );
@@ -51,6 +53,7 @@ namespace Salty_Gamemodes_Client
             EventHandlers[ "salty::UpdateDeadBody" ] += new Action<int>(ViewDeadBody);
             EventHandlers[ "salty::UpdateGameTime" ] += new Action<double>(UpdateGameTime);
             EventHandlers[ "salty::SpawnWeapon" ] += new Action<string, uint, int, Vector3, bool, float, int, int>(SpawnWeapon);
+            EventHandlers[ "salty::CreateMap" ] += new Action<string, Vector3, Vector3>(CreateMap);
 
             ActiveGame.SetTeam( 0 );
             ActiveGame.SetNoClip( true );
@@ -67,7 +70,8 @@ namespace Salty_Gamemodes_Client
         public void StartGame( int id, int team, double duration, Vector3 mapPos, Vector3 mapSize, Vector3 startPos, ExpandoObject gunSpawns ) {
             NetworkSetVoiceChannel( 0 );
             GetScreenActiveResolution( ref ScreenWidth, ref ScreenHeight );
-            voteMenu.Close();
+            if( voteMenu != null )
+                voteMenu.Close();
             voteMenu = null;
             if( ActiveGame.inGame )
                 ActiveGame.End();
@@ -91,6 +95,11 @@ namespace Salty_Gamemodes_Client
             ActiveGame.PlayerSpawn = startPos;
             Game.Player.Character.Position = startPos;
             ActiveGame.Start();
+        }
+
+        public void CreateMap(string mapName, Vector3 position, Vector3 size) {
+            ActiveMaps.Add( mapName, new Map( position, size, mapName ) );
+            ActiveMaps[mapName].CreateBlip();
         }
 
         public void SpawnDeadBody( Vector3 position, int ply, int killer ) {
@@ -263,6 +272,10 @@ namespace Salty_Gamemodes_Client
                     map.Value.DrawSpawnPoints();
                     map.Value.DrawBoundarys();
                 }
+            }
+
+            foreach( var map in ActiveMaps ) {
+                map.Value.DrawBoundarys();
             }
 
             if( test != null )

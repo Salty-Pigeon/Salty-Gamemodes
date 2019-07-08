@@ -20,12 +20,7 @@ namespace Salty_Gamemodes_Server {
             InGame,
             PostRound
         }
-
-        public Murder( MapManager manager, int ID, string MapTag ) : base( manager, ID, MapTag ) {
-
-        }
-
-        public Murder( MapManager manager, int ID, Map map ) : base( manager, ID, map ) {
+        public Murder( int ID, Map map, List<Player> players ) : base( ID, map, players ) {
 
         }
 
@@ -33,7 +28,7 @@ namespace Salty_Gamemodes_Server {
             WriteChat( "Murder", "Game starting", 255, 0, 0 );
 
             Random rand = new Random();
-            List<Player> players = Players.ToList();
+            List<Player> players = InGamePlayers.ToList();
 
             int driverID = rand.Next(0, players.Count);
             Player driver = players[driverID];

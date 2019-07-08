@@ -63,6 +63,7 @@
   <ItemGroup>
     <Compile Include="Base\BaseGamemode.cs" />
     <Compile Include="Base\Database.cs" />
+    <Compile Include="Base\GamemodeManager.cs" />
     <Compile Include="Gamemodes\DriveOrDie.cs" />
     <Compile Include="Gamemodes\IceCreamMan.cs" />
     <Compile Include="Gamemodes\Salty.cs" />
