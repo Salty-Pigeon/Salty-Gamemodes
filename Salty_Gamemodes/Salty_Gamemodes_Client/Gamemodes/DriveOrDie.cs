@@ -59,14 +59,11 @@ namespace Salty_Gamemodes_Client {
             GameMap.CreateBlip();
 
             if( team == (int)Teams.Trucker ) {
-                GoalText.Caption = "Destroy all the bikes";
-                GoalText.Colour = System.Drawing.Color.FromArgb( 200, 0, 0 );
+                ActiveHUD.SetGoal("Destroy all the bikes", 230, 0, 0, 255, 5 );
             }
             else if( team == (int)Teams.Bikie ) {
-                GoalText.Caption = "Dodge the Monster Trucks\nAvoid getting stuck in water and other vehicles or KABOOM!";
-                GoalText.Colour = System.Drawing.Color.FromArgb( 0, 200, 0 );
+                ActiveHUD.SetGoal("Dodge the Monster Trucks\nAvoid getting stuck in water and other vehicles or KABOOM!", 0, 230, 0, 255, 5);
             }
-            SetGoalTimer( 5 );
 
             SetTeam( team );
         }
@@ -81,9 +78,8 @@ namespace Salty_Gamemodes_Client {
             Game.PlayerPed.IsInvincible = true;
             playerList = new PlayerList().ToList();
             playerList.Remove( Game.Player );
-            GameTimeText.Position = new Vector2( 0, 0 );
-            GameTimeText.Centre = false;
-            if( Team == (int)Teams.Trucker ) {
+            ActiveHUD.SetGameTimePosition(0, 0, false);
+            if ( Team == (int)Teams.Trucker ) {
                 SpawnTruck();
             } else {
                 SpawnBike();
@@ -163,8 +159,7 @@ namespace Salty_Gamemodes_Client {
 
         public override void PlayerSpawned( ExpandoObject spawnInfo ) {
             if( Team == (int)Teams.Bikie ) {
-                GoalText.Caption = "Destroy all the bikes";
-                SetGoalTimer( 5 );
+                ActiveHUD.SetGoal("Destroy all the bikes", 230, 0, 0, 255, 5);
                 Bike.Delete();
                 SetTeam( (int)Teams.Trucker );
             }

@@ -25,10 +25,7 @@ namespace Salty_Gamemodes_Client {
 
         public Dictionary<int, DeadBody> DeadBodies = new Dictionary<int, DeadBody>();
 
-        
-        
         uint pedModel = 0;
-
 
         public int SpendPoints = 1;
 

@@ -54,6 +54,17 @@ namespace Salty_Gamemodes_Client {
 
         }
 
+        public void SetGoal( string caption, int r, int g, int b, int a, int duration ) {
+            GoalText.Caption = caption;
+            GoalText.Colour = System.Drawing.Color.FromArgb(a, r, g, b);
+            SetGoalTimer(duration);
+        }
+
+        public void SetGameTimePosition( int x, int y, bool centre ) {
+            GameTimeText.Position = new Vector2(x, y);
+            GameTimeText.Centre = centre;
+        }
+
         public void DrawText2D( float x, float y, string text, float scale, int r, int g, int b, int a, bool centre ) {
             SetTextScale(scale, scale);
             SetTextFont(0);

@@ -59,7 +59,7 @@
     <Compile Include="Gamemodes\TTT\TTT_HUD.cs" />
     <Compile Include="Init.cs" />
     <Compile Include="Base\Map.cs" />
-    <Compile Include="HUD\MapMenu.cs" />
+    <Compile Include="Base\MapMenu.cs" />
     <Compile Include="Gamemodes\Murder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Commands.cs" />
