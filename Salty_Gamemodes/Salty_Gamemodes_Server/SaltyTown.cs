@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace Salty_Gamemodes_Server {
     public class SaltyTown : BaseScript {
 
-        Salty ActiveGame;
+        Salty MainGame;
         MapManager Maps;
         GamemodeManager GamemodeManager;
         List<Player> ActivePlayers = new List<Player>();
@@ -25,7 +25,7 @@ namespace Salty_Gamemodes_Server {
 
         public SaltyTown( MapManager maps ) {
             Maps = maps;
-            ActiveGame = new Salty();
+            MainGame = new Salty();
             GamemodeManager = new GamemodeManager();
             ActivePlayers = new PlayerList().ToList();
         }

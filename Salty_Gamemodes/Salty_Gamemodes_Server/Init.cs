@@ -67,6 +67,11 @@ namespace Salty_Gamemodes_Server
                 Salty.StartRoom( Convert.ToInt32( args[0] ) );
             } ), false );
 
+            RegisterCommand("rooms", new Action<int, List<object>, string>(( source, args, raw ) => {
+                // Show rooms GUI to client
+
+            }), false);
+
             RegisterCommand( "joinroom", new Action<int, List<object>, string>( ( source, args, raw ) => {
                 Salty.JoinRoom( new PlayerList().ToList().Where( x => Convert.ToInt32(x.Handle) == source ).First(), Convert.ToInt32( args[0] ) );
             } ), false );
