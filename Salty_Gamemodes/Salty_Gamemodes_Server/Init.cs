@@ -84,7 +84,7 @@ namespace Salty_Gamemodes_Server
             } ), false );
 
             RegisterCommand( "startroom", new Action<int, List<object>, string>( ( source, args, raw ) => {
-                if( source != 0 ) { return; }
+                //if( source != 0 ) { return; }
                 Salty.StartGame( Convert.ToInt32( args[0] ) );
             } ), false );
 
