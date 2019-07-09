@@ -36,7 +36,7 @@ namespace Salty_Gamemodes_Client {
             }), false);
 
             RegisterCommand("score", new Action<int, List<object>, string>(( source, args, raw ) => {
-                Init.ActiveGame.AddScore(1);
+                Init.Salty.ActiveGame.AddScore(1);
             }), false);
 
             RegisterCommand( "id", new Action<int, List<object>, string>( ( source, args, raw ) => {

@@ -17,6 +17,24 @@ namespace Salty_Gamemodes_Server {
             IceCreamMan
         }
 
+        public Dictionary<string, int> Names = new Dictionary<string, int> {
+            { "Trouble in Terrorist Town", (int)Gamemodes.TTT },
+            { "Murder", (int)Gamemodes.Murder },
+            { "Ice Cream Man", (int)Gamemodes.IceCreamMan },
+            { "Drive Or Die", (int)Gamemodes.DriveOrDie },
+        };
+
+        public Dictionary<Gamemodes, string> Maps = new Dictionary<GamemodeManager.Gamemodes, string>() {
+            { Gamemodes.TTT, "ttt" },
+            { Gamemodes.Murder, "mmm" },
+            { Gamemodes.IceCreamMan, "icm" },
+            { Gamemodes.DriveOrDie, "dod" },
+        };
+
+        public List<string> GetNames() {
+            return Names.OrderBy( x => x.Value ).ToDictionary( x => x.Key, x => x.Value ).Keys.ToList();
+        }
+
         public BaseGamemode StartGame( int gamemode, Map map, List<Player> players ) {
             BaseGamemode Game;
             switch( (Gamemodes)gamemode ) {

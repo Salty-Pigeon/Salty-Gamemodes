@@ -52,8 +52,11 @@
   <ItemGroup>
     <Compile Include="Base\BaseGamemode.cs" />
     <Compile Include="Base\HUD.cs" />
+    <Compile Include="Base\SaltyRooms.cs" />
     <Compile Include="Gamemodes\DriveOrDie.cs" />
     <Compile Include="Gamemodes\IceCreamMan.cs" />
+    <Compile Include="Gamemodes\Salty\Salty.cs" />
+    <Compile Include="Gamemodes\Salty\SaltyHUD.cs" />
     <Compile Include="Gamemodes\TTT\DeadBody.cs" />
     <Compile Include="Gamemodes\TTT\TTT_DetectiveMenu.cs" />
     <Compile Include="Gamemodes\TTT\TTT_HUD.cs" />
@@ -63,6 +66,7 @@
     <Compile Include="Gamemodes\Murder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Commands.cs" />
+    <Compile Include="SaltyTown.cs" />
     <Compile Include="Testing.cs" />
     <Compile Include="UI\SaltyButton.cs" />
     <Compile Include="UI\SaltyMenu.cs" />
@@ -72,8 +76,6 @@
     <Compile Include="UI\VoteMenu.cs" />
     <Compile Include="Base\WeaponPickup.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Gamemodes\Salty\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

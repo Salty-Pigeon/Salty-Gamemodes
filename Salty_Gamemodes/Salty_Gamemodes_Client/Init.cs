@@ -13,14 +13,14 @@ namespace Salty_Gamemodes_Client
 {
     public class Init : BaseScript
     {
-        public BaseGamemode ActiveGame = new BaseGamemode();
+
         Commands commands;
         Testing test;
+        public SaltyTown Salty;
 
         Vector3 spawnPos = Vector3.Zero;
         public Dictionary<string, Map> Maps = new Dictionary<string, Map>();
 
-        Dictionary<string, Map> ActiveMaps = new Dictionary<string, Map>();
 
         public static int ScreenWidth = 0;
         public static int ScreenHeight = 0;
@@ -36,12 +36,13 @@ namespace Salty_Gamemodes_Client
 
             commands = new Commands(this);
             //test = new Testing(this);
+            Salty = new SaltyTown();
 
             EventHandlers[ "onClientResourceStart" ] += new Action<string>( OnClientResourceStart );
             EventHandlers[ "playerSpawned" ] += new Action<ExpandoObject>( PlayerSpawn );
             EventHandlers[ "baseevents:onPlayerDied" ] += new Action<int, List<dynamic>>( PlayerDied );
             EventHandlers[ "baseevents:onPlayerKilled" ] += new Action<int, ExpandoObject>( PlayerKilled );
-            EventHandlers[ "salty::StartGame" ] += new Action<int, int, double, Vector3, Vector3, Vector3, ExpandoObject>( StartGame );
+            EventHandlers[ "salty::StartGame" ] += new Action<int, int, double, Vector3, Vector3, string, Vector3, ExpandoObject>( StartGame );
             EventHandlers[ "salty::EndGame" ] += new Action( EndGame );
             EventHandlers[ "salty::SpawnPointGUI" ] += new Action<ExpandoObject, ExpandoObject>( SpawnGUI );
             EventHandlers[ "salty::VoteMap" ] += new Action<List<dynamic>>( VoteMap );
@@ -54,105 +55,96 @@ namespace Salty_Gamemodes_Client
             EventHandlers[ "salty::UpdateGameTime" ] += new Action<double>(UpdateGameTime);
             EventHandlers[ "salty::SpawnWeapon" ] += new Action<string, uint, int, Vector3, bool, float, int, int>(SpawnWeapon);
             EventHandlers[ "salty::CreateMap" ] += new Action<string, Vector3, Vector3>(CreateMap);
+            EventHandlers[ "salty::ShowRooms" ] += new Action<List<dynamic>>( ShowRoom );
 
-            ActiveGame.SetTeam( 0 );
-            ActiveGame.SetNoClip( true );
             Tick += Update;
             SetMaxWantedLevel( 0 );
             GetScreenActiveResolution( ref ScreenWidth, ref ScreenHeight );
         }
 
         public void SpawnWeapon( string wepModel, uint pickupHash, int worldHash, Vector3 gunPos, bool playerDropped, float waitTime, int ammoCount, int ammoInClip ) {
-            if( ActiveGame.GameMap != null )
-                ActiveGame.GameMap.SpawnWeapon( wepModel, pickupHash, worldHash, gunPos, playerDropped, waitTime, ammoCount, ammoInClip );
+            if( Salty.ActiveGame != null )
+                Salty.ActiveGame.GameMap.SpawnWeapon( wepModel, pickupHash, worldHash, gunPos, playerDropped, waitTime, ammoCount, ammoInClip );
         }
 
-        public void StartGame( int id, int team, double duration, Vector3 mapPos, Vector3 mapSize, Vector3 startPos, ExpandoObject gunSpawns ) {
-            NetworkSetVoiceChannel( 0 );
+        public void ShowRoom( List<dynamic> rooms ) {
+            List<string> names = new List<string>();
+            foreach( string name in rooms ) {
+                names.Add( name );
+            }
+            Salty.ShowRooms( names );
+        }
+
+
+        public void StartGame( int id, int team, double duration, Vector3 mapPos, Vector3 mapSize, string mapName, Vector3 startPos, ExpandoObject gunSpawns ) {
             GetScreenActiveResolution( ref ScreenWidth, ref ScreenHeight );
             if( voteMenu != null )
                 voteMenu.Close();
             voteMenu = null;
-            if( ActiveGame.inGame )
-                ActiveGame.End();
-            ActiveGame.SetNoClip( false );
-            Map map = new Map( mapPos, mapSize, "" );
-            map.GunSpawns = ExpandoToDictionary( gunSpawns );
-            if( id == 1 ) { // Trouble in Terrorist Town
-                ActiveGame = new TTT(map, team);
-            }
-            if( id == 2 ) { // Drive or die
-                ActiveGame = new DriveOrDie( map, team );
-            }
-            if( id == 3 ) { // Murder
-                ActiveGame = new Murder( map, team );
-            }
-            if( id == 4 ) { // Ice Cream Man
-                ActiveGame = new IceCreamMan( map, team );
-            }
-            if( duration > 0 )
-                ActiveGame.CreateGameTimer( duration );
-            ActiveGame.PlayerSpawn = startPos;
-            Game.Player.Character.Position = startPos;
-            ActiveGame.Start();
+            Map map = new Map( mapPos, mapSize, mapName );
+            Salty.StartGame( id, team, duration, map, startPos, ExpandoToDictionary( gunSpawns ) );
         }
 
         public void CreateMap(string mapName, Vector3 position, Vector3 size) {
-            ActiveMaps.Add( mapName, new Map( position, size, mapName ) );
-            ActiveMaps[mapName].CreateBlip();
+            Salty.ActiveMaps.Add( mapName, new Map( position, size, mapName ) );
+            Salty.ActiveMaps[mapName].CreateBlip();
         }
 
         public void SpawnDeadBody( Vector3 position, int ply, int killer ) {
-            if( ActiveGame is TTT ) {
-                (ActiveGame as TTT).SpawnDeadBody( position, ply, killer );
+            if( Salty.ActiveGame is TTT ) {
+                (Salty.ActiveGame as TTT).SpawnDeadBody( position, ply, killer );
             }
         }
 
         public void ViewDeadBody( int body ) {
-            if( ActiveGame is TTT ) {
-                (ActiveGame as TTT).BodyDiscovered( body );
+            if( Salty.ActiveGame is TTT ) {
+                (Salty.ActiveGame as TTT).BodyDiscovered( body );
             }
         }
 
         public void UpdateScore( int amount ) {
-            ActiveGame.UpdateScore(amount);
+            Salty.ActiveGame.UpdateScore(amount);
         }
 
         public void UpdatePlayerInfo(int entID, string key, int value) {
-            ActiveGame.UpdatePlayerInfo( GetPlayerFromServerId( entID ), key, value);
+            Debug.WriteLine( "Player info" );
+            Salty.ActiveGame.UpdatePlayerInfo( GetPlayerFromServerId( entID ), key, value);
         }
 
         public void EndGame() {
-            ActiveGame.End();
-            ActiveGame = new BaseGamemode();
-            if( !ActiveGame.isNoclip ) {
-                ActiveGame.noclipPos = Game.PlayerPed.Position;
-                ActiveGame.SetNoClip( true );
+            if( Maps.ContainsKey( Salty.ActiveGame.GameMap.Name ) ) {
+                Maps[Salty.ActiveGame.GameMap.Name].ClearBlip();
+                Maps.Remove( Salty.ActiveGame.GameMap.Name );
+            }
+            Salty.ActiveGame.End();
+            Salty.ActiveGame = new BaseGamemode();
+            if( !Salty.ActiveGame.isNoclip ) {
+                Salty.ActiveGame.SetNoClip( true );
             }
         }
         public void UpdateGameTime( double time ) {
-            ActiveGame.GameTime += time;
+            Salty.ActiveGame.GameTime += time;
         }
 
 
         public void UpdateInfo( int id, double duration, Vector3 mapPos, Vector3 mapSize ) {
             Map map = new Map( mapPos, mapSize, "" );
             if( id == 1 ) { // Trouble in Terrorist Town
-                ActiveGame = new TTT( map, 0 );            
+                Salty.ActiveGame = new TTT( map, 0 );            
             }
             if( id == 2 ) { // Drive or die
-                ActiveGame = new DriveOrDie( map, 0 );
+                Salty.ActiveGame = new DriveOrDie( map, 0 );
 
             }
             if( id == 3 ) { // Murder
-                ActiveGame = new Murder( map, 0 );
+                Salty.ActiveGame = new Murder( map, 0 );
             }
             if( id == 4 ) { // Murder
-                ActiveGame = new IceCreamMan( map, 0 );
+                Salty.ActiveGame = new IceCreamMan( map, 0 );
             }
-            ActiveGame.inGame = true;
+            Salty.ActiveGame.inGame = true;
             if( duration > 0 )
-                ActiveGame.CreateGameTimer( duration );
+                Salty.ActiveGame.CreateGameTimer( duration );
             Game.Player.Character.Position = mapPos + new Vector3( 0, 0, 50 );
             spawnPos = mapPos + new Vector3( 0, 0, 50 );
         }
@@ -243,30 +235,27 @@ namespace Salty_Gamemodes_Client
                 }
             }
             PlayerDied( killerType, deathCoords );
-            ActiveGame.PlayerKilled( killerID, deathData );
+            Salty.ActiveGame.PlayerKilled( killerID, deathData );
         }
 
         private void PlayerDied( int killerType, List<dynamic> deathcords ) {
             Vector3 coords = new Vector3( (float)deathcords[ 0 ], (float)deathcords[ 1 ], (float)deathcords[ 2 ] );
-            ActiveGame.PlayerDied( killerType, coords );
+            Salty.ActiveGame.PlayerDied( killerType, coords );
         }
 
         private void PlayerSpawn( ExpandoObject spawnInfo ) {
 
             if( spawnPos != Vector3.Zero ) {
                 Game.Player.Character.Position = spawnPos;
-                ActiveGame.noclipPos = spawnPos;
-                ActiveGame.SetNoClip( true );
+                Salty.ActiveGame.SetNoClip( true );
                 spawnPos = Vector3.Zero;
             } else {
-                ActiveGame.PlayerSpawned( spawnInfo );
+                Salty.ActiveGame.PlayerSpawned( spawnInfo );
             }
 
         }
 
         public async Task Update() {
-            if( ActiveGame != null )
-                ActiveGame.Update();
             foreach( var map in Maps ) {
                 if( map.Value.isVisible ) {
                     map.Value.DrawSpawnPoints();
@@ -274,24 +263,24 @@ namespace Salty_Gamemodes_Client
                 }
             }
 
-            foreach( var map in ActiveMaps ) {
+            foreach( var map in Salty.ActiveMaps ) {
                 map.Value.DrawBoundarys();
             }
 
             if( test != null )
                 test.Update();
 
+            Salty.Update();
+
         }
 
 
         public void GiveGun( string weapon, int ammo ) {
-            ActiveGame.GiveGun(weapon, ammo);
+            Salty.ActiveGame.GiveGun(weapon, ammo);
         }
 
         private void OnClientResourceStart( string resourceName ) {
             if( GetCurrentResourceName() != resourceName ) return;
-
-            ActiveGame.SetNoClip( false );
 
             TriggerServerEvent( "salty::netJoined" );
             if( commands != null )

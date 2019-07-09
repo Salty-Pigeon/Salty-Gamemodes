@@ -49,10 +49,9 @@ namespace Salty_Gamemodes_Server {
         }
 
         public virtual void End() {
-            TriggerClientEvent( "salty::EndGame" );
             GameMap.ResetSpawns();
-            //Init.ActiveGame = new BaseGamemode( 0, null, new PlayerList().ToList() );
-            Init.Salty.EndGame(ID);
+            Debug.WriteLine( "Game ended" );
+            Init.Salty.NextGame(ID);
         }
 
         public virtual void Update() {
@@ -95,8 +94,9 @@ namespace Salty_Gamemodes_Server {
             
         }
 
-        public void SpawnClient( Player ply, int teamSpawn ) {
-            ply.TriggerEvent( "salty::StartGame", ID, GetTeam(ply), GameLength, GameMap.Position, GameMap.Size, GameMap.GetNextSpawn( teamSpawn ), GameMap.GunSpawns );
+        public void SpawnClient( Player ply, int teamSpawn, int team ) {
+            ply.TriggerEvent( "salty::StartGame", ID, team, GameLength, GameMap.Position, GameMap.Size, GameMap.Name, GameMap.GetNextSpawn( teamSpawn ), GameMap.GunSpawns );
+            SetTeam( ply, team );
         }
 
         public virtual bool OnChatMessage( Player ply, string message ) {

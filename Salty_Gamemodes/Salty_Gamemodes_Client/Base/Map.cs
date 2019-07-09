@@ -62,7 +62,7 @@ namespace Salty_Gamemodes_Client {
             AddTextComponentString( "Map bounds" );
             EndTextCommandSetBlipName( Blip );
             isVisible = true;
-
+            Debug.WriteLine( "Blip created" );
         }
 
         public void Update() {

@@ -100,22 +100,19 @@ namespace Salty_Gamemodes_Server {
             for( var i = 0; i < traitorCount; i++ ) {
                 int traitorID = rand.Next( 0, players.Count );
                 Player traitor = players[traitorID];
-                SetTeam( traitor, (int)Teams.Traitors );
-                SpawnClient( traitor, 1 );
+                SpawnClient( traitor, 1, (int)Teams.Traitors );
                 players.RemoveAt( traitorID );
             }
 
             if( players.Count >= 4 ) {
                 int detectiveID = rand.Next( 0, players.Count );
                 Player detective = players[detectiveID];
-                SetTeam( detective, (int)Teams.Detectives );
-                SpawnClient( detective, 1 );
+                SpawnClient( detective, 1, (int)Teams.Detectives );
                 players.RemoveAt( detectiveID );
             }
 
             foreach (var ply in players) {
-                SetTeam( ply, (int)Teams.Innocents );
-                SpawnClient( ply, 1 );
+                SpawnClient( ply, 1, (int)Teams.Innocents );
             }
 
             GameMap.SpawnWeapons();

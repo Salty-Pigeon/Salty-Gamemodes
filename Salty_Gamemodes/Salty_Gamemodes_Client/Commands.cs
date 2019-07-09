@@ -22,15 +22,19 @@ namespace Salty_Gamemodes_Client {
 
 
             RegisterCommand( "respawn", new Action<int, List<object>, string>( ( source, args, raw ) => {
-                if( Init.ActiveGame is IceCreamMan ) {
-                    (Init.ActiveGame as IceCreamMan).Respawn();
+                if( Init.Salty.ActiveGame is IceCreamMan ) {
+                    (Init.Salty.ActiveGame as IceCreamMan).Respawn();
                 }
             } ), false );
 
             
             RegisterCommand("noclip", new Action<int, List<object>, string>(( source, args, raw ) => {
-                Init.ActiveGame.SetNoClip(!Init.ActiveGame.isNoclip);
-            }), false);
+                if( Init.Salty.isInRoom ) {
+                    Init.Salty.ActiveGame.SetNoClip( !Init.Salty.ActiveGame.isNoclip );
+                } else {
+                    Init.Salty.SaltyGame.SetNoClip( !Init.Salty.SaltyGame.isNoclip );
+                }
+            } ), false);
             /*
             
 

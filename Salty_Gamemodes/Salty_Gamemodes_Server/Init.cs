@@ -54,6 +54,8 @@ namespace Salty_Gamemodes_Server
             EventHandlers[ "salty::netJoined" ] += new Action<Player>( PlayerJoined );
             EventHandlers[ "salty::netUpdatePlayerBool" ] += new Action<Player, string>( UpdatePlayerBool );
             EventHandlers[ "salty::netBodyDiscovered" ] += new Action<Player, int>( BodyDiscovered );
+            EventHandlers["salty::netJoinRoom"] += new Action<Player, string>( JoinRoom );
+
             EventHandlers["chatMessage"] += new Action<int, string, string>( ChatMessage );
             
 
@@ -67,13 +69,18 @@ namespace Salty_Gamemodes_Server
                 Salty.StartRoom( Convert.ToInt32( args[0] ) );
             } ), false );
 
+            RegisterCommand( "endroom", new Action<int, List<object>, string>( ( source, args, raw ) => {
+                if( source != 0 ) { return; }
+                Salty.EndRoom( Convert.ToInt32( args[0] ) );
+            } ), false );
+
             RegisterCommand("rooms", new Action<int, List<object>, string>(( source, args, raw ) => {
                 // Show rooms GUI to client
-
+                Salty.SendRoomsToClient( SourceToPlayer( source ) );
             }), false);
 
             RegisterCommand( "joinroom", new Action<int, List<object>, string>( ( source, args, raw ) => {
-                Salty.JoinRoom( new PlayerList().ToList().Where( x => Convert.ToInt32(x.Handle) == source ).First(), Convert.ToInt32( args[0] ) );
+                Salty.JoinRoom( SourceToPlayer(source), Convert.ToInt32( args[0] ) );
             } ), false );
 
             RegisterCommand( "startroom", new Action<int, List<object>, string>( ( source, args, raw ) => {
@@ -112,21 +119,27 @@ namespace Salty_Gamemodes_Server
         }
 
 
+        public void JoinRoom([FromSource] Player ply, string gamemode ) {
+            Debug.WriteLine( gamemode );
+            Salty.JoinRoom( ply, gamemode );
+        }
+
+
         private string MapTagWinner;
 
         public void MapVoteOver( string winner ) {
             switch( MapTagWinner ) {
                 case ("ttt"):
-                    StartTTT( MapManager.Maps[winner] );
+                    //StartTTT( MapManager.Maps[winner] );
                     break;
                 case ("mmm"):
-                    StartMurder( MapManager.Maps[winner] );
+                    //StartMurder( MapManager.Maps[winner] );
                     break;
                 case ("icm"):
-                    StartIceCreamMan( MapManager.Maps[winner] );
+                    //StartIceCreamMan( MapManager.Maps[winner] );
                     break;
                 case ("dod"):
-                    StartDriveOrDie( MapManager.Maps[winner] );
+                    //StartDriveOrDie( MapManager.Maps[winner] );
                     break;
             }
             ActiveVote = null;
@@ -137,11 +150,13 @@ namespace Salty_Gamemodes_Server
         }
 
         public void PlayerJoined( [FromSource]Player ply ) {
-
-            if( ActiveGame.ID != (int)Gamemodes.None ) {
-                ply.TriggerEvent( "salty::UpdateInfo", ActiveGame.ID, ActiveGame.GameTime - GetGameTimer(), ActiveGame.GameMap.Position, ActiveGame.GameMap.Size );
+            foreach( var game in Salty.ActiveGamemodes.Values ) {
+                game.PlayerJoined( ply );
             }
-            ActiveGame.PlayerJoined( ply );
+        }
+
+        public Player SourceToPlayer( int source ) {
+            return new PlayerList().ToList().Where( x => Convert.ToInt32( x.Handle ) == source ).First();
         }
 
         public void ChatMessage( int author, string message, string lol ) {
@@ -156,15 +171,18 @@ namespace Salty_Gamemodes_Server
         }
 
         public void BodyDiscovered( [FromSource] Player ply, int body ) {
-            if( ActiveGame is TTT ) {
-                (ActiveGame as TTT).DeadBodies[body] = true;
+            if( Salty.ActiveGamemodes.ContainsKey((int)GamemodeManager.Gamemodes.TTT) ){
+                (Salty.ActiveGamemodes[(int)GamemodeManager.Gamemodes.TTT] as TTT).DeadBodies[body] = true;
                 TriggerClientEvent( "salty::UpdateDeadBody", body );
             }
+
         }
 
         public void UpdatePlayerBool( [FromSource]Player ply, string key ) {
-            ActiveGame.UpdatePlayerBoolean(ply, key);
-            
+            BaseGamemode activeGame = Salty.GetGame( ply );
+            if( activeGame != null )
+                activeGame.UpdatePlayerBoolean( ply, key );
+
         }
 
         private async Task Init_Tick() {
@@ -173,41 +191,13 @@ namespace Salty_Gamemodes_Server
             if( ActiveVote != null )
                 ActiveVote.Update();
             MapManager.Update();
+            Salty.Update();
         }
 
         public void EndGame() {
             ActiveGame.End();
         }
 
-
-        public void StartIceCreamMan(Map map) {
-            ActiveGame.End();
-            ActiveGame = new IceCreamMan( (int)Gamemodes.IceCreamMan, map, new PlayerList().ToList() );
-            ActiveGame.CreateGameTimer( 8 * 60 );
-            ActiveGame.Start();
-        }
-
-
-        public void StartMurder(Map map) {
-            ActiveGame.End();
-            ActiveGame = new Murder( (int)Gamemodes.Murder, map, new PlayerList().ToList() );
-            ActiveGame.CreateGameTimer( 5 * 60 );
-            ActiveGame.Start();
-        }
-
-        public void StartDriveOrDie(Map map) {
-            ActiveGame.End();
-            ActiveGame = new DriveOrDie( (int)Gamemodes.DriveOrDie, map, new PlayerList().ToList() );
-            ActiveGame.CreateGameTimer( 15 * 60 );
-            ActiveGame.Start();
-        }
-
-        public void StartTTT( Map map ) {
-            ActiveGame.End();
-            ActiveGame = new TTT( (int)Gamemodes.TTT, map, new PlayerList().ToList() );
-            ActiveGame.CreateGameTimer( 10 * 60 );
-            ActiveGame.Start();
-        }
 
         private void PlayerKilled( [FromSource] Player ply, int killerID, ExpandoObject deathData ) {
             int killerType = 0;
@@ -221,12 +211,16 @@ namespace Salty_Gamemodes_Server
                 }
             }
             PlayerDied( ply, killerType, deathCoords );
-            ActiveGame.PlayerKilled( ply, killerID, new Vector3(deathCoords[0], deathCoords[1], deathCoords[2]) );
+            BaseGamemode activeGame = Salty.GetGame( ply );
+            if( activeGame != null )
+                activeGame.PlayerKilled( ply, killerID, new Vector3(deathCoords[0], deathCoords[1], deathCoords[2]) );
         }
 
         private void PlayerDied( [FromSource] Player ply, int killerType, List<dynamic> deathcords ) {
             Vector3 coords = new Vector3( (float)deathcords[0], (float)deathcords[1], (float)deathcords[2] );
-            ActiveGame.PlayerDied( ply, killerType, coords );
+            BaseGamemode activeGame = Salty.GetGame( ply );
+            if( activeGame != null )
+                activeGame.PlayerDied( ply, killerType, coords );
         }
 
         private void AddScoreToPlayer( [FromSource] Player ply, int amount ) {

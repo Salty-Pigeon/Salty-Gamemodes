@@ -48,14 +48,12 @@ namespace Salty_Gamemodes_Server {
             for( var i = 0; i < bikeCount; i++ ) {
                 int bikeID = rand.Next( 0, players.Count );
                 Player biker = players[bikeID];
-                SetTeam( biker, (int)Teams.Bikie );
-                SpawnClient( biker, (int)Teams.Bikie );
+                SpawnClient( biker, (int)Teams.Bikie, (int)Teams.Bikie );
                 players.RemoveAt( bikeID );
             }
 
             foreach (var ply in players) {
-                SetTeam(ply, (int)Teams.Trucker);
-                SpawnClient(ply, (int)Teams.Trucker);
+                SpawnClient(ply, (int)Teams.Trucker, (int)Teams.Trucker );
             }
 
             base.Start();

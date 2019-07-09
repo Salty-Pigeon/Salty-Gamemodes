@@ -64,14 +64,12 @@ namespace Salty_Gamemodes_Server {
             int driverID = rand.Next(0, players.Count);
             Driver = players[driverID];
              
-            SetTeam( Driver, (int)Teams.Driver);
-            SpawnClient( Driver, (int)Teams.Driver );
+            SpawnClient( Driver, (int)Teams.Driver, (int)Teams.Driver );
             players.RemoveAt(driverID);
 
 
             foreach( var ply in players) {
-                SetTeam(ply, (int)Teams.Runner);
-                SpawnClient(ply, (int)Teams.Runner );
+                SpawnClient(ply, (int)Teams.Runner, (int)Teams.Runner );
             }
 
             base.Start();

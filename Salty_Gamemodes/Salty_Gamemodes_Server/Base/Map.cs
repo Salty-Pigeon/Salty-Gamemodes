@@ -175,8 +175,10 @@ namespace Salty_Gamemodes_Server {
             return gunSpawns.Substring( 0, gunSpawns.Length - 1 );
         }
 
-        public void SendToClients() {
-            TriggerClientEvent( "salty::CreateMap", Name, Position, Size );
+        public void SendToClients( List<Player> players ) {
+            foreach( var ply in players ) {
+                ply.TriggerEvent( "salty::CreateMap", Name, Position, Size );
+            }
         }
 
         public static Map None() {

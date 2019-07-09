@@ -56,7 +56,8 @@ namespace Salty_Gamemodes_Client {
         public Map GameMap;
         public string MapTag = "";
 
-        public Vector3 noclipPos = Vector3.Zero;
+        public Vector3 noclipSpawnPos = Vector3.Zero;
+
         private float deathTimer = 0;
         private float gracePeriod = 10 * 1000;
 
@@ -187,7 +188,7 @@ namespace Salty_Gamemodes_Client {
         }
 
         public virtual void PlayerDied( int killerType, Vector3 deathcords ) {
-            noclipPos = deathcords;
+            noclipSpawnPos = deathcords;
         }
 
         public virtual void PlayerSpawned( ExpandoObject spawnInfo ) {
@@ -411,9 +412,16 @@ namespace Salty_Gamemodes_Client {
             DisableControlAction( 0, 75, true );
         }
 
+
+        private Vector3 noclipPos;
+
         public virtual void SetNoClip( bool toggle ) {
-            if( GetDistanceBetweenCoords( noclipPos.X, noclipPos.Y, noclipPos.Z, 0, 0, 0, true) <= 10 )
+            if( noclipSpawnPos != Vector3.Zero && toggle ) {
+                Game.PlayerPed.Position = noclipSpawnPos;
+                noclipSpawnPos = Vector3.Zero;
+            } else {
                 noclipPos = Game.PlayerPed.Position;
+            }
             deathTimer = 0;
             isNoclip = toggle;
             SetEntityVisible( PlayerPedId(), !isNoclip, false );
