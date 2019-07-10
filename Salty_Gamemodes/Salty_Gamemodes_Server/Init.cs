@@ -44,7 +44,7 @@ namespace Salty_Gamemodes_Server
             EventHandlers["baseevents:onPlayerKilled"] += new Action<Player, int, ExpandoObject>(PlayerKilled);
 
             EventHandlers[ "salty::netStartGame" ] += new Action( ActiveGame.Start );
-            EventHandlers[ "salty::netEndGame" ] += new Action( EndGame );
+            //EventHandlers[ "salty::netEndGame" ] += new Action(  );
             EventHandlers[ "salty::netSpawnPointGUI" ] += new Action<Player>( SpawnPointGUI );
             EventHandlers[ "salty::netModifyMapPos" ] += new Action<Player, string, string, int, Vector3>( ModifyMapPosition );
             EventHandlers[ "salty::netModifyWeaponPos" ] += new Action<Player, string, string, string, Vector3>( ModifyWeaponPosition );
@@ -57,12 +57,7 @@ namespace Salty_Gamemodes_Server
             EventHandlers["salty::netJoinRoom"] += new Action<Player, string>( JoinRoom );
 
             EventHandlers["chatMessage"] += new Action<int, string, string>( ChatMessage );
-            
 
-            RegisterCommand( "endGame", new Action<int, List<object>, string>( ( source, args, raw ) => {
-                if( source != 0 ) { return; }
-                EndGame();
-            } ), false );
 
             RegisterCommand( "createroom", new Action<int, List<object>, string>( ( source, args, raw ) => {
                 if( source != 0 ) { return; }
@@ -192,10 +187,6 @@ namespace Salty_Gamemodes_Server
                 ActiveVote.Update();
             MapManager.Update();
             Salty.Update();
-        }
-
-        public void EndGame() {
-            ActiveGame.End();
         }
 
 
