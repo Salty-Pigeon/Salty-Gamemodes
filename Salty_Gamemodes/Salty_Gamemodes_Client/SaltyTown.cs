@@ -51,7 +51,6 @@ namespace Salty_Gamemodes_Client {
                     if( map.IsInZone( Game.PlayerPed.Position ) ) {
                         zoneTimer = 0;
                         if( !SaltyGame.isNoclip ) {
-                            //SaltyGame.noclipPos = Game.PlayerPed.Position;
                             SaltyGame.SetNoClip( true );
                         }
                         inZone = true;

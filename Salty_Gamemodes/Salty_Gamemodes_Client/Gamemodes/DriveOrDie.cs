@@ -27,7 +27,6 @@ namespace Salty_Gamemodes_Client {
             "Chimera",
             "Thrust",
             "Sanchez2",
-            "Lectro",
             "Fcr"
         };
 

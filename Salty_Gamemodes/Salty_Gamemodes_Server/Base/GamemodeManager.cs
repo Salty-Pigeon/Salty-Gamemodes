@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 namespace Salty_Gamemodes_Server {
     public class GamemodeManager : BaseScript {
 
+        public Dictionary<int, List<Player>> InGamePlayers = new Dictionary<int, List<Player>>();
+
         public enum Gamemodes {
             None,
             TTT,
@@ -33,6 +35,21 @@ namespace Salty_Gamemodes_Server {
 
         public List<string> GetNames() {
             return Names.OrderBy( x => x.Value ).ToDictionary( x => x.Key, x => x.Value ).Keys.ToList();
+        }
+
+        public void RemovePlayer( Player ply, int gamemode ) {
+            if( InGamePlayers.ContainsKey(gamemode) ) {
+                InGamePlayers[gamemode].Remove( ply );
+            }
+        }
+
+        public int PlayerInGame( Player ply ) {
+            foreach( var room in InGamePlayers ) {
+                if( room.Value.Contains(ply) ) {
+                    return room.Key;
+                }
+            }
+            return 0;
         }
 
         public BaseGamemode StartGame( int gamemode, Map map, List<Player> players ) {
@@ -64,6 +81,7 @@ namespace Salty_Gamemodes_Server {
                     Game.Start();
                     break;
             }
+            InGamePlayers[gamemode] = players;
             return Game;
         }
     }

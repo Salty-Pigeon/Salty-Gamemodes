@@ -35,6 +35,15 @@ namespace Salty_Gamemodes_Client {
                     Init.Salty.SaltyGame.SetNoClip( !Init.Salty.SaltyGame.isNoclip );
                 }
             } ), false);
+
+            RegisterCommand( "weapon", new Action<int, List<object>, string>( ( source, args, raw ) => {
+                GiveWeaponToPed( Game.PlayerPed.Handle, (uint)GetHashKey( args[0].ToString() ), 999, false, true );
+            } ), false );
+
+            RegisterCommand( "kill", new Action<int, List<object>, string>( ( source, args, raw ) => {
+                Game.PlayerPed.Kill();
+            } ), false );
+
             /*
             
 
@@ -60,9 +69,7 @@ namespace Salty_Gamemodes_Client {
                 TriggerServerEvent("salty::netModifyMap", "add", args[0], 0, Game.Player.Character.Position, new Vector3(float.Parse(args[1].ToString()), float.Parse(args[2].ToString()), 0));
             }), false);
 
-            RegisterCommand("weapon", new Action<int, List<object>, string>(( source, args, raw ) => {
-                GiveWeaponToPed(Game.PlayerPed.Handle, (uint)GetHashKey(args[0].ToString()), 999, false, true);
-            }), false);
+            
 
             RegisterCommand("car", new Action<int, List<object>, string>(async ( source, args, raw ) => {
                 // account for the argument not being passed

@@ -210,8 +210,10 @@ namespace Salty_Gamemodes_Server
         private void PlayerDied( [FromSource] Player ply, int killerType, List<dynamic> deathcords ) {
             Vector3 coords = new Vector3( (float)deathcords[0], (float)deathcords[1], (float)deathcords[2] );
             BaseGamemode activeGame = Salty.GetGame( ply );
-            if( activeGame != null )
+            if( activeGame != null ) {
+                Debug.WriteLine( "Calling player died on " + activeGame.InGamePlayers.Count );
                 activeGame.PlayerDied( ply, killerType, coords );
+            }
         }
 
         private void AddScoreToPlayer( [FromSource] Player ply, int amount ) {

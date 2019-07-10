@@ -20,10 +20,13 @@ namespace Salty_Gamemodes_Client {
         }
 
         public override void Update() {
-
+            
             base.Update();
         }
 
+        public override bool CanPickupWeapon( string weaponModel ) {
+            return false;
+        }
 
 
     }
