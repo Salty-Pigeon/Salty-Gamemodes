@@ -282,7 +282,8 @@ namespace Salty_Gamemodes_Client {
                     }
                     alpha = 255 - alpha;
                 }
-                SetEntityAlpha( PlayerPedId(), alpha, 0 );
+                Game.PlayerPed.Opacity = alpha;
+                //SetEntityAlpha( PlayerPedId(), alpha, 0 );
             } else if ( teleportTime < gameTime) {
                 isTeleporting = false;
                 hasTeleported = false;

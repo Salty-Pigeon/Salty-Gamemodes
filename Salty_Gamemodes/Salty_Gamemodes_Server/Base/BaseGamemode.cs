@@ -50,7 +50,6 @@ namespace Salty_Gamemodes_Server {
 
         public virtual void End() {
             GameMap.ResetSpawns();
-            Debug.WriteLine( "Game ended" );
             Init.Salty.NextGame(ID);
         }
 

@@ -11,11 +11,11 @@ namespace Salty_Gamemodes_Server {
 
         Salty MainGame;
         MapManager Maps;
-        GamemodeManager GamemodeManager;
-        List<Player> ActivePlayers = new List<Player>();
+        public GamemodeManager GamemodeManager;
+        public List<Player> ActivePlayers = new List<Player>();
         public Dictionary<int, BaseGamemode> ActiveGamemodes = new Dictionary<int, BaseGamemode>();
         Dictionary<int, List<Player>> ActiveRooms = new Dictionary<int, List<Player>>();
-        
+        public Dictionary<int, int> RoomHosts = new Dictionary<int, int>();
 
         Dictionary<int, float> NextMapTimer = new Dictionary<int, float>();
 
@@ -27,28 +27,28 @@ namespace Salty_Gamemodes_Server {
         }
 
         public void JoinRoom( Player ply, int gamemode ) {
-            
-            Debug.WriteLine( "Joining room " + (GamemodeManager.Gamemodes)gamemode );
 
             if( !ActiveRooms.ContainsKey(gamemode) ) {
-                Debug.WriteLine( "No gamemode created, creating." );
                 StartRoom( gamemode );
+                RoomHosts[gamemode] = Convert.ToInt32(ply.Handle);
             } else if( ActiveRooms[gamemode].Contains( ply ) ) {
                 WriteChat( ply, "SaltyTown", "Already in this room.", 255, 255, 255 );
                 return;
             }
 
-            if( !ActivePlayers.Contains( ply ) ) {
+            if( GamemodeManager.PlayerInGame(ply) > 0 ) {
                 LeaveRoom( ply );
             }
 
             if( ActiveGamemodes.ContainsKey(gamemode) ) {
-                Debug.WriteLine( " players: " + ActiveGamemodes[gamemode].InGamePlayers.Count );
                 WriteChat( ply, "SaltyTown", "You will join the next game when it starts." , 255, 255, 255 );
+                ply.TriggerEvent( "salty::EndGame" );
             }
 
+            
             ActivePlayers.Remove( ply );
             ActiveRooms[gamemode].Add( ply );
+            GamemodeManager.RemovePlayer( ply, gamemode );
 
         }
 
@@ -68,7 +68,6 @@ namespace Salty_Gamemodes_Server {
 
         public void StartRoom( int gamemode ) {
             if( ActiveRooms.ContainsKey(gamemode) ) {
-                Debug.WriteLine( "Room already created for: " + (GamemodeManager.Gamemodes)gamemode );
                 return;
             }
             ActiveRooms.Add( gamemode, new List<Player>() );
@@ -78,15 +77,12 @@ namespace Salty_Gamemodes_Server {
         public BaseGamemode GetGame( Player ply ) {
             int room = GetRoom( ply );
             if( !ActiveGamemodes.ContainsKey(room) ) {
-                Debug.WriteLine( room + " game has not started" );
                 return null;
             }
             int game = GamemodeManager.PlayerInGame( ply );
             if ( game > 0 ) {
-                Debug.WriteLine( ply.Name + " is in game " + room );
                 return ActiveGamemodes[room];
             }
-            Debug.WriteLine( "Player not active in a gamemode" );
 
             return null;
         }
@@ -108,11 +104,9 @@ namespace Salty_Gamemodes_Server {
 
         public void StartGame( int gamemode, Map map ) {
             if( !ActiveRooms.ContainsKey(gamemode ) ) {
-                Debug.WriteLine( "No room created" );
                 return;
             }
             if( ActiveGamemodes.ContainsKey(gamemode) ) {
-                Debug.WriteLine( "Game in progress." );
             } else {
                 ActiveGamemodes.Add( gamemode, GamemodeManager.StartGame( gamemode, map, ActiveRooms[gamemode] ) );
             }
@@ -120,15 +114,12 @@ namespace Salty_Gamemodes_Server {
 
         public void StartGame( int gamemode ) {
             if( !GamemodeManager.Names.ContainsValue(gamemode) ) {
-                Debug.WriteLine( "No gamemode found" );
                 return;
             }
             if( !ActiveRooms.ContainsKey( gamemode ) ) {
-                Debug.WriteLine( "No room created" );
                 return;
             }
             if( ActiveGamemodes.ContainsKey( gamemode ) ) {
-                Debug.WriteLine( "Game in progress." );
                 return;
             }
             else {
@@ -139,22 +130,23 @@ namespace Salty_Gamemodes_Server {
         }
 
         public bool isPlayerInRoom( Player ply ) {
-            return ActivePlayers.Contains( ply );
+            foreach( var players in ActiveRooms.Values ) {
+                if( players.Contains( ply ) )
+                    return true;
+            }
+            return false;
         }
 
         public GamemodeManager.Gamemodes GetPlayerRoom( Player ply ) {
-            if( isPlayerInRoom(ply) ) {
-                foreach( var room in ActiveRooms ) {
-                    if( room.Value.Contains( ply ) )
-                        return (GamemodeManager.Gamemodes)room.Key;
-                }
+            foreach( var room in ActiveRooms ) {
+                if( room.Value.Contains( ply ) )
+                    return (GamemodeManager.Gamemodes)room.Key;
             }
             return GamemodeManager.Gamemodes.None;
         }
 
         public void NextGame( int gamemode ) {
             foreach( var ply in ActiveRooms[gamemode] ) {
-                Debug.WriteLine( ply.Name );
                 ply.TriggerEvent( "salty::EndGame" );
             }
             WriteChat( gamemode, ((GamemodeManager.Gamemodes)gamemode).ToString(), "Next game starting in 5 seconds", 230, 0, 0 );
@@ -171,6 +163,16 @@ namespace Salty_Gamemodes_Server {
             }
         }
 
+        public void StartRoom( Player ply ) {
+            int gamemode = (int)GetPlayerRoom( ply );
+            if( RoomHosts.ContainsValue( Convert.ToInt32(ply.Handle) ) ) {
+                StartGame( gamemode );
+            }
+            else {
+                WriteChat( ply, "SaltyTown", "Only host can start the game", 255, 255, 255 );
+            }
+        }
+
         public void EndRoom( int gamemode ) {
             ActiveGamemodes[gamemode].End();
             ActiveGamemodes.Remove( gamemode );
@@ -181,11 +183,31 @@ namespace Salty_Gamemodes_Server {
         }
 
         public void LeaveRoom( Player ply ) {
-            var room = GetRoom( ply );
-            Debug.WriteLine( ply.Name + " leaving room " + (GamemodeManager.Gamemodes)room );
-            ActiveRooms[room].Remove( ply );
+            var room = GamemodeManager.PlayerInGame( ply );
+            if( room == 0 ) {
+                ActivePlayers.Remove( ply );
+            } else {
+                if( ActiveRooms.ContainsKey(room) )
+                    ActiveRooms[room].Remove( ply );
+            }
+            if( RoomHosts.ContainsKey(room) ) {
+                int handle = Convert.ToInt32( ply.Handle );
+                if( RoomHosts[room] == handle ) {
+                    if( ActiveRooms[room].Count == 0 ) {
+                        EndRoom( room );
+                        RoomHosts.Remove( room );
+                    } else {
+                        Player host = ActiveRooms[room].First();
+                        WriteChat( room, "SaltyTown", "New host: " + host.Name, 255, 255, 255 );
+                        RoomHosts[room] = handle;
+                    }
+                }
+            }
+
+            ply.TriggerEvent( "salty::RoomLeft" );
             ActivePlayers.Add( ply );
             GamemodeManager.RemovePlayer( ply, room );
+            
         }
 
         public void WriteChat( Player ply, string prefix, string str, int r, int g, int b ) {

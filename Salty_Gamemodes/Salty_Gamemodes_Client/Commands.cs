@@ -27,7 +27,11 @@ namespace Salty_Gamemodes_Client {
                 }
             } ), false );
 
-            
+            RegisterCommand( "die", new Action<int, List<object>, string>( ( source, args, raw ) => {
+                Game.PlayerPed.Kill();
+            } ), false );
+
+            /*
             RegisterCommand("noclip", new Action<int, List<object>, string>(( source, args, raw ) => {
                 if( Init.Salty.isInRoom ) {
                     Init.Salty.ActiveGame.SetNoClip( !Init.Salty.ActiveGame.isNoclip );
@@ -40,11 +44,9 @@ namespace Salty_Gamemodes_Client {
                 GiveWeaponToPed( Game.PlayerPed.Handle, (uint)GetHashKey( args[0].ToString() ), 999, false, true );
             } ), false );
 
-            RegisterCommand( "kill", new Action<int, List<object>, string>( ( source, args, raw ) => {
-                Game.PlayerPed.Kill();
-            } ), false );
+            
 
-            /*
+            
             
 
             RegisterCommand("spawnPoints", new Action<int, List<object>, string>(( source, args, raw ) => {

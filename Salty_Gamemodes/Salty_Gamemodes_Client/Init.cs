@@ -56,6 +56,7 @@ namespace Salty_Gamemodes_Client
             EventHandlers[ "salty::SpawnWeapon" ] += new Action<string, uint, int, Vector3, bool, float, int, int>(SpawnWeapon);
             EventHandlers[ "salty::CreateMap" ] += new Action<string, Vector3, Vector3>(CreateMap);
             EventHandlers[ "salty::ShowRooms" ] += new Action<List<dynamic>>( ShowRoom );
+            EventHandlers[ "salty::RoomLeft" ] += new Action( RoomLeft );
 
             Tick += Update;
             SetMaxWantedLevel( 0 );
@@ -75,6 +76,9 @@ namespace Salty_Gamemodes_Client
             Salty.ShowRooms( names );
         }
 
+        public void RoomLeft() {
+            Salty.RoomLeft();
+        }
 
         public void StartGame( int id, int team, double duration, Vector3 mapPos, Vector3 mapSize, string mapName, Vector3 startPos, ExpandoObject gunSpawns ) {
             GetScreenActiveResolution( ref ScreenWidth, ref ScreenHeight );
@@ -235,12 +239,21 @@ namespace Salty_Gamemodes_Client
                 }
             }
             PlayerDied( killerType, deathCoords );
-            Salty.ActiveGame.PlayerKilled( killerID, deathData );
+            if( Salty.isInRoom ) {
+                Salty.ActiveGame.PlayerKilled( killerID, deathData );
+            }
+            else {
+                Salty.SaltyGame.PlayerKilled( killerID, deathData );
+            }
         }
 
         private void PlayerDied( int killerType, List<dynamic> deathcords ) {
             Vector3 coords = new Vector3( (float)deathcords[ 0 ], (float)deathcords[ 1 ], (float)deathcords[ 2 ] );
-            Salty.ActiveGame.PlayerDied( killerType, coords );
+            if( Salty.isInRoom ) {
+                Salty.ActiveGame.PlayerDied( killerType, coords );
+            } else {
+                Salty.SaltyGame.PlayerDied( killerType, coords );
+            }
         }
 
         private void PlayerSpawn( ExpandoObject spawnInfo ) {
@@ -249,8 +262,10 @@ namespace Salty_Gamemodes_Client
                 Game.Player.Character.Position = spawnPos;
                 Salty.ActiveGame.SetNoClip( true );
                 spawnPos = Vector3.Zero;
-            } else {
+            } else if( Salty.isInRoom ) {
                 Salty.ActiveGame.PlayerSpawned( spawnInfo );
+            } else {
+                Salty.SaltyGame.PlayerSpawned( spawnInfo );
             }
 
         }

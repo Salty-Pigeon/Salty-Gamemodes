@@ -168,7 +168,8 @@ namespace Salty_Gamemodes_Client {
                 Bike.Delete();
             Game.PlayerPed.Position = PlayerSpawn;
             Bike = await World.CreateVehicle( Bikes[rand.Next( 0, Bikes.Count )], Game.PlayerPed.Position, 266.6f );
-            Game.PlayerPed.SetIntoVehicle( Bike, VehicleSeat.Driver );
+            if( Bike != null )
+                Game.PlayerPed.SetIntoVehicle( Bike, VehicleSeat.Driver );
             SetGameplayCamRelativeHeading( 0 );
             Game.PlayerPed.CanBeKnockedOffBike = false;
         }

@@ -29,6 +29,7 @@ namespace Salty_Gamemodes_Client {
 
 
         public void RoomLeft() {
+            SaltyGame.StripWeapons();
             isInRoom = false;
         }
 

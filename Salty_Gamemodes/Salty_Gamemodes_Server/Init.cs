@@ -58,29 +58,28 @@ namespace Salty_Gamemodes_Server
 
             EventHandlers["chatMessage"] += new Action<int, string, string>( ChatMessage );
 
-
-            RegisterCommand( "createroom", new Action<int, List<object>, string>( ( source, args, raw ) => {
-                if( source != 0 ) { return; }
-                Salty.StartRoom( Convert.ToInt32( args[0] ) );
-            } ), false );
-
-            RegisterCommand( "endroom", new Action<int, List<object>, string>( ( source, args, raw ) => {
-                if( source != 0 ) { return; }
-                Salty.EndRoom( Convert.ToInt32( args[0] ) );
-            } ), false );
-
             RegisterCommand("rooms", new Action<int, List<object>, string>(( source, args, raw ) => {
                 // Show rooms GUI to client
                 Salty.SendRoomsToClient( SourceToPlayer( source ) );
             }), false);
 
-            RegisterCommand( "joinroom", new Action<int, List<object>, string>( ( source, args, raw ) => {
-                Salty.JoinRoom( SourceToPlayer(source), Convert.ToInt32( args[0] ) );
+            RegisterCommand( "leaveroom", new Action<int, List<object>, string>( ( source, args, raw ) => {
+                Salty.LeaveRoom( SourceToPlayer( source ) );
             } ), false );
 
             RegisterCommand( "startroom", new Action<int, List<object>, string>( ( source, args, raw ) => {
                 //if( source != 0 ) { return; }
-                Salty.StartGame( Convert.ToInt32( args[0] ) );
+                Salty.StartRoom( SourceToPlayer( source ) );
+            } ), false );
+
+            /*
+            RegisterCommand( "endroom", new Action<int, List<object>, string>( ( source, args, raw ) => {
+                if( source != 0 ) { return; }
+                Salty.EndRoom( Convert.ToInt32( args[0] ) );
+            } ), false );
+
+            RegisterCommand( "joinroom", new Action<int, List<object>, string>( ( source, args, raw ) => {
+                Salty.JoinRoom( SourceToPlayer(source), Convert.ToInt32( args[0] ) );
             } ), false );
 
             RegisterCommand( "vote", new Action<int, List<object>, string>( ( source, args, raw ) => {
@@ -109,13 +108,12 @@ namespace Salty_Gamemodes_Server
                 if( source != 0 ) { return; }
                 SQLConnection.SaveAll(MapManager.Maps);
             } ), false );
-
+            */
             Tick += Init_Tick;
         }
 
 
         public void JoinRoom([FromSource] Player ply, string gamemode ) {
-            Debug.WriteLine( gamemode );
             Salty.JoinRoom( ply, gamemode );
         }
 
@@ -148,6 +146,7 @@ namespace Salty_Gamemodes_Server
             foreach( var game in Salty.ActiveGamemodes.Values ) {
                 game.PlayerJoined( ply );
             }
+            Salty.ActivePlayers.Add( ply );
         }
 
         public Player SourceToPlayer( int source ) {
@@ -209,10 +208,9 @@ namespace Salty_Gamemodes_Server
 
         private void PlayerDied( [FromSource] Player ply, int killerType, List<dynamic> deathcords ) {
             Vector3 coords = new Vector3( (float)deathcords[0], (float)deathcords[1], (float)deathcords[2] );
-            BaseGamemode activeGame = Salty.GetGame( ply );
-            if( activeGame != null ) {
-                Debug.WriteLine( "Calling player died on " + activeGame.InGamePlayers.Count );
-                activeGame.PlayerDied( ply, killerType, coords );
+            int activeGame = Salty.GamemodeManager.PlayerInGame( ply );
+            if( activeGame > 0 ) {
+                Salty.ActiveGamemodes[activeGame].PlayerDied( ply, killerType, coords );
             }
         }
 

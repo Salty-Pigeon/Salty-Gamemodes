@@ -43,6 +43,12 @@ namespace Salty_Gamemodes_Server {
             }
         }
 
+        public void AddPlayer( Player ply, int gamemode ) {
+            if( InGamePlayers.ContainsKey( gamemode ) ) {
+                InGamePlayers[gamemode].Add( ply );
+            } 
+        }
+
         public int PlayerInGame( Player ply ) {
             foreach( var room in InGamePlayers ) {
                 if( room.Value.Contains(ply) ) {

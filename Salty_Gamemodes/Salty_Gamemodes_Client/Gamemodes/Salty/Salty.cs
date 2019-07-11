@@ -13,6 +13,7 @@ namespace Salty_Gamemodes_Client {
         public Salty() {
             ActiveHUD = new SaltyHUD( this );
             SetNoClip( false );
+            StripWeapons();
         }
 
         public SaltyHUD GetHUD() {

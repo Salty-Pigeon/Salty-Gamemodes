@@ -425,6 +425,11 @@ namespace Salty_Gamemodes_Client {
             deathTimer = 0;
             isNoclip = toggle;
             SetEntityVisible( PlayerPedId(), !isNoclip, false );
+            if( isNoclip ) {
+                Game.PlayerPed.Opacity = 0;
+            } else {
+                Game.PlayerPed.Opacity = 255;
+            }
             SetEntityCollision( PlayerPedId(), !isNoclip, !isNoclip );
             SetEntityInvincible( PlayerPedId(), isNoclip );
             SetEveryoneIgnorePlayer( PlayerPedId(), isNoclip );
@@ -433,6 +438,10 @@ namespace Salty_Gamemodes_Client {
 
         private void NoClipUpdate() {
             SetEntityCoordsNoOffset( PlayerPedId(), noclipPos.X, noclipPos.Y, noclipPos.Z, false, false, false );
+
+            if( Game.PlayerPed.Opacity > 0 ) {
+                Game.PlayerPed.Opacity = 0;
+            }
 
             Vector3 heading = GetGameplayCamRot( 0 );
             SetEntityRotation( PlayerPedId(), heading.X, heading.Y, -heading.Z, 0, true );
