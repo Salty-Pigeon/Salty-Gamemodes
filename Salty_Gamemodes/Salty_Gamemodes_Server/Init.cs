@@ -16,7 +16,8 @@ namespace Salty_Gamemodes_Server
             TTT,
             DriveOrDie,
             Murder,
-            IceCreamMan
+            IceCreamMan,
+            TDM
         }
 
 
@@ -149,7 +150,7 @@ namespace Salty_Gamemodes_Server
             Salty.ActivePlayers.Add( ply );
         }
 
-        public Player SourceToPlayer( int source ) {
+        public static Player SourceToPlayer( int source ) {
             return new PlayerList().ToList().Where( x => Convert.ToInt32( x.Handle ) == source ).First();
         }
 
@@ -200,10 +201,11 @@ namespace Salty_Gamemodes_Server
                     deathCoords = data.Value as List<dynamic>;
                 }
             }
+            Vector3 coords = new Vector3( (float)deathCoords[0], (float)deathCoords[1], (float)deathCoords[2] );
             PlayerDied( ply, killerType, deathCoords );
             BaseGamemode activeGame = Salty.GetGame( ply );
             if( activeGame != null )
-                activeGame.PlayerKilled( ply, killerID, new Vector3(deathCoords[0], deathCoords[1], deathCoords[2]) );
+                activeGame.PlayerKilled( ply, killerID, coords );
         }
 
         private void PlayerDied( [FromSource] Player ply, int killerType, List<dynamic> deathcords ) {

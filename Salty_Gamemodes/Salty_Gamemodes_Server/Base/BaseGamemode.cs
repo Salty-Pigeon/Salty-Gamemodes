@@ -187,6 +187,7 @@ namespace Salty_Gamemodes_Server {
             else {
                 PlayerDetails[ply]["Score"] += amount;
             }
+            ply.TriggerEvent( "salty::UpdateScore", GetScore( ply ) );
         }
 
         public void WriteChat( string prefix, string str, int r, int g, int b ) {

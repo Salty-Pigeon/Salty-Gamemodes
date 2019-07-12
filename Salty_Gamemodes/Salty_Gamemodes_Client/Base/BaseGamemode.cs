@@ -241,14 +241,18 @@ namespace Salty_Gamemodes_Client {
         }
 
         public void RemoveWeapon( Weapon removedWeapon ) {
-            string weaponName = HashToModel[(uint)removedWeapon.Hash.GetHashCode()];
-            foreach( var i in PlayerWeapons.Keys.ToList() ) {
+            uint hash = (uint)removedWeapon.Hash.GetHashCode();
+            if( !HashToModel.ContainsKey(hash) ) {
+                return;
+            }
+            string weaponName = HashToModel[hash];
+            foreach( var i in PlayerWeapons.Keys ) {
                 if( PlayerWeapons[i] == weaponName )
                     PlayerWeapons.Remove( i );
             }
             uint key = (uint)GetHashKey( weaponName );
             if( AmmoInClip.ContainsKey( key ) ) {
-                AmmoInClip.Remove( (uint)GetHashKey( weaponName ) );
+                AmmoInClip.Remove( key );
             }
 
             Game.PlayerPed.Weapons.Remove( removedWeapon );
@@ -290,6 +294,7 @@ namespace Salty_Gamemodes_Client {
 
         public virtual void PlayerPickedUpWeapon(string wepName, int count) {
             PlayerWeapons[WeaponSlots[wepName]] = wepName;
+            lastScroll = GetGameTimer();
         }
 
         public virtual void PlayerDroppedWeapon( string wepName, int count ) {
@@ -322,6 +327,19 @@ namespace Salty_Gamemodes_Client {
                     return OtherPlayerInfo[entID][key] != 0;
             }
             return false;
+        }
+
+        public void DropWeapon() {
+            if( Game.PlayerPed.Weapons.Current.Hash.ToString() == "Unarmed" )
+                return;
+            foreach( WeaponPickup wep in GameMap.CreatedWeapons.Values.ToList() ) {
+                if( (wep.WorldModel == Game.PlayerPed.Weapons.Current.Model.GetHashCode()) ) {
+                    WeaponPickup item = new WeaponPickup( GameMap, wep.WeaponModel, wep.WeaponHash, wep.WorldModel, Game.Player.Character.Position, true, 1500, Game.PlayerPed.Weapons.Current.Ammo, Game.PlayerPed.Weapons.Current.AmmoInClip );
+                    item.Throw();
+                    RemoveWeapon( wep.WeaponModel, true );
+                    break;
+                }
+            }
         }
 
         public virtual void HUD() {

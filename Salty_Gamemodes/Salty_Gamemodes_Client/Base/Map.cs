@@ -24,8 +24,6 @@ namespace Salty_Gamemodes_Client {
             { "WEAPON_COMBATMG", "W_MG_COMBATMG" }
         };
 
-        public Dictionary<string, int> WeaponWeights = new Dictionary<string, int>();
-
         public Dictionary<string, WeaponPickup> CreatedWeapons = new Dictionary<string, WeaponPickup>();
 
         public List<WeaponPickup> SpawnedWeapons = new List<WeaponPickup>();

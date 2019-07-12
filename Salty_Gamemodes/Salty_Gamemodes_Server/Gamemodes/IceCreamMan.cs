@@ -49,10 +49,8 @@ namespace Salty_Gamemodes_Server {
 
         public override void PlayerDied( Player player, int killerType, Vector3 deathcords ) {
             if( GetTeam(player) == (int)Teams.Runner ) {
-                AddScore( player, 3 );
-                Driver.TriggerEvent( "salty::UpdateScore", GetScore(Driver) );
+                AddScore( Driver, 3 );
             }
-
             base.PlayerDied( player, killerType, deathcords );
         }
 

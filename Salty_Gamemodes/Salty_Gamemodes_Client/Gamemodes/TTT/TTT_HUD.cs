@@ -75,31 +75,6 @@ namespace Salty_Gamemodes_Client {
             base.Draw();
         }
 
-        public override void DrawWeaponSwitch() {
-            if (ActiveTTT.lastScroll + (2 * 1000) > GetGameTimer()) {
-                int index = 0;
-                foreach (var weapon in ActiveTTT.WeaponSlots.OrderBy(x => x.Value)) {
-                    if (!ActiveTTT.PlayerWeapons.ContainsValue(weapon.Key))
-                        continue;
-                    if (WeaponTexts.Count <= weapon.Value) {
-                        WeaponTexts.Add(new SaltyText(0.85f, 0.85f + (index * 0.4f), 0, 0, 0.3f, weapon.Key, 255, 255, 255, 255, false, false, 0, true));
-                    }
-
-                    if ((uint)Game.PlayerPed.Weapons.Current.Hash.GetHashCode() == (uint)GetHashKey(weapon.Key)) {
-                        DrawRectangle(0.85f, 0.85f + (0.04f * index), 0.1f, 0.03f, 230, 230, 0, 200);
-                    }
-                    else {
-                        DrawRectangle(0.85f, 0.85f + (0.04f * index), 0.1f, 0.03f, 0, 0, 0, 200);
-                    }
-
-                    WeaponTexts[index].Caption = ActiveTTT.GameWeapons[weapon.Key];
-                    WeaponTexts[index].Position = new Vector2(0.85f, 0.85f + (index * 0.04f));
-                    WeaponTexts[index].Draw();
-                    index++;
-                }
-            }
-        }
-
         public override void UpdateTeam( int team ) {
             switch (team) {
                 case ((int)TTT.Teams.Spectators):

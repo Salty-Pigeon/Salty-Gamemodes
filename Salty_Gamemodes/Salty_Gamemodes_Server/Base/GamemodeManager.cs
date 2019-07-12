@@ -16,7 +16,8 @@ namespace Salty_Gamemodes_Server {
             TTT,
             DriveOrDie,
             Murder,
-            IceCreamMan
+            IceCreamMan,
+            TDM
         }
 
         public Dictionary<string, int> Names = new Dictionary<string, int> {
@@ -24,6 +25,7 @@ namespace Salty_Gamemodes_Server {
             { "Murder", (int)Gamemodes.Murder },
             { "Ice Cream Man", (int)Gamemodes.IceCreamMan },
             { "Drive Or Die", (int)Gamemodes.DriveOrDie },
+            { "Team Deathmatch", (int)Gamemodes.TDM }
         };
 
         public Dictionary<Gamemodes, string> Maps = new Dictionary<GamemodeManager.Gamemodes, string>() {
@@ -31,6 +33,7 @@ namespace Salty_Gamemodes_Server {
             { Gamemodes.Murder, "mmm" },
             { Gamemodes.IceCreamMan, "icm" },
             { Gamemodes.DriveOrDie, "dod" },
+            { Gamemodes.TDM, "ttt" }
         };
 
         public List<string> GetNames() {
@@ -78,6 +81,11 @@ namespace Salty_Gamemodes_Server {
                     break;
                 case Gamemodes.DriveOrDie:
                     Game = new DriveOrDie( (int)Gamemodes.DriveOrDie, map, players );
+                    Game.CreateGameTimer( 15 * 60 );
+                    Game.Start();
+                    break;
+                case Gamemodes.TDM:
+                    Game = new TDM( (int)Gamemodes.TDM, map, players );
                     Game.CreateGameTimer( 15 * 60 );
                     Game.Start();
                     break;

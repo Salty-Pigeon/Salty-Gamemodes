@@ -67,6 +67,7 @@
     <Compile Include="Gamemodes\DriveOrDie.cs" />
     <Compile Include="Gamemodes\IceCreamMan.cs" />
     <Compile Include="Gamemodes\Salty.cs" />
+    <Compile Include="Gamemodes\TDM.cs" />
     <Compile Include="Init.cs" />
     <Compile Include="Base\Map.cs" />
     <Compile Include="Base\MapManager.cs" />

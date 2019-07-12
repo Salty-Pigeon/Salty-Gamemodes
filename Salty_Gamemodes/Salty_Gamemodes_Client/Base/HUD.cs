@@ -240,41 +240,37 @@ namespace Salty_Gamemodes_Client {
             GameTimeText.Draw();
         }
 
+
         public virtual void DrawWeaponSwitch() {
-
-            if (ActiveGame.Team == 0)
-                return;
-
-            if (ActiveGame.lastScroll + (2 * 1000) > GetGameTimer()) {
+            if( ActiveGame.lastScroll + (2 * 1000) > GetGameTimer() ) {
                 int index = 0;
-                foreach (var weapon in ActiveGame.PlayerWeapons) {
-                    if (WeaponTexts.Count <= index) {
-                        WeaponTexts.Add(new SaltyText(0.85f, 0.85f + (index * 0.4f), 0, 0, 0.3f, weapon.Value, 255, 255, 255, 255, false, false, 0, true));
+                foreach( var weapon in ActiveGame.WeaponSlots.OrderBy( x => x.Value ) ) {
+                    if( !ActiveGame.PlayerWeapons.ContainsValue( weapon.Key ) )
+                        continue;
+                    if( WeaponTexts.Count <= weapon.Value ) {
+                        WeaponTexts.Add( new SaltyText( 0.85f, 0.85f + (index * 0.4f), 0, 0, 0.3f, weapon.Key, 255, 255, 255, 255, false, false, 0, true ) );
                     }
 
-                    if ((uint)Game.PlayerPed.Weapons.Current.Hash.GetHashCode() == (uint)GetHashKey(weapon.Value)) {
-                        DrawRectangle(0.85f, 0.85f + (0.04f * index), 0.1f, 0.03f, 230, 230, 0, 200);
+                    if( (uint)Game.PlayerPed.Weapons.Current.Hash.GetHashCode() == (uint)GetHashKey( weapon.Key ) ) {
+                        DrawRectangle( 0.85f, 0.85f + (0.04f * index), 0.1f, 0.03f, 230, 230, 0, 200 );
                     }
                     else {
-                        DrawRectangle(0.85f, 0.85f + (0.04f * index), 0.1f, 0.03f, 0, 0, 0, 200);
+                        DrawRectangle( 0.85f, 0.85f + (0.04f * index), 0.1f, 0.03f, 0, 0, 0, 200 );
                     }
 
-                    WeaponTexts[index].Caption = ActiveGame.GameWeapons[weapon.Value];
-                    WeaponTexts[index].Position = new Vector2(0.85f, 0.85f + (index * 0.04f));
+                    WeaponTexts[index].Caption = ActiveGame.GameWeapons[weapon.Key];
+                    WeaponTexts[index].Position = new Vector2( 0.85f, 0.85f + (index * 0.04f) );
                     WeaponTexts[index].Draw();
-
                     index++;
                 }
             }
-
-            if (IsControlJustPressed(2, 15)) {
-                ActiveGame.ChangeSelectedWeapon(+1);
+            if( IsControlJustPressed( 2, 15 ) ) {
+                ActiveGame.ChangeSelectedWeapon( -1 );
             }
 
-            if (IsControlJustPressed(2, 14)) {
-                ActiveGame.ChangeSelectedWeapon(-1);
+            if( IsControlJustPressed( 2, 14 ) ) {
+                ActiveGame.ChangeSelectedWeapon( +1 );
             }
-
         }
 
         public void UpdateScore( int score, int difference ) {

@@ -54,18 +54,6 @@ namespace Salty_Gamemodes_Client {
             GameMap = gameMap;
             GameMap.Gamemode = this;
 
-            GameMap.WeaponWeights = new Dictionary<string, int>() {
-                { "WEAPON_PISTOL", 8 },
-                { "WEAPON_COMBATPISTOL", 7  },
-                { "WEAPON_SMG", 6  },
-                { "WEAPON_CARBINERIFLE", 5  },
-                { "WEAPON_ASSAULTRIFLE", 4  },
-                //{ "WEAPON_SNIPERRIFLE", 2 },
-                { "WEAPON_PUMPSHOTGUN", 4  },
-                { "WEAPON_MICROSMG", 6 },
-                { "WEAPON_COMBATMG", 2 }
-            };
-
             GameWeapons = new Dictionary<string, string>() {
                 { "WEAPON_UNARMED", "Fists" },
                 { "WEAPON_PISTOL", "Pistol"  },
@@ -160,19 +148,8 @@ namespace Salty_Gamemodes_Client {
            if( Team == 0 )
                 return;
 
-            if( IsControlJustPressed( 0, 23 ) && Game.PlayerPed.Weapons.Current.Hash.ToString() != "Unarmed" ) {
-
-
-                // Drop current weapon, basegameode handles everything weapon related, grab the name of weapon from current weapon that's all that is needed from weapons.
-                
-                foreach( WeaponPickup wep in GameMap.CreatedWeapons.Values.ToList() ) {
-                    if( (wep.WorldModel == Game.PlayerPed.Weapons.Current.Model.GetHashCode()) ) {
-                        WeaponPickup item = new WeaponPickup( GameMap, wep.WeaponModel, wep.WeaponHash, wep.WorldModel, Game.Player.Character.Position, true, 1500, Game.PlayerPed.Weapons.Current.Ammo, Game.PlayerPed.Weapons.Current.AmmoInClip );
-                        item.Throw();
-                        RemoveWeapon( wep.WeaponModel, true );
-                        break;
-                    }
-                }
+            if( IsControlJustPressed( 0, 23 ) ) {
+                DropWeapon();
             }
 
             if( IsControlJustPressed( 0, 244 ) ) { // M 244
@@ -221,14 +198,6 @@ namespace Salty_Gamemodes_Client {
                 }
             }
 
-            if (IsControlJustPressed(2, 15)) {
-                ChangeSelectedWeapon(-1);
-            }
-
-            if (IsControlJustPressed(2, 14)) {
-                ChangeSelectedWeapon(+1);
-            }
-
             base.Controls();
         }
 
@@ -239,7 +208,6 @@ namespace Salty_Gamemodes_Client {
         }
 
         public override void PlayerPickedUpWeapon( string wepName, int count ) {
-            lastScroll = GetGameTimer();
             base.PlayerPickedUpWeapon( wepName, count );
         }
 

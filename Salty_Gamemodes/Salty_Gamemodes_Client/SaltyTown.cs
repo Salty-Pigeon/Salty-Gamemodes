@@ -95,6 +95,9 @@ namespace Salty_Gamemodes_Client {
             if( id == 4 ) { // Ice Cream Man
                 ActiveGame = new IceCreamMan( map, team );
             }
+            if( id == 5 ) { // TDM
+                ActiveGame = new TDM( map, team );
+            }
             if( duration > 0 )
                 ActiveGame.CreateGameTimer( duration );
             ActiveGame.PlayerSpawn = startPos;

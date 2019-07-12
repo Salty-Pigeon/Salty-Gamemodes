@@ -57,6 +57,8 @@
     <Compile Include="Gamemodes\IceCreamMan.cs" />
     <Compile Include="Gamemodes\Salty\Salty.cs" />
     <Compile Include="Gamemodes\Salty\SaltyHUD.cs" />
+    <Compile Include="Gamemodes\TDM\TDM.cs" />
+    <Compile Include="Gamemodes\TDM\TDM_HUD.cs" />
     <Compile Include="Gamemodes\TTT\DeadBody.cs" />
     <Compile Include="Gamemodes\TTT\TTT_DetectiveMenu.cs" />
     <Compile Include="Gamemodes\TTT\TTT_HUD.cs" />

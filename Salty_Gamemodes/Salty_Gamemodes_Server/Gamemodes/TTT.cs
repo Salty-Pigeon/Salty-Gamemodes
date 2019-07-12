@@ -144,6 +144,7 @@ namespace Salty_Gamemodes_Server {
 
         public override void End() {
             WriteChat( "TTT", "Game ending", 255, 0, 0 );
+            TriggerClientEvent( "salty::ClearWeapons", GameMap.Name );
             base.End();
         }
 

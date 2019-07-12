@@ -54,6 +54,7 @@ namespace Salty_Gamemodes_Client
             EventHandlers[ "salty::UpdateDeadBody" ] += new Action<int>(ViewDeadBody);
             EventHandlers[ "salty::UpdateGameTime" ] += new Action<double>(UpdateGameTime);
             EventHandlers[ "salty::SpawnWeapon" ] += new Action<string, uint, int, Vector3, bool, float, int, int>(SpawnWeapon);
+            EventHandlers[ "salty::ClearWeapons" ] += new Action<string>(ClearWeapons);
             EventHandlers[ "salty::CreateMap" ] += new Action<string, Vector3, Vector3>(CreateMap);
             EventHandlers[ "salty::ShowRooms" ] += new Action<List<dynamic>>( ShowRoom );
             EventHandlers[ "salty::RoomLeft" ] += new Action( RoomLeft );
@@ -66,6 +67,11 @@ namespace Salty_Gamemodes_Client
         public void SpawnWeapon( string wepModel, uint pickupHash, int worldHash, Vector3 gunPos, bool playerDropped, float waitTime, int ammoCount, int ammoInClip ) {
             if( Salty.ActiveGame != null )
                 Salty.ActiveGame.GameMap.SpawnWeapon( wepModel, pickupHash, worldHash, gunPos, playerDropped, waitTime, ammoCount, ammoInClip );
+        }
+
+        public void ClearWeapons( string map ) {
+            Debug.WriteLine( "Clearing weapons " + map );
+            Maps[map].ClearWeapons();
         }
 
         public void ShowRoom( List<dynamic> rooms ) {

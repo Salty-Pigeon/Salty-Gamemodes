@@ -73,6 +73,17 @@ namespace Salty_Gamemodes_Client {
 
         }
 
+        public override void Controls() {
+            if( IsControlJustPressed( 2, 15 ) ) {
+                ChangeSelectedWeapon( -1 );
+            }
+
+            if( IsControlJustPressed( 2, 14 ) ) {
+                ChangeSelectedWeapon( +1 );
+            }
+            base.Controls();
+        }
+
         public override void Update() {
             CantEnterVehichles();
             base.Update();
