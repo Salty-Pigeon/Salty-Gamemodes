@@ -297,8 +297,9 @@ namespace Salty_Gamemodes_Client {
             }
         }
 
-        public void DrawSpriteOrigin( Vector3 pos, string texture, float width, float height, float rotation ) {
+        public void DrawSpriteOrigin( Vector3 pos, string texture, float width, float height, float rotation, bool throughWalls ) {
             SetDrawOrigin(pos.X, pos.Y, pos.Z, 0);
+            SetSeethrough( false );
             DrawSprite("saltyTextures", texture, 0, 0, width, height, rotation, 255, 255, 255, 255);
             ClearDrawOrigin();
         }

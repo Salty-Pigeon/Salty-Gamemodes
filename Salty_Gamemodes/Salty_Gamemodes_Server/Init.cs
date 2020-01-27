@@ -21,6 +21,8 @@ namespace Salty_Gamemodes_Server
         }
 
 
+
+
         public int GamemodeVoteCount = 0;
 
         public bool inGame = false;

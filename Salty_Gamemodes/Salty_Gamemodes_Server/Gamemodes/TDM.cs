@@ -73,6 +73,9 @@ namespace Salty_Gamemodes_Server {
 
         public override void End() {
             TriggerClientEvent( "salty::ClearWeapons", GameMap.Name );
+            var winner = GetScores().OrderBy( x => x.Value ).ElementAt( 0 );
+
+            WriteChat( "TDM", string.Format( "{0} won with a score of {1}", winner.Key.Name, PlayerDetails[winner.Key]["Score"] ), 255, 0, 0 );
             base.End();
         }
 

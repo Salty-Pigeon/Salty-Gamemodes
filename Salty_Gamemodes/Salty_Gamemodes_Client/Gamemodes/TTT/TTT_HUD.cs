@@ -146,7 +146,7 @@ namespace Salty_Gamemodes_Client {
             foreach (var ply in ActiveTTT.OtherPlayerInfo) {
                 if (ActiveTTT.GetTeam(ply.Key) == (int)TTT.Teams.Traitors) {
                     Vector3 pos = GetEntityCoords(GetPlayerPed(ply.Key), true) + new Vector3(0, 0, Game.PlayerPed.HeightAboveGround);
-                    DrawSpriteOrigin(pos, "traitor", 0.02f, 0.03f, 0);
+                    DrawSpriteOrigin(pos, "traitor", 0.02f, 0.03f, 0, true);
                 }
             }
         }

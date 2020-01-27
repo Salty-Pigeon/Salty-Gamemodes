@@ -21,6 +21,8 @@ namespace Salty_Gamemodes_Client
         Vector3 spawnPos = Vector3.Zero;
         public Dictionary<string, Map> Maps = new Dictionary<string, Map>();
 
+        public float textTimer = 0f;
+        public float textTime = 15 * 60 * 1000;
 
         public static int ScreenWidth = 0;
         public static int ScreenHeight = 0;
@@ -37,6 +39,9 @@ namespace Salty_Gamemodes_Client
             commands = new Commands(this);
             //test = new Testing(this);
             Salty = new SaltyTown();
+
+            textTimer = GetGameTimer() + textTime;
+
 
             EventHandlers[ "onClientResourceStart" ] += new Action<string>( OnClientResourceStart );
             EventHandlers[ "playerSpawned" ] += new Action<ExpandoObject>( PlayerSpawn );
@@ -293,6 +298,11 @@ namespace Salty_Gamemodes_Client
 
             Salty.Update();
 
+            if( textTimer - GetGameTimer() < 0 ) {
+                Salty.SaltyGame.WriteChat( "SaltyTown", "/rooms to join a room and /startroom to start the room if it isn't started. /leaveroom to leave a room.", 255, 255, 255 );
+                textTimer = GetGameTimer() + textTime;
+            }
+
         }
 
 
@@ -308,6 +318,7 @@ namespace Salty_Gamemodes_Client
                 commands.Load();
             if( test != null )
                 test.LoadCommands();
+            Salty.SaltyGame.WriteChat( "SaltyTown", "/rooms to join a room and /startroom to start the room if it isn't started. /leaveroom to leave a room.", 255, 255, 255 );
 
         }
     }

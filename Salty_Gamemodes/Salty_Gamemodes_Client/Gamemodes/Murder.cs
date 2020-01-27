@@ -97,10 +97,36 @@ namespace Salty_Gamemodes_Client {
             HideHudAndRadarThisFrame();
             ActiveHUD.DrawWeaponSwitch();
             FirstPersonForAlive();
-
+            DrawFootprints();
             base.HUD();
         }
 
+        List<Vector3> footprints = new List<Vector3>();
+        Dictionary<Player, Vector3> PlayerFootprints = new Dictionary<Player, Vector3>();
+        bool leftFoot = false;
+        float footprintDistance = 3f;
+        public void DrawFootprints() {
+            foreach( var player in new PlayerList() ) {
+                if( PlayerFootprints.ContainsKey(player) ) {
+                    if( player.Character.Position.DistanceToSquared(PlayerFootprints[player]) >= footprintDistance ) {
+                        PlayerFootprints[player] = player.Character.Position;
+                        footprints.Add( new Vector3( player.Character.Position.X, player.Character.Position.Y, player.Character.Position.Z - player.Character.HeightAboveGround ) );
+                    }
+                } else {
+                    PlayerFootprints.Add( player, player.Character.Position );
+                }
+            }
+            foreach( var print in footprints ) {
+                if( leftFoot ) {
+                    ActiveHUD.DrawSpriteOrigin( print, "leftfoot", 0.01f, 0.01f, 0, false );
+                    
+                }
+                else {
+                    ActiveHUD.DrawSpriteOrigin( print, "rightfoot", 0.01f, 0.01f, 0, false );
+                }
+                leftFoot = !leftFoot;
+            }
+        }
 
         public override bool CanPickupWeapon( string weaponModel ) {
             return base.CanPickupWeapon( weaponModel );
